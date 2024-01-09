@@ -17,4 +17,4 @@ jobs:
       - name: Lint
         run: bun run lint:fix
       - name: Test
-        run: bun run test
+        run: bun test
