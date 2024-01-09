@@ -1,15 +1,28 @@
 {
-  "name": "loom-fs",
-  "module": "app.ts",
+  "name": "@cotton-coding/loom-fs",
+  "module": "dist/app.js",
+  "files": [
+    "dist"
+  ],
   "type": "module",
+  "scripts": {
+    "build": "bun build --minify -e --splitting --target node ./app.ts --out-dir dist",
+    "publish": "publint && npm publish",
+    "lint": "eslint --ext .ts .",
+    "lint:fix": "eslint --ext .ts . --fix"
+  },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@faker-js/faker": "^8.3.1",
+    "@types/bun": "latest",
+    "@typescript-eslint/eslint-plugin": "latest",
+    "@typescript-eslint/parser": "latest",
+    "eslint": "^8.56.0",
+    "publint": "^0.2.7"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
   },
   "dependencies": {
-    "@faker-js/faker": "^8.3.1",
     "yaml": "^2.3.4"
   }
 }
