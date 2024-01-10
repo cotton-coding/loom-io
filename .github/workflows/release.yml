@@ -2,9 +2,9 @@ name: Realease
 
 on:
   workflow_run:
-    workflows: ["test"]
-    types:
-      - completed
+    workflows: ["Test"]
+    types: [completed]
+    branches: ['refs/heads/main', 'refs/tags/v*.*.*', 'feature/*']
 
 jobs:
   build:
