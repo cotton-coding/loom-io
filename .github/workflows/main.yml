@@ -34,6 +34,17 @@ jobs:
           bun-version: latest
       - name: Build
         run: bun ./build.ts
+  test-login:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node for npm
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Login
+        run: npm login
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   publish:
     name: Publish
     needs: build
@@ -51,6 +62,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+      - name: Login
+        run: npm login
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Publish
         run: npm publish
         env:
