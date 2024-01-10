@@ -47,5 +47,15 @@
       "types": "./dist/app.d.ts",
       "import": "./dist/app.js"
     }
+  },
+  "maintainers": [
+    {
+      "name": "Wolfgang Rathgeb",
+      "email": "ghost+npm@dropanote.de"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cotton-coding/loom.git"
   }
 }
