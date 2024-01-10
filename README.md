@@ -1,15 +1,5 @@
-# loom-fs
+#loom
 
-To install dependencies:
+Is a repository for tool. Currently there is only a filesystem lib, that implement common tools to work easier with the filesystem and reading files and dirs
 
-```bash
-bun install
-```
-
-To run:
-
-```bash
-bun run app.ts
-```
-
-This project was created using `bun init` in bun v1.0.21. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+This project is based on Bun so use bun for development
