@@ -3,8 +3,6 @@ name: Realease
 on:
   workflow_run:
     workflows: ["Test"]
-    types:
-      - completed
 
 jobs:
   build:
