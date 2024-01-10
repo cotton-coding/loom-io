@@ -3,7 +3,7 @@ name: Realease
 on:
   workflow_run:
     workflows: ["Test"]
-    types: [completed]
+    types: [in_progress]
     branches: 
       - "main"
       - 'feature/**'
