@@ -3,7 +3,7 @@
   "module": "dist/app.js",
   "author": "Cotton Coding",
   "license": "MIT",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "A file system wrapper for Node.js and Bun",
   "keywords": [
     "bun",
