@@ -32,6 +32,7 @@
     "@types/bun": "latest",
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
+    "bun-plugin-dts": "^0.2.1",
     "eslint": "^8.56.0",
     "publint": "^0.2.7"
   },

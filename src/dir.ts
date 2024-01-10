@@ -1,6 +1,6 @@
-import fs from 'node:fs/promises';
+import * as fs from 'node:fs/promises';
 import type { Dirent } from 'node:fs';
-import path from 'node:path';
+import * as path from 'node:path';
 import { File } from './file.js';
 
 type PickMatching<T, V> =
@@ -27,7 +27,7 @@ export class Directory {
 
 		const dirs =  await fs.readdir(path.join(this.path, subDir ?? ''), {withFileTypes: true});
 
-		return dirs.map((dir) => {
+		return dirs.map((dir: Dirent) => {
 			const p = params.map((param) => {
 				return dir[param]();
 			});
