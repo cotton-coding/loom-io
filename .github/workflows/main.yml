@@ -63,6 +63,6 @@ jobs:
         with:
           node-version: 20
       - name: Publish
-        run: npm publish
+        run: npm publish --scope=@cotton-coding
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
