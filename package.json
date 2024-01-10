@@ -1,6 +1,6 @@
 {
-  "name": "@cotton-coding/loom-fs",
-  "module": "dist/app.js",
+  "name": "@loom-io/fs",
+  "module": "app.ts",
   "author": "Cotton Coding",
   "license": "MIT",
   "version": "0.1.1",
@@ -22,18 +22,21 @@
   ],
   "type": "module",
   "scripts": {
-    "build": "bun build --minify -e --splitting --target node ./app.ts --out-dir dist",
+    "build": "tsc app.ts -d --outDir ./dist",
     "publish": "publint && npm publish",
     "lint": "eslint --ext .ts .",
     "lint:fix": "eslint --ext .ts . --fix"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.3.1",
+    "@loom-io/fs": "^0.1.1",
     "@types/bun": "latest",
+    "@types/node": "^20.10.8",
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
     "eslint": "^8.56.0",
-    "publint": "^0.2.7"
+    "publint": "^0.2.7",
+    "typescript": "^5.3.3"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
@@ -42,6 +45,19 @@
     "yaml": "^2.3.4"
   },
   "exports": {
-    ".": "./dist/app.js"
+    ".": {
+      "import": "./dist/app.js",
+      "types": "./dist/app.d.ts"
+    }
+  },
+  "maintainers": [
+    {
+      "name": "Wolfgang Rathgeb",
+      "email": "ghost+npm@dropanote.de"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cotton-coding/loom.git"
   }
 }

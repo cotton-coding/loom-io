@@ -1,6 +1,6 @@
-import fs from 'node:fs/promises';
+import * as fs from 'node:fs/promises';
 import type { Dirent } from 'node:fs';
-import path from 'node:path';
+import * as path from 'node:path';
 import { File } from './file.js';
 
 type PickMatching<T, V> =
