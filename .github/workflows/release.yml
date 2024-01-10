@@ -1,16 +1,6 @@
 name: Realease
 
-on:
-  push:
-    branches:
-      - main
-      - 'feature/**'
-  workflow_run:
-    workflows: ["Test"]
-    types: [in_progress]
-    branches: 
-      - "main"
-      - 'feature/**'
+on: [push]
 
 jobs:
   build:
