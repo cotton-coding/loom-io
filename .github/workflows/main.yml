@@ -1,4 +1,4 @@
-name: Test & Publish
+name: Core-Pipeline
 on: 
   push:
     branches:
