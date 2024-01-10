@@ -4,7 +4,7 @@ on:
   workflow_run:
     workflows: ["Test"]
     types: [completed]
-    branches: ['refs/heads/main', 'refs/tags/v*.*.*', 'feature/*']
+    branches: ['main', 'feature/*']
 
 jobs:
   build:
