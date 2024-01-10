@@ -17,4 +17,4 @@ jobs:
       - name: Lint
         run: bun run lint:fix
       - name: Test
-        run: bun test
+        run: bun test --coverage
