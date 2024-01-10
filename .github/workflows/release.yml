@@ -2,7 +2,7 @@ name: Realease
 
 on:
   workflow_run:
-    workflows: ["Test"]
+    workflows: ["Lint & Test"]
     types: [completed]
     branches: 
       - "main"
