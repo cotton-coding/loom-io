@@ -14,7 +14,12 @@ jobs:
           bun-version: latest
       - name: Install
         run: bun install     
-      - name: Lint
+      - name: Lint & Fix
         run: bun run lint:fix
       - name: Test
         run: bun test --coverage
+      - name: Commit Diff
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "auto fix lint errors"
+          commit_options: "--no-verify"
