@@ -30,6 +30,8 @@ jobs:
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
+      - name: Install
+        run: bun install
       - name: Build
         run: bun ./build.ts
       - name: Setup Node for npm
