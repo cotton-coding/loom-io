@@ -1,5 +1,5 @@
 {
-  "name": "@cotton-coding/loom-fs",
+  "name": "@loom-io/fs",
   "module": "dist/app.js",
   "author": "Cotton Coding",
   "license": "MIT",
@@ -43,6 +43,9 @@
     "yaml": "^2.3.4"
   },
   "exports": {
-    ".": "./dist/app.js"
+    ".": {
+      "import": "./dist/app.js",
+      "types": "./dist/app.d.ts"
+    }
   }
 }
