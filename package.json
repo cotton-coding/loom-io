@@ -44,8 +44,8 @@
   },
   "exports": {
     ".": {
-      "import": "./dist/app.js",
-      "types": "./dist/app.d.ts"
+      "types": "./dist/app.d.ts",
+      "import": "./dist/app.js"
     }
   }
 }
