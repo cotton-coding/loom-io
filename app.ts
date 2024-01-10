@@ -1,10 +1,10 @@
-import { Directory } from './src/dir';
-import { File } from './src/file';
-import type { LoomFSPlugin } from './src/types';
+import { Directory } from './src/dir.js';
+import { File } from './src/file.js';
+import type { LoomFSPlugin } from './src/types.js';
 import crypto from 'node:crypto';
 
-import jsonConverter from './src/plugins/jsonConverter';
-import yamlConverter from './src/plugins/yamlConverter';
+import jsonConverter from './src/plugins/jsonConverter.js';
+import yamlConverter from './src/plugins/yamlConverter.js';
 
 export type { LoomFSPlugin };
 export type { File, Directory };

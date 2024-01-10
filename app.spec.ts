@@ -1,9 +1,9 @@
 import { expect, test, describe, beforeAll } from 'bun:test';
-import { LoomFs } from './app';
-import jsonConverter from './src/plugins/jsonConverter';
-import yamlConverter from './src/plugins/yamlConverter';
-import { Directory } from './src/dir';
-import { File } from './src/file';
+import { LoomFs } from './app.js';
+import jsonConverter from './src/plugins/jsonConverter.js';
+import yamlConverter from './src/plugins/yamlConverter.js';
+import { Directory } from './src/dir.js';
+import { File } from './src/file.js';
 
 
 class LoomFsTest extends LoomFs {

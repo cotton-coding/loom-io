@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import type { Dirent } from 'node:fs';
 import path from 'node:path';
-import { File } from './file';
+import { File } from './file.js';
 
 type PickMatching<T, V> =
     { [K in keyof T as T[K] extends V ? K : never]: T[K] }

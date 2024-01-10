@@ -1,11 +1,11 @@
 import { expect, test, describe, beforeEach, afterEach, beforeAll, afterAll } from 'bun:test';
-import { File } from './file';
-import { FileDoesNotExistException, PluginNotFoundException } from './exceptions';
-import { TestFilesystemHelper } from '../test/helpers/testFilesystemHelper';
+import { File } from './file.js';
+import { FileDoesNotExistException, PluginNotFoundException } from './exceptions.js';
+import { TestFilesystemHelper } from '../test/helpers/testFilesystemHelper.js';
 
 
-import jsonConverter from './plugins/jsonConverter';
-import yamlConverter from './plugins/yamlConverter';
+import jsonConverter from './plugins/jsonConverter.js';
+import yamlConverter from './plugins/yamlConverter.js';
 
 
 class FileTest extends File {

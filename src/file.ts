@@ -1,7 +1,7 @@
 import fs from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import type { LoomFSFileConverter } from './types';
-import { FileDoesNotExistException, PluginNotFoundException } from './exceptions';
+import type { LoomFSFileConverter } from './types.js';
+import { FileDoesNotExistException, PluginNotFoundException } from './exceptions.js';
 
 export class File {
 
