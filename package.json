@@ -1,6 +1,22 @@
 {
   "name": "@cotton-coding/loom-fs",
   "module": "dist/app.js",
+  "author": "Cotton Coding",
+  "license": "MIT",
+  "version": "0.1.0",
+  "description": "A file system wrapper for Node.js and Bun",
+  "keywords": [
+    "bun",
+    "fs",
+    "directory",
+    "dir",
+    "file",
+    "file system",
+    "filesystem",
+    "node",
+    "nodejs",
+    "wrapper"
+  ],
   "files": [
     "dist"
   ],
@@ -25,5 +41,8 @@
   "dependencies": {
     "yaml": "^2.3.4"
   },
-  "version": "0.1.0"
+  "exports": {
+    ".": "./dist/app.js"
+  }
+  
 }
