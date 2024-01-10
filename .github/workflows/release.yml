@@ -1,16 +1,15 @@
 name: Test & Publish
-on: 
+on:
   push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
     branches:
-      - master
-      - develop
-      - 'hotfix/**'
-      - 'feature/**'
-  pull_request: 
+      - test/login
+
 
 jobs:
   test:
-    name: lint & test
+    name: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,13 +23,8 @@ jobs:
         run: bun run lint:fix
       - name: Test
         run: bun test --coverage
-      - name: Commit Diff
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: "auto fix lint errors"
-          commit_options: "--no-verify"
-  build:
-    name: Build
+  publish:
+    name: Build & Publish
     needs: test
     runs-on: ubuntu-latest
     steps:
@@ -41,3 +35,12 @@ jobs:
           bun-version: latest
       - name: Build
         run: bun ./build.ts
+      - name: Setup Node for npm
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org/
+      - name: Publish
+        run: npm publish --scope=@cotton-coding
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
