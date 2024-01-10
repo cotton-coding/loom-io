@@ -42,7 +42,7 @@ jobs:
         with:
           node-version: 20
       - name: Login
-        run: npm login
+        run: npm login --scope=@cotton-coding
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   publish:
@@ -62,10 +62,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
-      - name: Login
-        run: npm login
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Publish
         run: npm publish
         env:
