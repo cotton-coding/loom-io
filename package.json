@@ -3,7 +3,7 @@
   "module": "dist/exports/lib.js",
   "author": "Cotton Coding",
   "license": "MIT",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "A file system wrapper for Node.js and Bun",
   "keywords": [
     "bun",
