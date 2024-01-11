@@ -33,9 +33,9 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - name: Install
         run: npm ci
-      - name: Build
-        run: npm run build
+      - name: Build & publint
+        run: npm run prepublishOnly
       - name: Publish
-        run: npm publish --scope=@cotton-coding
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

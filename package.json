@@ -24,12 +24,10 @@
   "scripts": {
     "test": "vitest --retry 7 --typecheck.enabled",
     "test:ci": "npm run test -- --run --coverage",
-    "publish": "publint && npm publish",
     "lint": "eslint --ext .ts .",
     "lint:fix": "eslint --ext .ts . --fix",
     "build": "tsc --project tsconfig.json",
-    "prepublishOnly": "npm run build && publint",
-    "publish:dry": "npm run prepublishOnly && npm pack && npm publish --dry-run"
+    "prepublishOnly": "npm run build && publint"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.3.1",

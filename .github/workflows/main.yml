@@ -29,23 +29,9 @@ jobs:
         with:
           commit_message: "auto fix lint errors"
           commit_options: "--no-verify"
-  build:
-    name: Build
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Setup NodeJs
-        uses: actions/setup-node@v4
-        with:
-          node-version: latest
-      - name: Install
-        run: npm ci
-      - name: Build
-        run: npm run build
   pusblish-dry:
-    name: Publish Dry Run
-    needs: build
+    name: Build & dry run on publish
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -56,7 +42,9 @@ jobs:
           registry-url: https://registry.npmjs.org/
       - name: Install
         run: npm ci
+      - name: Build && publint
+        run: npm run prepublishOnly
       - name: Publish Dry Run
-        run: npm run publish:dry
+        run: npm publish --dry-run
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
