@@ -1,7 +1,7 @@
 import { describe, test, expect, beforeEach, afterEach } from 'vitest';
 import { Directory } from './dir.js';
 
-import { TestFilesystemHelper } from '../test/helpers/testFilesystemHelper.js';
+import { TestFilesystemHelper } from '../../test/helpers/testFilesystemHelper.js';
 
 class DirectoryTest extends Directory {
 

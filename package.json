@@ -1,6 +1,6 @@
 {
   "name": "@loom-io/fs",
-  "module": "dist/app.js",
+  "module": "dist/exports/lib.js",
   "author": "Cotton Coding",
   "license": "MIT",
   "version": "0.3.1",
@@ -24,10 +24,10 @@
   "scripts": {
     "test": "vitest --retry 7 --typecheck.enabled",
     "test:ci": "npm run test -- --run --coverage",
-    "publish": "publint && npm publish",
     "lint": "eslint --ext .ts .",
     "lint:fix": "eslint --ext .ts . --fix",
-    "build": "tsc app.ts -d --outDir ./dist"
+    "build": "tsc --project tsconfig.json",
+    "prepublishOnly": "npm run build && publint"
   },
   "devDependencies": {
     "@faker-js/faker": "^8.3.1",
@@ -48,8 +48,8 @@
   },
   "exports": {
     ".": {
-      "types": "./dist/types/app.d.ts",
-      "import": "./dist/app.js"
+      "types": "./dist/exports/lib.d.ts",
+      "import": "./dist/exports/lib.js"
     }
   },
   "maintainers": [
