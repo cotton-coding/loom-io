@@ -10,12 +10,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Bun
+      - name: Setup NodeJs
         uses: actions/setup-node@v4
         with:
           node-version: 20
       - name: Install
-        run: mpm ci     
+        run: npm ci     
       - name: Lint & Fix
         run: npm run lint:fix
       - name: Test
