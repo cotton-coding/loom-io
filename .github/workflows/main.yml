@@ -39,5 +39,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: latest
+      - name: Install
+        run: npm ci
       - name: Build
         run: npm run build
