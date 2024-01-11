@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach, afterEach } from 'bun:test';
+import { describe, test, expect, beforeEach, afterEach } from 'vitest';
 import { Directory } from './dir.js';
 
 import { TestFilesystemHelper } from '../test/helpers/testFilesystemHelper.js';
@@ -83,7 +83,7 @@ describe('Test Directory Service', () => {
 				const dir = new Directory(testHelper.getBasePath());
 				const paths = await dir.list(undefined, 'isDirectory');
 				expect(paths[0]).toHaveLength(2);
-				expect(paths[0][0]).toBeString();
+				expect(paths[0][0]).toBeTypeOf('string');
 				expect(paths[0][1]).toBe(true);
 			});
 
@@ -93,7 +93,7 @@ describe('Test Directory Service', () => {
 				const dir = new Directory(testHelper.getBasePath());
 				const paths = await dir.list(undefined, 'isDirectory', 'isFile');
 				expect(paths[0]).toHaveLength(3);
-				expect(paths[0][0]).toBeString();
+				expect(paths[0][0]).toBeTypeOf('string');
 				expect(paths[0][1]).toBe(false);
 				expect(paths[0][2]).toBe(true);
 			});
