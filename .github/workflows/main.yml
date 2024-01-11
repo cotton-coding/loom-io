@@ -21,7 +21,7 @@ jobs:
       - name: Install
         run: npm ci     
       - name: Lint & Fix
-        run: nom run lint:fix
+        run: npm run lint:fix
       - name: Test
         run: npm run test:ci
       - name: Commit Diff
