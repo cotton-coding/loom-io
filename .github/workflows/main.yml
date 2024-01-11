@@ -14,16 +14,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
+      - name: Setup NodeJs
+        uses: actions/setup-node@v4
         with:
-          bun-version: latest
+          node-version: latest
       - name: Install
-        run: bun install     
+        run: npm ci     
       - name: Lint & Fix
-        run: bun run lint:fix
+        run: nom run lint:fix
       - name: Test
-        run: bun test --coverage
+        run: npm run test
       - name: Commit Diff
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
@@ -35,9 +35,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
+      - name: Setup NodeJs
+        uses: actions/setup-node@v4
         with:
-          bun-version: latest
+          node-version: latest
       - name: Build
-        run: bun ./build.ts
+        run: npm run build
