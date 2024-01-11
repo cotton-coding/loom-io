@@ -1,9 +1,9 @@
 import { expect, test, describe, beforeAll } from 'vitest';
-import { LoomFs } from './app.js';
-import jsonConverter from './src/plugins/jsonConverter.js';
-import yamlConverter from './src/plugins/yamlConverter.js';
-import { Directory } from './src/dir.js';
-import { File } from './src/file.js';
+import { LoomFs } from './lib.js';
+import jsonConverter from '../plugins/jsonConverter.js';
+import yamlConverter from '../plugins/yamlConverter.js';
+import { Directory } from '../core/dir.js';
+import { File } from '../core/file.js';
 
 
 class LoomFsTest extends LoomFs {

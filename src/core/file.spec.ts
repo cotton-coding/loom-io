@@ -1,11 +1,11 @@
 import { expect, test, describe, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
 import { File } from './file.js';
 import { FileDoesNotExistException, PluginNotFoundException } from './exceptions.js';
-import { TestFilesystemHelper } from '../test/helpers/testFilesystemHelper.js';
+import { TestFilesystemHelper } from '../../test/helpers/testFilesystemHelper.js';
 
 
-import jsonConverter from './plugins/jsonConverter.js';
-import yamlConverter from './plugins/yamlConverter.js';
+import jsonConverter from '../plugins/jsonConverter.js';
+import yamlConverter from '../plugins/yamlConverter.js';
 
 
 class FileTest extends File {

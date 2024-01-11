@@ -43,3 +43,20 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
+  pusblish-dry-run:
+    name: Publish Dry Run
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup NodeJs
+        uses: actions/setup-node@v4
+        with:
+          node-version: latest
+          registry-url: https://registry.npmjs.org/
+      - name: Install
+        run: npm ci
+      - name: Publish Dry Run
+        run: npm run publish:dry-run
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -1,5 +1,5 @@
 import { parse, stringify } from 'yaml';
-import type { LoomFSPlugin } from '../types.js';
+import type { LoomFSPlugin } from '../core/types.js';
 
 export default {
 	type: 'jsonConverter',
