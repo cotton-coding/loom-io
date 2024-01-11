@@ -23,7 +23,7 @@ jobs:
       - name: Lint & Fix
         run: nom run lint:fix
       - name: Test
-        run: npm run test
+        run: npm run test:ci
       - name: Commit Diff
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
