@@ -43,7 +43,7 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
-  pusblish-dry-run:
+  pusblish-dry:
     name: Publish Dry Run
     needs: build
     runs-on: ubuntu-latest
@@ -57,6 +57,6 @@ jobs:
       - name: Install
         run: npm ci
       - name: Publish Dry Run
-        run: npm run publish:dry-run
+        run: npm run publish:dry
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
