@@ -2,6 +2,7 @@ import { describe, test, expect, beforeEach, afterEach } from 'vitest';
 import { Directory } from './dir.js';
 
 import { TestFilesystemHelper } from '../../test/helpers/testFilesystemHelper.js';
+import { File } from './file.js';
 
 class DirectoryTest extends Directory {
 
@@ -49,73 +50,51 @@ describe('Test Directory Service', () => {
 			});
 
 			test('list directory' , async () => {
-				const testDir = await testHelper.createDirs();
+				const testDir = (await testHelper.createDirs()).includeBasePath().getPaths(1);
 
 				const dir = new Directory(testHelper.getBasePath());
-				const paths = await dir.list(undefined);
-				for(const t of testDir) {
-					const split = t.split('/');
-					const firstPart = split ? split[0] : t;
-					expect(paths).toContain(firstPart);
+				const paths = await dir.list();
+				for(const t of paths) {
+					expect(testDir).toContain((t as Directory).path);
 				}
 			});
 
 			test('list with subdirectory', async () => {
 				const subPath = 'someRandomTestDir';
 				const testSubHelper = testHelper.createSubDir(subPath);
-				const testDir = await testSubHelper.createDirs(30);
-				await testHelper.createDirs(2);
+				const testDir = (await testSubHelper.createDirs(30)).includeBasePath().getPaths(1);
+				await testHelper.createDirs(7);
+
 
 				const dir = new Directory(testHelper.getBasePath());
-				const paths = await dir.list(subPath);
-				for(const t of testDir) {
-					const split = t.split('/');
-					const subPart = split ? split[0] : t;
-					expect(paths).toContain(subPart);
+				const paths = await dir.subdir(subPath).list();
+				for(const t of paths) {
+					expect(testDir).toContain((t as Directory).path);
 				}
 			});
 
-            
-			test('list with additional params', async () => {
-				await testHelper.createDirs(30);
-				await testHelper.createDirs(2);
+			// TODO: maybe needed for list.asStringArray();
+			// test('list with additional params', async () => {
+			// 	await testHelper.createDirs(30);
+			// 	await testHelper.createDirs(2);
 
-				const dir = new Directory(testHelper.getBasePath());
-				const paths = await dir.list(undefined, 'isDirectory');
-				expect(paths[0]).toHaveLength(2);
-				expect(paths[0][0]).toBeTypeOf('string');
-				expect(paths[0][1]).toBe(true);
-			});
+			// 	const dir = new Directory(testHelper.getBasePath());
+			// 	const paths = await dir.list(undefined, 'isDirectory');
+			// 	expect(paths[0]).toHaveLength(2);
+			// 	expect(paths[0][0]).toBeTypeOf('string');
+			// 	expect(paths[0][1]).toBe(true);
+			// });
 
-			test('list with additional multiple params', async () => {
-				await testHelper.createFile('testFile', {path: 'testFile.txt'});
+			// test('list with additional multiple params', async () => {
+			// 	await testHelper.createFile('testFile', {path: 'testFile.txt'});
 
-				const dir = new Directory(testHelper.getBasePath());
-				const paths = await dir.list(undefined, 'isDirectory', 'isFile');
-				expect(paths[0]).toHaveLength(3);
-				expect(paths[0][0]).toBeTypeOf('string');
-				expect(paths[0][1]).toBe(false);
-				expect(paths[0][2]).toBe(true);
-			});
-		});
-
-		describe('listFiles methode', () => {
-
-			test('listFiles test returned amount', async () => {
-				await testHelper.createDirs();
-				await testHelper.createFile('lorem', {path: 'testDir234/tt.txt'});
-				await testHelper.createFile('lorem', {path: 'tt2.txt'});
-
-				const dir = new Directory(testHelper.getBasePath());
-				const files = await dir.listFiles(undefined, true);
-				expect(files).toHaveLength(2);
-
-				const files2 = await dir.listFiles();
-				expect(files2).toHaveLength(1);
-				expect(files2[0]).toBe('tt2.txt');
-
-			});
-
+			// 	const dir = new Directory(testHelper.getBasePath());
+			// 	const paths = await dir.list(undefined, 'isDirectory', 'isFile');
+			// 	expect(paths[0]).toHaveLength(3);
+			// 	expect(paths[0][0]).toBeTypeOf('string');
+			// 	expect(paths[0][1]).toBe(false);
+			// 	expect(paths[0][2]).toBe(true);
+			// });
 		});
 
 		describe('files methode', () => {
@@ -132,7 +111,7 @@ describe('Test Directory Service', () => {
                 
 				for(const f of files) {
 					expect(f).toBeInstanceOf;
-					expect(await f.text()).toBe('lorem');
+					expect(await (f as File).text()).toBe('lorem');
 				}
 
 

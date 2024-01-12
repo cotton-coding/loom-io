@@ -109,15 +109,28 @@ export class PathObject {
 		return this;
 	}
 
-	getPath() {
-		return this._includeBasePath ? joinPath(this.basePath, this.paths[0]) : this.paths[0];
+	getPath(dept: number = 0) {
+		if(dept == 0) {
+			return this._includeBasePath ? joinPath(this.basePath, this.paths[0]) : this.paths[0];
+		} else {
+			const parts = this.paths[0].split('/');
+			return parts.slice(0, dept).join('/');
+		}
 	}
 
-	getPaths() {
-		if(this._includeBasePath) {
-			return this.paths.map((path) => joinPath(this.basePath, path));
+	getPaths(dept: number = 0) {
+		let paths = this.paths;
+		if(dept != 0) {
+			paths = paths.map((path) => {
+				const parts = path.split('/');
+				return parts.slice(0, dept).join('/');
+			});
 		}
-		return this.paths;
+		
+		if(this._includeBasePath) {
+			return paths.map((path) => joinPath(this.basePath, path));
+		}
+		return paths;
 	}
     
 	[Symbol.iterator]() {
