@@ -6,7 +6,7 @@ import crypto from 'node:crypto';
 import jsonConverter from '../plugins/jsonConverter.js';
 import yamlConverter from '../plugins/yamlConverter.js';
 
-export type { LoomFSPlugin };
+export type { LoomFSPlugin, PLUGIN_TYPE };
 export type { File, Directory };
 export class LoomFs {
 

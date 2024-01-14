@@ -58,17 +58,17 @@ To handle and covert more file types to json loom-io/fs allow to register plugin
 ```ts
 // Plugin type to convert file content to json
 export type LoomFSFileConverter = {
-    type: PLUGIN_TYPE.FILE_CONVERTER,
-    extentions: string[],
-    parse<T = unknown>(content: string): T
-    stringify<T = unknown>(content: T): string
+  type: PLUGIN_TYPE.FILE_CONVERTER,
+  extentions: string[],
+  parse<T = unknown>(content: string): T
+  stringify<T = unknown>(content: T): string
 }
 ```
 
 Currently there are two plugins already included, to convert yml and json files to json.
 
 ```ts
-import { PLUGIN_TYPE, type LoomFSFileConverter } from '../core/types.js';
+import { PLUGIN_TYPE, type LoomFSFileConverter } from 'loom-io/fs';
 
 
 //example for the plugin to convert json strings.
