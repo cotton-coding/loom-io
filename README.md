@@ -4,9 +4,9 @@ This repository should include service to handle and work with files. The goal i
 
 ## How to
 
-The libary offers to read a dir or file from filesystem.
+The libary offers to read a dir or file from filesystem. File content could be read and converted to json. To support more then .json files it is possible to add plugin. Currently files with extension yml, yaml and json are convert able to json by default.
 
-```js
+```ts
 import Loom from '@loom-io/js'
 
 const file = Loom.file('./some/file.json')
@@ -16,13 +16,17 @@ const str = file.text();
 const json = file.json();
 const buffer = file.plain();
 
+
+// Register a plugin, look below to get more informations on plugins
+Loom.register(/*some plugin*/)
+
 ```
 
 By default the system can read json and yml and convert it to json. To Support more, you can write PlugIns and adapted them.
 
 Reading a dir Works simular.
 
-```js
+```ts
 import Loom, {type File} from '@loom-io/fs'
 
 const dir = Loom.dir('some/dir');
@@ -46,4 +50,45 @@ for(let el of list) {
 }
 
 ```
+
+## Plugins
+
+To handle and covert more file types to json loom-io/fs allow to register plugins. Currently there is only support for one type of Plugin
+
+```ts
+// Plugin type to convert file content to json
+export type LoomFSFileConverter = {
+    type: PLUGIN_TYPE.FILE_CONVERTER,
+    extentions: string[],
+    parse<T = unknown>(content: string): T
+    stringify<T = unknown>(content: T): string
+}
+```
+
+Currently there are two plugins already included, to convert yml and json files to json.
+
+```ts
+import { PLUGIN_TYPE, type LoomFSFileConverter } from '../core/types.js';
+
+
+//example for the plugin to convert json strings.
+export default {
+	type: PLUGIN_TYPE.FILE_CONVERTER,
+	extentions: ['json'],
+	parse: JSON.parse,
+	stringify: JSON.stringify
+} satisfies LoomFSFileConverter;
+```
+
+Plugins could be registered with `Loom.register`
+
+```ts
+import Loom from 'loom-io/fs';
+import mdPlugin from './link/to/plugin';
+
+Loom.register(mdPlugin);
+
+```
+
+
 
