@@ -1,14 +1,15 @@
-import { Dirent } from 'fs';
+import type { Dirent } from 'fs';
 import { Directory } from './dir.js';
 import { DirentWrapper } from './wrapper/dirent.js';
+import type { File } from './file.js';
 
 
 type PickMatching<T, V> =
     { [K in keyof T as T[K] extends V ? K : never]: T[K] }
 type DirentMethodsName = keyof PickMatching<DirentWrapper, () => unknown>;
-type ReturnTypeTuble<T extends Array<keyof DirentWrapper>> = {
-    [K in keyof T]: DirentWrapper[T[K]] extends () => unknown ? ReturnType<DirentWrapper[T[K]]> : DirentWrapper[T[K]]
-}
+// type ReturnTypeTuble<T extends Array<keyof DirentWrapper>> = {
+//     [K in keyof T]: DirentWrapper[T[K]] extends () => unknown ? ReturnType<DirentWrapper[T[K]]> : DirentWrapper[T[K]]
+// }
 
 export class List {
 
@@ -24,10 +25,10 @@ export class List {
 		this.add(dirOrDirentWrapper, _paths);
 	}
 
-	add(paths: DirentWrapper[]): void
-	add(dir: Directory, paths: Dirent[]): void
-	add(dirOrDirentWrapper: Directory | DirentWrapper[], paths?: Dirent[]): void
-	add(list: List): void
+	add(paths: DirentWrapper[]): List
+	add(dir: Directory, paths: Dirent[]): List
+	add(dirOrDirentWrapper: Directory | DirentWrapper[], paths?: Dirent[]): List
+	add(list: List): List
 	add(dirOrListOrDirentWrapper: Directory | DirentWrapper[] | List, paths?: Dirent[]) {
 
 		if(dirOrListOrDirentWrapper instanceof Directory) {
@@ -41,6 +42,8 @@ export class List {
 		} else {
 			this.dirWrap.push(...dirOrListOrDirentWrapper);
 		}
+
+		return this;
 	}
 
 	concat(...lists: List[]): List {
@@ -56,13 +59,30 @@ export class List {
 		return this.dirWrap.length;
 	}
 
+	protected convert(wrap: DirentWrapper) {
+		if(wrap.isDirectory()) {
+			return wrap.dir.subdir(wrap.name);
+		} else {
+			return wrap.dir.file(wrap.name);
+		}
+	}
+
+	at(index: number) {
+		const wrap = this.dirWrap[index];
+		return this.convert(wrap);
+	}
+
+	first<T = Directory | File>(): T {
+		return this.at(0) as T;
+	}
+
+	last<T = Directory | File>(): T {
+		return this.at(this.length - 1) as T;
+	}
+
 	asArray() {
 		return this.dirWrap.map((wrap) => {
-			if(wrap.isDirectory()) {
-				return wrap.dir.subdir(wrap.name);
-			} else {
-				return wrap.dir.file(wrap.name);
-			}
+			return this.convert(wrap);
 		});
 	}
 
@@ -71,7 +91,7 @@ export class List {
 		return new List(filtered);
 	}
 
-	filterByDirent(direntMethod: DirentMethodsName) {
+	filterByType(direntMethod: DirentMethodsName) {
 		return this.filter((wrap) => wrap[direntMethod]());
 	}
 

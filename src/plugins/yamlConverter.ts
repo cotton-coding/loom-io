@@ -1,8 +1,8 @@
 import { parse, stringify } from 'yaml';
-import type { LoomFSPlugin } from '../core/types.js';
+import { PLUGIN_TYPE, type LoomFSPlugin } from '../core/types.js';
 
 export default {
-	type: 'jsonConverter',
+	type: PLUGIN_TYPE.FILE_CONVERTER,
 	extentions: ['yml', 'yaml'],
 	parse,
 	stringify

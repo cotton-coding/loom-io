@@ -1,8 +1,8 @@
-import type { LoomFSPlugin } from '../core/types.js';
+import { PLUGIN_TYPE, type LoomFSFileConverter } from '../core/types.js';
 
 export default {
-	type: 'jsonConverter',
+	type: PLUGIN_TYPE.FILE_CONVERTER,
 	extentions: ['json'],
 	parse: JSON.parse,
 	stringify: JSON.stringify
-} satisfies LoomFSPlugin;
+} satisfies LoomFSFileConverter;

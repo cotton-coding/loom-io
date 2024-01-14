@@ -4,20 +4,18 @@ import { Directory } from './dir.js';
 import { TestFilesystemHelper } from '../../test/helpers/testFilesystemHelper.js';
 import { File } from './file.js';
 
-class DirectoryTest extends Directory {
-
-	getPath() {
-		return this.path;
-	}
-}
-
-
 describe('Test Directory Service', () => {
 	test('Create Instance and set path', () => {
 		const path = './test/data';
-		const dir = new DirectoryTest(path);
+		const dir = new Directory(path);
 		expect(dir).toBeInstanceOf(Directory);
-		expect(dir.getPath()).toBe(path);
+		expect(dir.path).toBe(path);
+	});
+
+	test('relativePath', () => {
+		const dir = new Directory('./test/');
+		const dir2 = new Directory('./test/data');
+		expect(dir.relativePath(dir2)).toBe('data');
 	});
 
 
@@ -33,6 +31,7 @@ describe('Test Directory Service', () => {
 		afterEach(() => {
 			testHelper.destroy();
 		});
+
 
 
 		describe('list methode', () => {
@@ -115,6 +114,23 @@ describe('Test Directory Service', () => {
 				}
 
 
+			});
+
+			test('get files recursive', async () => {
+				await testHelper.createDirs();
+				await testHelper.createFile('lorem', {path: 'dorem/tt.txt'});
+				await testHelper.createFile('lorem');
+				await testHelper.createFile('lorem');
+
+				const dir = new Directory(testHelper.getBasePath());
+
+				const files = await dir.files(true);
+				expect(files).toHaveLength(3);
+								
+				for(const f of files) {
+					expect(f).toBeInstanceOf;
+					expect(await (f as File).text()).toBe('lorem');
+				}
 			});
 
 		});

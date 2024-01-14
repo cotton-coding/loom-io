@@ -6,7 +6,7 @@ export class DirentWrapper {
 
 	constructor(
 		protected _dir: Directory,  
-		protected dirent: Dirent) {
+		protected _dirent: Dirent) {
 	}
 
 	isDirectory() {
@@ -15,6 +15,10 @@ export class DirentWrapper {
 
 	isFile() {
 		return this.dirent.isFile();
+	}
+
+	get dirent() {
+		return this._dirent;
 	}
 
 	get dir() {

@@ -33,14 +33,14 @@ export class Directory {
 	}
 
 
-	file(name: string): File {
+	file(name: string) {
 		return new File(path.join(this.path, name));
 	}
 
 	protected async filesRecursion(list: List): Promise<List> {
 
-		const dirList = list.filterByDirent('isDirectory');
-		const fileList = list.filterByDirent('isFile');
+		const dirList = list.filterByType('isDirectory');
+		const fileList = list.filterByType('isFile');
 
 		for(const el of dirList) {
 			if(el instanceof Directory) {
@@ -58,7 +58,7 @@ export class Directory {
 		if(recursive) {
 			return this.filesRecursion(list);
 		} else {
-			const fileList = list.filterByDirent('isFile');
+			const fileList = list.filterByType('isFile');
 			return fileList;
 		}
   

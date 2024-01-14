@@ -58,14 +58,14 @@ export class TestFilesystemHelper {
 		return this.basePath;
 	}
 
-	destroy() {
-		fs.rm(this.basePath, {recursive: true});
+	async destroy() {
+		await fs.rm(this.basePath, {recursive: true});
 	}
 
 	static async init() {
 		const id = faker.string.uuid();
 		const basePath = joinPath(process.cwd(), './test/tmp', id);
-		fs.mkdir(basePath, {recursive: true});
+		await fs.mkdir(basePath, {recursive: true});
 		return new TestFilesystemHelper(basePath);
 	}
 }
@@ -128,9 +128,10 @@ export class PathObject {
 		}
 		
 		if(this._includeBasePath) {
-			return paths.map((path) => joinPath(this.basePath, path));
+			const p = paths.map((path) => joinPath(this.basePath, path));
+			return Array.from(new Set(p));
 		}
-		return paths;
+		return Array.from(new Set(paths));
 	}
     
 	[Symbol.iterator]() {
