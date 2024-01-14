@@ -58,14 +58,14 @@ export class TestFilesystemHelper {
 		return this.basePath;
 	}
 
-	destroy() {
-		fs.rm(this.basePath, {recursive: true});
+	async destroy() {
+		await fs.rm(this.basePath, {recursive: true});
 	}
 
 	static async init() {
 		const id = faker.string.uuid();
 		const basePath = joinPath(process.cwd(), './test/tmp', id);
-		fs.mkdir(basePath, {recursive: true});
+		await fs.mkdir(basePath, {recursive: true});
 		return new TestFilesystemHelper(basePath);
 	}
 }
@@ -109,15 +109,29 @@ export class PathObject {
 		return this;
 	}
 
-	getPath() {
-		return this._includeBasePath ? joinPath(this.basePath, this.paths[0]) : this.paths[0];
+	getPath(dept: number = 0) {
+		if(dept == 0) {
+			return this._includeBasePath ? joinPath(this.basePath, this.paths[0]) : this.paths[0];
+		} else {
+			const parts = this.paths[0].split('/');
+			return parts.slice(0, dept).join('/');
+		}
 	}
 
-	getPaths() {
-		if(this._includeBasePath) {
-			return this.paths.map((path) => joinPath(this.basePath, path));
+	getPaths(dept: number = 0) {
+		let paths = this.paths;
+		if(dept != 0) {
+			paths = paths.map((path) => {
+				const parts = path.split('/');
+				return parts.slice(0, dept).join('/');
+			});
 		}
-		return this.paths;
+		
+		if(this._includeBasePath) {
+			const p = paths.map((path) => joinPath(this.basePath, path));
+			return Array.from(new Set(p));
+		}
+		return Array.from(new Set(paths));
 	}
     
 	[Symbol.iterator]() {

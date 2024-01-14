@@ -1,50 +1,68 @@
 import * as fs from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import type { LoomFSFileConverter } from './types.js';
-import { FileDoesNotExistException, PluginNotFoundException } from './exceptions.js';
+import { PLUGIN_TYPE, type LoomFSFileConverter } from './types.js';
+import { FileConvertException, FileDoesNotExistException, PluginNotFoundException } from './exceptions.js';
 
 export class File {
 
-	protected static plugins: LoomFSFileConverter[] = [];
+	protected static converterPlugins: Map<string, LoomFSFileConverter> = new Map();
+	protected _extention: string | undefined;
 
 	constructor(
-        protected path: string
+        protected _path: string
 	) {
-		if(!existsSync(path)) {
-			throw new FileDoesNotExistException(path);
+		if(!existsSync(_path)) {
+			throw new FileDoesNotExistException(_path);
 		}
+	}
+
+	get path() {
+		return this._path;
+	}
+
+	get name(): string {
+		return <string>this.path.split('/').pop();
+	}
+
+	get extention() {
+		if(this._extention === undefined) {
+			const split = this.name.split('.');
+			this._extention = split.length > 1 ? split.pop() : undefined;
+		}
+		return this._extention;
 	}
 
 	async json<T>() {
 		const text = await this.text();
-		for(const plugin of File.plugins) {
-			if(plugin.extentions.includes(this.path.split('.').pop()!)) {
-				return plugin.parse(text) as T;
-			}
+		
+		if(this.extention === undefined) {
+			throw new FileConvertException(this.path, 'File has no extension');
+		}
+	
+		const plugin = File.converterPlugins.get(this.extention);
+
+		if(plugin === undefined) {
+			throw new PluginNotFoundException(this.path);
 		}
 
-		throw new PluginNotFoundException(this.path);
+		return plugin.parse<T>(text);
+		
+	}
+
+	async plain() {
+		return await fs.readFile(this.path);
 	}
 
 	async text(encoding: BufferEncoding = 'utf8') {
-		return fs.readFile(this.path, encoding);
+		return await fs.readFile(this.path, encoding);
 	}
 
 	static register(plugin: LoomFSFileConverter) {
-		File.plugins.push(plugin);
-	}
-
-	static async fromArray (paths: string[]) {
-		return {
-			asArray() {
-				return paths.map((path) => new File(path));
-			},
-			[Symbol.iterator]: function* () {
-				for(const path of paths) {
-					yield new File(path);
-				}
-			}
-		};
+		if(plugin.type === PLUGIN_TYPE.FILE_CONVERTER) {
+			plugin.extentions.forEach(ext => {
+				File.converterPlugins.set(ext, plugin);
+			});
+		}
 	}
     
 }

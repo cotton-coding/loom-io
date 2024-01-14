@@ -1,6 +1,6 @@
 import { Directory } from '../core/dir.js';
 import { File } from '../core/file.js';
-import type { LoomFSPlugin } from '../core/types.js';
+import { PLUGIN_TYPE, type LoomFSPlugin } from '../core/types.js';
 import crypto from 'node:crypto';
 
 import jsonConverter from '../plugins/jsonConverter.js';
@@ -28,7 +28,7 @@ export class LoomFs {
 			return;
 		}
 		this.pluginHashes.push(pluginHash);
-		if(['jsonConverter'].includes(plugin.type)) {
+		if(PLUGIN_TYPE.FILE_CONVERTER === plugin.type) {
 			File.register(plugin);
 		}
 	}

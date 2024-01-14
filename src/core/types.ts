@@ -1,5 +1,9 @@
+export enum PLUGIN_TYPE {
+    FILE_CONVERTER
+}
+
 export type LoomFSFileConverter = {
-    type: 'jsonConverter',
+    type: PLUGIN_TYPE.FILE_CONVERTER,
     extentions: string[],
     parse<T = unknown>(content: string): T
     stringify<T = unknown>(content: T): string

@@ -1,12 +1,11 @@
 import { expect, test, describe, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
 import { File } from './file.js';
-import { FileDoesNotExistException, PluginNotFoundException } from './exceptions.js';
+import { FileConvertException, FileDoesNotExistException, PluginNotFoundException } from './exceptions.js';
 import { TestFilesystemHelper } from '../../test/helpers/testFilesystemHelper.js';
 
 
 import jsonConverter from '../plugins/jsonConverter.js';
 import yamlConverter from '../plugins/yamlConverter.js';
-
 
 class FileTest extends File {
 
@@ -14,12 +13,12 @@ class FileTest extends File {
 		return this.path;
 	}
 
-	static getPlugins() {
-		return File.plugins;
+	static getConvertPlugins() {
+		return Array.from(new Set(File.converterPlugins.values()));
 	}
 
 	static emptyPlugins() {
-		File.plugins = [];
+		File.converterPlugins = new Map();
 	}
 }
 
@@ -46,32 +45,13 @@ describe('Test File Service', () => {
 
 	test('Create Instance with invalid path', () => {
 		const path = './test/data/test2.txt';
-		expect(() => new File(path)).toThrow(FileDoesNotExistException as ErrorConstructor);
+		expect(() => new File(path)).toThrow(FileDoesNotExistException);
 	});
 
 	test('Register plugins', async () => {
 		new File('./test/data/test.json');
-		const plugins = FileTest.getPlugins();
+		const plugins = FileTest.getConvertPlugins();
 		expect(plugins).toHaveLength(2);
-	});
-
-	test('Create from Array', async () => { 
-            
-		const paths = ['./test/data/test.json', './test/data/test.yaml'];
-		const files = await File.fromArray(paths);
-		const fileArray = files.asArray();
-		expect(fileArray).toHaveLength(2);
-		expect(fileArray[0]).toBeInstanceOf(File);
-		expect(fileArray[1]).toBeInstanceOf(File);
-
-		for(let x = 0; x < 3; x++) {
-			let loopCount = 0;
-			for (const file of files) {
-				expect(file).toBeInstanceOf(File);
-				loopCount++;
-			}
-			expect(loopCount).toBe(2);
-		}
 	});
     
 
@@ -91,6 +71,13 @@ describe('Test File Service', () => {
 			const file = new File(testFile.includeBasePath().getPath());
 			const content = await file.text();
 			expect(content).toBe(testFile.getContent());
+		});
+
+		test.each(['json', 'yaml', 'yml', 'log', 'txt'])('Get extenction %s', async (extention) => {
+			const testFile = await testHelper.createFile('', { extention });
+			const file = new File(testFile.includeBasePath().getPath());
+			expect(file.extention).toBe(extention);
+
 		});
 
 		test('Read json file', async () => {
@@ -123,13 +110,24 @@ describe('Test File Service', () => {
 			expect(content.test).toBe(true);
 		});
 
+		test('Read file plain', async () => {
+			const testContent = '1234k2hk3jh1fasdasfc%';
+			const testFile = await testHelper.createFile(testContent, { extention: 'rtx' });
+			const path = testFile.includeBasePath().getPath();
+
+			const file = new File(path);
+			const content = await file.plain();
+			expect(content).toBeInstanceOf(Buffer);
+			expect(content.toString()).toBe(testContent);
+		});
+
 		
 
 	});
 });
 
 
-describe.todo('Test with missing plugins'	, () => {
+describe('Test Error handling'	, () => {
 
 	let testHelper: TestFilesystemHelper;
 
@@ -151,15 +149,26 @@ describe.todo('Test with missing plugins'	, () => {
 		const testFile = await testHelper.createFile(testContent, { extention: 'json' });
 	
 		const file = new File(testFile.includeBasePath().getPath());
-		expect(() => file.json()).toThrow(PluginNotFoundException);
+		expect(() => file.json()).rejects.toThrow(PluginNotFoundException);
 	});
 
 	test('Plugin not registered for path', async () => {
 
 		const testFile = testHelper.createFile('test', { extention: 'md' });
+		const path = (await testFile).includeBasePath().getPath();
 					
-		const file = new File((await testFile).includeBasePath().getPath());
-		expect(() => file.json()).toThrow(PluginNotFoundException);
+		const file = new File(path);
+		expect(() => file.json()).rejects.toThrow(PluginNotFoundException);
+	});
+
+	test('No file extenstion', async () => {
+		
+		const testFile = testHelper.createFile('{test: true}', { path: 'test/test' });
+		const path = (await testFile).includeBasePath().getPath();
+					
+		const file = new File(path);
+		expect(file.text()).resolves.toBe('{test: true}');
+		expect(file.json()).rejects.toThrow(FileConvertException);
 	});
 });
 
