@@ -5,7 +5,7 @@
   "types": "dist/exports/lib.d.ts",
   "author": "Cotton Coding",
   "license": "MIT",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "description": "A file system wrapper for Node.js and Bun",
   "keywords": [
     "bun",
