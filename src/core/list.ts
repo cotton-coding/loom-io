@@ -106,7 +106,7 @@ export class List<T extends ListTypes = ListTypes> {
 	}
 
 	/**
-	 * @deprecated Deprecated from version 0.5 use only instead
+	 * @deprecated Deprecated use only instead
 	 */
 	filterByType(direntMethod: DirentMethodsName) {
 		return this.filter((wrap) => wrap[direntMethod]());

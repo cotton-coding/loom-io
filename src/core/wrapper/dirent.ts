@@ -37,5 +37,4 @@ export class DirentWrapper {
 		return join(this.dir.path, this.name);
 	}
 
-
 }

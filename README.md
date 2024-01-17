@@ -63,6 +63,32 @@ dir.subDir('sub/path'); // this is not validated and only throws an arrow an cal
 
 ```
 
+## Lists
+
+A list Object is returned if you call `list` or `files` of the directory object. The list Object gives you the ability to iterate offer the results, get them as an Array or filter them.
+
+```ts
+const arrayOfFilesAndDirectories = dir.list().asArray();
+
+//Ready type save filter
+const listOfFiles = dir.list().only('files');
+const listOfDirs = dir.list().only('dirs');
+
+//own filter for more advanced. The callback function gets an DirentWrapper Object which have some readonly attributes, you can get also the dirent or the dir.
+dir.list().filter<File>((el) => el.name.endsWith('.spec.yml'));
+dir.list().filter<Directory>((el) => el.isDirectory());
+
+// see more examples for iteration above
+for(let file of dir.files()) {
+  const json = file.json();
+  // do something with the content
+}
+
+```
+
+
+
+
 ## Plugins
 
 To handle and covert more file types to json loom-io/fs allow to register plugins. Currently there is only support for one type of Plugin
