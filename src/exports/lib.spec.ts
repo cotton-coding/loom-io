@@ -24,6 +24,7 @@ describe('Test Entry', () => {
 		expect(LoomFs).toBeDefined();
 		expect(LoomFs.dir).toBeDefined();
 		expect(LoomFs.file).toBeDefined();
+		expect(LoomFs.root).toBeDefined();
 	});
 
 	test('Register Plugins', () => {
@@ -42,6 +43,12 @@ describe('Test Entry', () => {
 		const dir = LoomFs.dir('./test/data');
 		expect(dir).toBeDefined();
 		expect(dir).toBeInstanceOf(Directory);
+	});
+
+	test('Get root dir', () => {
+		const dir = LoomFs.root();
+		expect(dir).toBeDefined();
+		expect(dir.path).toBe(process.cwd());
 	});
 
 	test('Get File Instance', () => {

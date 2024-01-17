@@ -35,6 +35,8 @@ jobs:
         run: npm ci
       - name: Build & publint
         run: npm run prepublishOnly
+      - name: Pack
+        run: npm pack
       - name: Publish
         run: npm publish
         env:

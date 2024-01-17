@@ -6,10 +6,10 @@ import { File } from './file.js';
 
 describe('Test Directory Service', () => {
 	test('Create Instance and set path', () => {
-		const path = './test/data';
+		const path = 'test/data';
 		const dir = new Directory(path);
 		expect(dir).toBeInstanceOf(Directory);
-		expect(dir.path).toBe(path);
+		expect(dir.path).toBe(`${process.cwd()}/${path}`);
 	});
 
 	test('relativePath', () => {
@@ -18,8 +18,30 @@ describe('Test Directory Service', () => {
 		expect(dir.relativePath(dir2)).toBe('data');
 	});
 
+	test('path', () => {
+		const testPath = 'test/data';
+		const dir = new Directory(`./${testPath}`);
+		expect(dir.path).toBe(`${process.cwd()}/${testPath}`);
+	});
 
-	describe('with generaed file', () => {
+	test('parent', () => {
+		const dir = new Directory('./test/data');
+		expect(dir.parent).toBeInstanceOf(Directory);
+		expect(dir.parent!.path).toBe(`${process.cwd()}/test`);
+	});
+
+	test('parent of root', () => {
+		const root = new Directory('/');
+		expect(root.parent).toBe(undefined);
+	});
+
+	test('parent of first level after root', () => {
+		const dir = new Directory('/etc');
+		expect(dir.parent).toBeDefined();
+		expect(dir.parent!.path).toBe('/');
+	});
+
+	describe('with generated file', () => {
 
 		let testHelper: TestFilesystemHelper;
 
@@ -34,9 +56,8 @@ describe('Test Directory Service', () => {
 
 
 
-		describe('list methode', () => {
+		describe('list method', () => {
 
-            
 			test('list directory amount', async () => {
 				await testHelper.createDir('testDir');
 				await testHelper.createDir('testDir2/testDir3');
@@ -58,7 +79,7 @@ describe('Test Directory Service', () => {
 				}
 			});
 
-			test('list with subdirectory', async () => {
+			test('list with subDirectory', async () => {
 				const subPath = 'someRandomTestDir';
 				const testSubHelper = testHelper.createSubDir(subPath);
 				const testDir = (await testSubHelper.createDirs(30)).includeBasePath().getPaths(1);
@@ -66,7 +87,7 @@ describe('Test Directory Service', () => {
 
 
 				const dir = new Directory(testHelper.getBasePath());
-				const paths = await dir.subdir(subPath).list();
+				const paths = await dir.subDir(subPath).list();
 				for(const t of paths) {
 					expect(testDir).toContain((t as Directory).path);
 				}
@@ -96,7 +117,7 @@ describe('Test Directory Service', () => {
 			// });
 		});
 
-		describe('files methode', () => {
+		describe('files method', () => {
                 
 			test('files test returned amount', async () => {
 				await testHelper.createDirs();

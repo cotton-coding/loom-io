@@ -4,7 +4,7 @@ export enum PLUGIN_TYPE {
 
 export type LoomFSFileConverter = {
     type: PLUGIN_TYPE.FILE_CONVERTER,
-    extentions: string[],
+    extensions: string[],
     parse<T = unknown>(content: string): T
     stringify<T = unknown>(content: T): string
 }

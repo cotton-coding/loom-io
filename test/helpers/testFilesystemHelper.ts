@@ -5,7 +5,7 @@ import { join as joinPath, dirname} from 'node:path';
 export type TestFilesystemHelperFileOptions= {
     path?: string,
     mimeType?: string,
-    extention?: string,
+    extension?: string,
 }
 
 export type TestFilesystemHelperDirOptions = {
@@ -26,8 +26,8 @@ export class TestFilesystemHelper {
 
 	async createFile(content: string = faker.lorem.paragraph(), option: TestFilesystemHelperFileOptions = {}) {
 		const mimeType =  option.mimeType ?? 'text/plain';
-		const exctention = option.extention ?? faker.system.fileExt(mimeType);
-		const path = option.path ?? joinPath(getRandomPath(), `${faker.system.fileName()}.${exctention}`);
+		const extension = option.extension ?? faker.system.fileExt(mimeType);
+		const path = option.path ?? joinPath(getRandomPath(), `${faker.system.fileName()}.${extension}`);
 		const fullPath = joinPath(this.basePath, path);
 		await fs.mkdir(dirname(fullPath), {recursive: true});
 

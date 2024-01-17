@@ -6,13 +6,20 @@ import { TestFilesystemHelper } from '../../test/helpers/testFilesystemHelper';
 
 class RevealedList extends List {
 	
-	constructor(list: List) {
-		super([]);
-		this.add(list);
+	constructor(list?: List) {
+		super();
+		if(list){
+			this.add(list);
+		}
 	}
 
-	getPaths() {
+	getWraps() {
 		return this.dirWrap;
+	}
+
+	revealedAdd(...params: unknown[]) {
+		const _params = params as Parameters<List['add']>;
+		return this.add(..._params);
 	}
 }
 
@@ -30,10 +37,10 @@ describe('Test List', () => {
 	});
 
 
-	describe('Constructore, add and concat', () => {
+	describe('Constructor, add and concat', () => {
 
 		test('Create Instance', () => {
-			const list = new List([]);
+			const list = new List();
 			expect(list).toBeInstanceOf(List);
 		});
 
@@ -42,8 +49,8 @@ describe('Test List', () => {
 			const list = await dir.list();
 			const revealedList = new RevealedList(list);
 			expect(list).toBeInstanceOf(List);
-			const paths = revealedList.getPaths();
-			const newList = new List(paths);
+			const paths = revealedList.getWraps();
+			const newList = List.from(paths);
 			expect(newList).toBeInstanceOf(List);
 		});
 
@@ -52,57 +59,12 @@ describe('Test List', () => {
 			const list = await dir.list();
 			const revealedList = new RevealedList(list);
 			expect(list).toBeInstanceOf(List);
-			const paths = revealedList.getPaths().map((wrap) => wrap.dirent);
+			const paths = revealedList.getWraps().map((wrap) => wrap.dirent);
 			const newList = new List(dir, paths);
 			expect(newList).toBeInstanceOf(List);
 		});
 
-		test('Add DirentWrapper', async () => {
-			const dir = new Directory('./test/data');
-			const list = await dir.list();
-			const revealedList = new RevealedList(list);
-			const paths = revealedList.getPaths();
-			const newList = new List([]);
-			newList.add(paths);
-			expect(newList).toBeInstanceOf(List);
-		});
 
-		test('Add Directory and paths', async () => {
-			const dir = new Directory('./test/data');
-			const list = await dir.list();
-			const revealedList = new RevealedList(list);
-			const paths = revealedList.getPaths().map((wrap) => wrap.dirent);
-			const newList = new List([]);
-			newList.add(dir, paths);
-			expect(newList).toBeInstanceOf(List);
-			expect(newList).not.toBe(list);
-
-			const newListArray = newList.asArray();
-			const listArray = list.asArray();
-			expect(newListArray).toHaveLength(listArray.length);
-			expect(newListArray).toStrictEqual(listArray);
-		});
-
-		test('Add List', async () => {
-			const dir = new Directory('./test/data');
-			const list = await dir.list();
-			const revealedList = new RevealedList(list);
-			const newList = new List([]);
-			newList.add(revealedList);
-			expect(newList).toBeInstanceOf(List);
-			expect(newList).not.toBe(list);
-
-			const newListArray = newList.asArray();
-			const listArray = list.asArray();
-			expect(newListArray).toHaveLength(listArray.length);
-			expect(newListArray).toStrictEqual(listArray);
-		});
-
-		test('Add throw error on wrong argument', async () => {
-			const dir = new Directory('./test/data');
-			const newList = new List([]);
-			expect(() => newList.add(dir)).toThrowError();
-		});
 
 		test('Concat Lists', async () => {
 
@@ -148,7 +110,7 @@ describe('Test List', () => {
 
 		});
 
-		test('filter function with subdir', async () => {
+		test('filter function with subDir', async () => {
 			const subDirName = 'testDir';
 			const testSub = await testHelper.createSubDir(subDirName);
 			await testSub.createFile('lorem', {path: 'some.log'});
@@ -208,7 +170,7 @@ describe('Test List', () => {
 
 	describe('Iterator', () => {
 		
-		test('Interate over list', async () => {
+		test('Iterate over list', async () => {
 			await testHelper.createDir('testDir');
 			const amount = (await testHelper.createDirs()).getPaths(1).length;
 			await testHelper.createFile('lorem', {path: 'some.log'});
@@ -280,5 +242,34 @@ describe('Test List', () => {
 			expect(last instanceof Directory || last instanceof File).toBeTruthy();
 			expect(last.path).toBe(zero.path);
 		});
+	});
+
+	describe('protected functions', () => {
+
+		test('Add DirentWrapper', async () => {
+			const dir = new Directory('./test/data');
+			const list = await dir.list();
+			const revealedList = new RevealedList(list);
+			const paths = revealedList.getWraps();
+			const newList = new RevealedList();
+			newList.revealedAdd(paths);
+			expect(newList).toBeInstanceOf(List);
+		});
+
+		test('Add List', async () => {
+			const dir = new Directory('./test/data');
+			const list = await dir.list();
+			const revealedList = new RevealedList(list);
+			const newList = new RevealedList();
+			newList.revealedAdd(revealedList);
+			expect(newList).toBeInstanceOf(List);
+			expect(newList).not.toBe(list);
+
+			const newListArray = newList.asArray();
+			const listArray = list.asArray();
+			expect(newListArray).toHaveLength(listArray.length);
+			expect(newListArray).toStrictEqual(listArray);
+		});
+
 	});
 });
