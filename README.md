@@ -16,6 +16,9 @@ const str = file.text();
 const json = file.json();
 const buffer = file.plain();
 
+// If you want to have the directory just call
+file.parent // it is the same as for a directory 
+
 
 // Register a plugin, look below to get more information on plugins
 Loom.register(/*some plugin*/)
@@ -27,15 +30,16 @@ By default the system can read json and yml and convert it to json. To Support m
 Reading a dir Works similar.
 
 ```ts
-import Loom, {type File} from '@loom-io/fs'
+import Loom, {type File, type Directory} from '@loom-io/fs'
 
+const root = Loom.root(); // Returns a directory object of the project root, to call the system root call Loom.dir('/)
 const dir = Loom.dir('some/dir');
 
 // here you have functions to list the content of the dir and get files
 const files  = dir.files(true);  // return all files in the directory and it's subdirectories as type File.
 
 for(let file of files) {
-  const json = (file as File).json();
+  const json = file.json();
   // do something with the content
 }
 
@@ -44,10 +48,18 @@ const list = dir.list() // returns a iterable to get Files and Directories
 for(let el of list) {
   if(el instanceOf List) { // check if it is a File
     console.log(el.text()); // do some Stuff with the file content
-  } else {
+  } else (el instanceOf Directory) {
     console.log(el.list().length) // in the other case it is an directory and you can go on working with it
   }
 }
+
+// to get the parent of a directory
+if(dir.parent !== undefined) {
+  dir.parent.list()
+}
+
+// to select a specific sub directory call
+dir.subDir('sub/path'); // this is not validated and only throws an arrow an calling list or files
 
 ```
 
@@ -59,7 +71,7 @@ To handle and covert more file types to json loom-io/fs allow to register plugin
 // Plugin type to convert file content to json
 export type LoomFSFileConverter = {
   type: PLUGIN_TYPE.FILE_CONVERTER,
-  extentions: string[],
+  extensions: string[],
   parse<T = unknown>(content: string): T
   stringify<T = unknown>(content: T): string
 }
@@ -74,7 +86,7 @@ import { PLUGIN_TYPE, type LoomFSFileConverter } from 'loom-io/fs';
 //example for the plugin to convert json strings.
 export default {
 	type: PLUGIN_TYPE.FILE_CONVERTER,
-	extentions: ['json'],
+	extensions: ['json'],
 	parse: JSON.parse,
 	stringify: JSON.stringify
 } satisfies LoomFSFileConverter;

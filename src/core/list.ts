@@ -31,35 +31,29 @@ export class List<T extends ListTypes = ListTypes> {
 		dir?: Directory,
 		_paths?: Dirent[])
 	{
-		this.dirWrap = [];
 		if(dir && _paths) {
-			this.add(dir, _paths);
+			this.dirWrap = _paths.map((p)  => new DirentWrapper(dir, p));
+		} else {
+			this.dirWrap = [];
 		}
 	}
 
 	protected add(paths: DirentWrapper[]): void
-	protected add(dir: Directory, paths: Dirent[]): void
 	protected add(list: List<T>): void
 	protected add(listOrWrap: List<T> | DirentWrapper[]): void
-	protected add(dirOrListOrDirentWrapper: Directory | DirentWrapper[] | List<T>, paths?: Dirent[]) {
+	protected add(listOrDirentWrapper: DirentWrapper[] | List<T>) {
 
-		if(dirOrListOrDirentWrapper instanceof Directory) {
-			if(paths === undefined) {
-				throw new Error('List constructor requires paths argument if the first argument is a Directory');
-			}
-			const wrapped = paths.map((path) => new DirentWrapper(dirOrListOrDirentWrapper, path));
-			this.dirWrap.push(...wrapped);
-		} else if(dirOrListOrDirentWrapper instanceof List) {
-			this.dirWrap.push(...dirOrListOrDirentWrapper.dirWrap);
+		if(listOrDirentWrapper instanceof List) {
+			this.dirWrap.push(...listOrDirentWrapper.dirWrap);
 		} else {
-			this.dirWrap.push(...dirOrListOrDirentWrapper);
+			this.dirWrap.push(...listOrDirentWrapper);
 		}
 	}
 
 	concat<U extends ListTypes>(...lists: Array<List<U>>): List<T | U> {
 		const newList = List.from<T | U>(this);
 		for(const list of lists) {
-			newList.add(list.dirWrap);
+			newList.add(list);
 		}
 
 		return newList;

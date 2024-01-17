@@ -62,6 +62,13 @@ describe('Test File Service', () => {
 		const plugins = FileTest.getConvertPlugins();
 		expect(plugins).toHaveLength(2);
 	});
+
+	test('get parent or dir', () => {
+		const file = File.from('./test/data/test.json');
+		expect(file.dir).instanceOf(Directory);
+		expect(file.dir.path).toBe(`${process.cwd()}/test/data`);
+		expect(file.dir).toBe(file.parent);
+	});
     
 
 	describe('Test with generated file', () => {

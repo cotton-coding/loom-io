@@ -256,22 +256,6 @@ describe('Test List', () => {
 			expect(newList).toBeInstanceOf(List);
 		});
 
-		test('Add Directory and paths', async () => {
-			const dir = new Directory('./test/data');
-			const list = await dir.list();
-			const revealedList = new RevealedList(list);
-			const paths = revealedList.getWraps().map((wrap) => wrap.dirent);
-			const newList = new RevealedList();
-			newList.revealedAdd(dir, paths);
-			expect(newList).toBeInstanceOf(List);
-			expect(newList).not.toBe(list);
-
-			const newListArray = newList.asArray();
-			const listArray = list.asArray();
-			expect(newListArray).toHaveLength(listArray.length);
-			expect(newListArray).toStrictEqual(listArray);
-		});
-
 		test('Add List', async () => {
 			const dir = new Directory('./test/data');
 			const list = await dir.list();
