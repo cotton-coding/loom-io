@@ -1,50 +1,87 @@
 import * as fs from 'node:fs/promises';
 import { existsSync } from 'node:fs';
 import { PLUGIN_TYPE, type LoomFSFileConverter } from './types.js';
-import { FileConvertException, FileDoesNotExistException, PluginNotFoundException } from './exceptions.js';
+import { FileConvertException, PluginNotFoundException } from './exceptions.js';
+import { Directory } from './dir.js';
+import { join as joinPath, extname, dirname, basename } from 'node:path';
+
+export interface PrefixDefinition {
+	dept: number,
+	separator: string
+}
 
 export class File {
 
 	protected static converterPlugins: Map<string, LoomFSFileConverter> = new Map();
-	protected _extention: string | undefined;
+	protected _extension: string | undefined;
 
-	constructor(
-        protected _path: string
-	) {
-		if(!existsSync(_path)) {
-			throw new FileDoesNotExistException(_path);
+	static from(dir: Directory, name: string): File
+	static from(path: string): File
+	static from(dirOrPath: Directory | string, name: string = ''){
+		
+		if(typeof dirOrPath === 'string') {
+			name = basename(dirOrPath);
+			dirOrPath = new Directory(dirname(dirOrPath));
 		}
+
+		return new File(dirOrPath, name);
 	}
 
-	get path() {
-		return this._path;
+	static async exists(path: string): Promise<boolean>
+	static async exists(dir: Directory, name: string): Promise<boolean>
+	static async exists(dirOrPath: Directory | string, name: string = ''){
+		const path = 
+			typeof dirOrPath === 'string'
+				? dirOrPath 
+				: joinPath((dirOrPath as Directory).path, name);
+	
+		return new Promise((resolve) => {
+			const exists = existsSync(path);
+			resolve(exists);
+		});
+	}
+
+	constructor(
+		protected _dir: Directory,
+    protected _name: string
+	) {}
+
+	get path(): string {
+		return joinPath(this.dir.path, this.name);
 	}
 
 	get name(): string {
-		return <string>this.path.split('/').pop();
+		return this._name;
 	}
 
-	get extention() {
-		if(this._extention === undefined) {
-			const split = this.name.split('.');
-			this._extention = split.length > 1 ? split.pop() : undefined;
+	get extension() {
+		if(this._extension === undefined) {
+			const ext = extname(this.name);
+			this._extension = ext === '' ? undefined: ext.slice(1);
 		}
-		return this._extention;
+		return this._extension;
+	}
+
+	get dir(): Directory {
+		return this._dir;
+	}
+
+	get parent() {
+		return this.dir;
 	}
 
 	async json<T>() {
-		const text = await this.text();
-		
-		if(this.extention === undefined) {
+		if(this.extension === undefined) {
 			throw new FileConvertException(this.path, 'File has no extension');
 		}
 	
-		const plugin = File.converterPlugins.get(this.extention);
+		const plugin = File.converterPlugins.get(this.extension);
 
 		if(plugin === undefined) {
 			throw new PluginNotFoundException(this.path);
 		}
 
+		const text = await this.text();
 		return plugin.parse<T>(text);
 		
 	}
@@ -59,10 +96,9 @@ export class File {
 
 	static register(plugin: LoomFSFileConverter) {
 		if(plugin.type === PLUGIN_TYPE.FILE_CONVERTER) {
-			plugin.extentions.forEach(ext => {
+			plugin.extensions.forEach(ext => {
 				File.converterPlugins.set(ext, plugin);
 			});
 		}
 	}
-    
 }

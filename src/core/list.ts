@@ -4,6 +4,8 @@ import { DirentWrapper } from './wrapper/dirent.js';
 import type { File } from './file.js';
 
 
+export type ListTypes = File | Directory;
+
 type PickMatching<T, V> =
     { [K in keyof T as T[K] extends V ? K : never]: T[K] }
 type DirentMethodsName = keyof PickMatching<DirentWrapper, () => unknown>;
@@ -11,25 +13,35 @@ type DirentMethodsName = keyof PickMatching<DirentWrapper, () => unknown>;
 //     [K in keyof T]: DirentWrapper[T[K]] extends () => unknown ? ReturnType<DirentWrapper[T[K]]> : DirentWrapper[T[K]]
 // }
 
-export class List {
+export class List<T extends ListTypes = ListTypes> {
 
 	protected dirWrap: DirentWrapper[];
 
-	constructor(direntWrapper: DirentWrapper[])
+	static from<T extends ListTypes>(list: List<T>): List<T>
+	static from<T extends ListTypes>(direntWraps: DirentWrapper[]): List<T>
+	static from<T extends ListTypes>(listOrWrap: List<T> | DirentWrapper[]) {
+		const list = new List<T>();
+		list.add(listOrWrap);
+		return list;
+	}
+
+	constructor()
 	constructor(dir: Directory, paths: Dirent[])
 	constructor(
-		dirOrDirentWrapper: Directory | DirentWrapper[],
+		dir?: Directory,
 		_paths?: Dirent[])
 	{
 		this.dirWrap = [];
-		this.add(dirOrDirentWrapper, _paths);
+		if(dir && _paths) {
+			this.add(dir, _paths);
+		}
 	}
 
-	add(paths: DirentWrapper[]): List
-	add(dir: Directory, paths: Dirent[]): List
-	add(dirOrDirentWrapper: Directory | DirentWrapper[], paths?: Dirent[]): List
-	add(list: List): List
-	add(dirOrListOrDirentWrapper: Directory | DirentWrapper[] | List, paths?: Dirent[]) {
+	protected add(paths: DirentWrapper[]): void
+	protected add(dir: Directory, paths: Dirent[]): void
+	protected add(list: List<T>): void
+	protected add(listOrWrap: List<T> | DirentWrapper[]): void
+	protected add(dirOrListOrDirentWrapper: Directory | DirentWrapper[] | List<T>, paths?: Dirent[]) {
 
 		if(dirOrListOrDirentWrapper instanceof Directory) {
 			if(paths === undefined) {
@@ -42,12 +54,10 @@ export class List {
 		} else {
 			this.dirWrap.push(...dirOrListOrDirentWrapper);
 		}
-
-		return this;
 	}
 
-	concat(...lists: List[]): List {
-		const newList = new List(this.dirWrap);
+	concat<U extends ListTypes>(...lists: Array<List<U>>): List<T | U> {
+		const newList = List.from<T | U>(this);
 		for(const list of lists) {
 			newList.add(list.dirWrap);
 		}
@@ -61,7 +71,7 @@ export class List {
 
 	protected convert(wrap: DirentWrapper) {
 		if(wrap.isDirectory()) {
-			return wrap.dir.subdir(wrap.name);
+			return wrap.dir.subDir(wrap.name);
 		} else {
 			return wrap.dir.file(wrap.name);
 		}
@@ -80,17 +90,30 @@ export class List {
 		return this.at(this.length - 1) as T;
 	}
 
-	asArray() {
-		return this.dirWrap.map((wrap) => {
-			return this.convert(wrap);
-		});
+	asArray(): Array<T> {
+		return [...this];
 	}
 
-	filter(fn: (wrap: DirentWrapper) => boolean) {
+	filter<T extends ListTypes>(fn: (wrap: DirentWrapper) => boolean): List<T> {
 		const filtered = this.dirWrap.filter(fn);
-		return new List(filtered);
+		return List.from(filtered);
 	}
 
+	only(type: 'directories' | 'dirs'): List<Directory>
+	only(type: 'files'): List<File>
+	only(type: 'files' | 'directories' | 'dirs') {
+		switch(type) {
+		case 'files':
+			return this.filter<File>((wrap) => wrap.isFile());
+		case 'dirs':
+		case 'directories':
+			return this.filter<Directory>((wrap) => wrap.isDirectory());
+		}
+	}
+
+	/**
+	 * @deprecated Deprecated from version 0.5 use only instead
+	 */
 	filterByType(direntMethod: DirentMethodsName) {
 		return this.filter((wrap) => wrap[direntMethod]());
 	}
@@ -114,12 +137,12 @@ export class List {
 	// }
 
 
-	*[Symbol.iterator]() {
+	*[Symbol.iterator](): IterableIterator<T> {
 		for(const wrap of this.dirWrap) {
 			if(wrap.isDirectory()) {
-				yield wrap.dir.subdir(wrap.name);
+				yield wrap.dir.subDir(wrap.name) as T;
 			} else {
-				yield wrap.dir.file(wrap.name);
+				yield wrap.dir.file(wrap.name) as T;
 			}
 		}
 	}

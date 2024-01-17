@@ -14,12 +14,16 @@ export class LoomFs {
 
 	protected constructor() {}
 
+	static root() {
+		return new Directory();
+	}
+
 	static dir(path: string) {
 		return new Directory(path);
 	}
 
 	static file(path: string) {
-		return new File(path);
+		return File.from(path);
 	}
 
 	static register(plugin: LoomFSPlugin) {

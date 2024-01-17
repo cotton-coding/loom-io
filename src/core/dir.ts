@@ -1,5 +1,5 @@
 import * as fs from 'node:fs/promises';
-import * as path from 'node:path';
+import { join as joinPath, relative as relativePath, resolve as resolvePath} from 'node:path';
 import { File } from './file.js';
 import { List } from './list.js';
 
@@ -7,18 +7,36 @@ import { List } from './list.js';
 
 export class Directory {
 
+	protected readonly _path: string;
+
 	constructor(
-        protected _path: string
+		path: string = process.cwd()
 	) {
-		fs.access(_path);
+		this._path = resolvePath(path);
 	}
 
 	get path() {
 		return this._path;
 	}
 
+	get parent(): Directory | undefined {
+		if(this._path === '/') return undefined;
+		const split = this.path.slice(1).split('/');
+		split.pop();
+		return new Directory(`/${split.join('/')}`);
+	}
+
+	subDir(name: string) {
+		return new Directory(joinPath(this.path, name));
+	}
+
+	/**
+	 * @deprecated use subDir
+	 * @param subDir 
+	 * @returns 
+	 */
 	subdir(subDir: string) {
-		return new Directory(path.join(this.path, subDir));
+		return this.subDir(subDir);
 	}
 
 	async list(): Promise<List> {
@@ -28,40 +46,40 @@ export class Directory {
 		return new List(this, paths);
 	}
 
-	relativePath(dir: Directory): string {
-		return path.relative(this.path, dir.path);
+	/**
+	 * Returns the relative path to the given path or undefined if the given dir or file is parent or not related
+	 */
+	relativePath(dir: Directory | File): string | undefined {
+		const p = relativePath(this.path, dir.path);
+		return p === '' ? undefined : p;
 	}
 
 
-	file(name: string) {
-		return new File(path.join(this.path, name));
+	file(name: string): File {
+		return new File(this, name);
 	}
 
-	protected async filesRecursion(list: List): Promise<List> {
+	protected async filesRecursion(list: List): Promise<List<File>>{
 
-		const dirList = list.filterByType('isDirectory');
-		const fileList = list.filterByType('isFile');
+		const dirList = list.only('dirs');
+		let fileList = list.only('files');
 
 		for(const el of dirList) {
-			if(el instanceof Directory) {
-				const subList = await el.list();
-				fileList.add(await this.filesRecursion(subList));
-			}
+			const subList = await el.list();
+			fileList = fileList.concat(await this.filesRecursion(subList));
 		}
 
 		return fileList;
 	}
 
-	async files(recursive: boolean = false): Promise<List> {
+	async files(recursive: boolean = false): Promise<List<File>> {
 		const list = await this.list();
 
 		if(recursive) {
 			return this.filesRecursion(list);
 		} else {
-			const fileList = list.filterByType('isFile');
+			const fileList = list.only('files');
 			return fileList;
 		}
-  
-		
 	}
 }
