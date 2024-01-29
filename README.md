@@ -12,9 +12,9 @@ import Loom from '@loom-io/fs'
 const file = Loom.file('./some/file.json')
 
 // the file could be read as plain txt or json
-const str = file.text();
-const json = file.json();
-const buffer = file.plain();
+const str = await file.text();
+const json = await file.json();
+const buffer = await file.plain();
 
 // If you want to have the directory just call
 file.parent // it is the same as for a directory 
@@ -36,26 +36,26 @@ const root = Loom.root(); // Returns a directory object of the project root, to 
 const dir = Loom.dir('some/dir');
 
 // here you have functions to list the content of the dir and get files
-const files  = dir.files(true);  // return all files in the directory and it's subdirectories as type File.
+const files  = await dir.files(true);  // return all files in the directory and it's subdirectories as type File.
 
 for(let file of files) {
   const json = file.json();
   // do something with the content
 }
 
-const list = dir.list() // returns a iterable to get Files and Directories
+const list = await dir.list() // returns a iterable to get Files and Directories
 
 for(let el of list) {
   if(el instanceOf List) { // check if it is a File
-    console.log(el.text()); // do some Stuff with the file content
+    console.log(await el.text()); // do some Stuff with the file content
   } else (el instanceOf Directory) {
-    console.log(el.list().length) // in the other case it is an directory and you can go on working with it
+    console.log((await el.list()).length) // in the other case it is an directory and you can go on working with it
   }
 }
 
 // to get the parent of a directory
 if(dir.parent !== undefined) {
-  dir.parent.list()
+  await dir.parent.list()
 }
 
 // to select a specific sub directory call
@@ -71,15 +71,15 @@ A list Object is returned if you call `list` or `files` of the directory object.
 const arrayOfFilesAndDirectories = dir.list().asArray();
 
 //Ready type save filter
-const listOfFiles = dir.list().only('files');
-const listOfDirs = dir.list().only('dirs');
+const listOfFiles = (await dir.list()).only('files');
+const listOfDirs = (await dir.list()).only('dirs');
 
 //own filter for more advanced. The callback function gets an DirentWrapper Object which have some readonly attributes, you can get also the dirent or the dir.
-dir.list().filter<File>((el) => el.name.endsWith('.spec.yml'));
-dir.list().filter<Directory>((el) => el.isDirectory());
+(await dir.list()).filter<File>((el) => el.name.endsWith('.spec.yml'));
+(await dir.list()).filter<Directory>((el) => el.isDirectory());
 
 // see more examples for iteration above
-for(let file of dir.files()) {
+for(let file of await dir.files()) {
   const json = file.json();
   // do something with the content
 }
