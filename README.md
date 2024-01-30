@@ -30,7 +30,7 @@ By default the system can read json and yml and convert it to json. To Support m
 Reading a dir Works similar.
 
 ```ts
-import Loom, {type File, type Directory} from '@loom-io/fs'
+import Loom, {type LoomFile, type Directory} from '@loom-io/fs'
 
 const root = Loom.root(); // Returns a directory object of the project root, to call the system root call Loom.dir('/)
 const dir = Loom.dir('some/dir');
@@ -46,7 +46,7 @@ for(let file of files) {
 const list = await dir.list() // returns a iterable to get Files and Directories
 
 for(let el of list) {
-  if(el instanceOf List) { // check if it is a File
+  if(el instanceOf LoomFile) { // check if it is a File
     console.log(await el.text()); // do some Stuff with the file content
   } else (el instanceOf Directory) {
     console.log((await el.list()).length) // in the other case it is an directory and you can go on working with it
@@ -75,7 +75,7 @@ const listOfFiles = (await dir.list()).only('files');
 const listOfDirs = (await dir.list()).only('dirs');
 
 //own filter for more advanced. The callback function gets an DirentWrapper Object which have some readonly attributes, you can get also the dirent or the dir.
-(await dir.list()).filter<File>((el) => el.name.endsWith('.spec.yml'));
+(await dir.list()).filter<LoomFile>((el) => el.name.endsWith('.spec.yml'));
 (await dir.list()).filter<Directory>((el) => el.isDirectory());
 
 // see more examples for iteration above
