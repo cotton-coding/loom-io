@@ -1,5 +1,5 @@
 import { Directory } from '../core/dir.js';
-import { File } from '../core/file.js';
+import { LoomFile } from '../core/file.js';
 import { PLUGIN_TYPE, type LoomFSPlugin } from '../core/types.js';
 import crypto from 'node:crypto';
 
@@ -7,7 +7,7 @@ import jsonConverter from '../plugins/jsonConverter.js';
 import yamlConverter from '../plugins/yamlConverter.js';
 
 export type { LoomFSPlugin, PLUGIN_TYPE };
-export type { File, Directory };
+export type { LoomFile as File, Directory };
 export class LoomFs {
 
 	protected static pluginHashes: string[] = [];
@@ -23,7 +23,7 @@ export class LoomFs {
 	}
 
 	static file(path: string) {
-		return File.from(path);
+		return LoomFile.from(path);
 	}
 
 	static register(plugin: LoomFSPlugin) {
@@ -33,7 +33,7 @@ export class LoomFs {
 		}
 		this.pluginHashes.push(pluginHash);
 		if(PLUGIN_TYPE.FILE_CONVERTER === plugin.type) {
-			File.register(plugin);
+			LoomFile.register(plugin);
 		}
 	}
 }

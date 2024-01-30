@@ -21,3 +21,9 @@ export class FileConvertException extends Error {
 		super(`Error converting file ${path}: ${message}`);
 	}
 }
+
+export class DataInvalidException extends Error {
+	constructor(message: string) {
+		super(`Data not valid: ${message}`);
+	}
+}

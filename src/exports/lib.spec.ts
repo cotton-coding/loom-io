@@ -3,7 +3,7 @@ import { LoomFs } from './lib.js';
 import jsonConverter from '../plugins/jsonConverter.js';
 import yamlConverter from '../plugins/yamlConverter.js';
 import { Directory } from '../core/dir.js';
-import { File } from '../core/file.js';
+import { LoomFile } from '../core/file.js';
 
 
 class LoomFsTest extends LoomFs {
@@ -52,9 +52,9 @@ describe('Test Entry', () => {
 	});
 
 	test('Get File Instance', () => {
-		const file = LoomFs.file('./test/data/test.json');
+		const file = LoomFs.file('test/data/test.json');
 		expect(file).toBeDefined();
-		expect(file).toBeInstanceOf(File);
+		expect(file).toBeInstanceOf(LoomFile);
 	});
 
     

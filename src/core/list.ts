@@ -1,10 +1,10 @@
 import type { Dirent } from 'fs';
 import { Directory } from './dir.js';
 import { DirentWrapper } from './wrapper/dirent.js';
-import type { File } from './file.js';
+import type { LoomFile } from './file.js';
 
 
-export type ListTypes = File | Directory;
+export type ListTypes = LoomFile | Directory;
 
 type PickMatching<T, V> =
     { [K in keyof T as T[K] extends V ? K : never]: T[K] }
@@ -76,11 +76,11 @@ export class List<T extends ListTypes = ListTypes> {
 		return this.convert(wrap);
 	}
 
-	first<T = Directory | File>(): T {
+	first<T = Directory | LoomFile>(): T {
 		return this.at(0) as T;
 	}
 
-	last<T = Directory | File>(): T {
+	last<T = Directory | LoomFile>(): T {
 		return this.at(this.length - 1) as T;
 	}
 
@@ -94,11 +94,11 @@ export class List<T extends ListTypes = ListTypes> {
 	}
 
 	only(type: 'directories' | 'dirs'): List<Directory>
-	only(type: 'files'): List<File>
+	only(type: 'files'): List<LoomFile>
 	only(type: 'files' | 'directories' | 'dirs') {
 		switch(type) {
 		case 'files':
-			return this.filter<File>((wrap) => wrap.isFile());
+			return this.filter<LoomFile>((wrap) => wrap.isFile());
 		case 'dirs':
 		case 'directories':
 			return this.filter<Directory>((wrap) => wrap.isDirectory());
