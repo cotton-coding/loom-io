@@ -1,7 +1,7 @@
 import { expect, describe, test, beforeEach, afterEach } from 'vitest';
 import { List } from './list';
 import { Directory } from './dir';
-import { File } from './file';
+import { LoomFile } from './file';
 import { TestFilesystemHelper } from '../../test/helpers/testFilesystemHelper';
 
 class RevealedList extends List {
@@ -126,7 +126,7 @@ describe('Test List', () => {
 			expect(filtered.first()).toBeInstanceOf(Directory);
 			const file = (await filtered.first<Directory>().list()).first();
 			
-			expect(file).toBeInstanceOf(File);
+			expect(file).toBeInstanceOf(LoomFile);
 
 		});
 
@@ -161,7 +161,7 @@ describe('Test List', () => {
 			expect(filtered).toBeInstanceOf(List);
 			
 			for(const file of filtered) {
-				expect(file).toBeInstanceOf(File);
+				expect(file).toBeInstanceOf(LoomFile);
 			}
 
 		});
@@ -184,7 +184,7 @@ describe('Test List', () => {
 			let count = 0;
 			for(const el of list) {
 				expect(el).toBeDefined();
-				if(!(el instanceof Directory || el instanceof File)) {
+				if(!(el instanceof Directory || el instanceof LoomFile)) {
 					throw new Error('Element is not a Directory or File');
 				}
 				count++;
@@ -221,7 +221,7 @@ describe('Test List', () => {
 			const first = list.first();
 			const zero = list.at(0);
 			expect(first).toBeDefined();
-			expect(first instanceof Directory || first instanceof File).toBeTruthy();
+			expect(first instanceof Directory || first instanceof LoomFile).toBeTruthy();
 			expect(first.path).toBe(zero.path);
 		});
 
@@ -239,7 +239,7 @@ describe('Test List', () => {
 			const last = list.last();
 			const zero = list.at(total - 1);
 			expect(last).toBeDefined();
-			expect(last instanceof Directory || last instanceof File).toBeTruthy();
+			expect(last instanceof Directory || last instanceof LoomFile).toBeTruthy();
 			expect(last.path).toBe(zero.path);
 		});
 	});
