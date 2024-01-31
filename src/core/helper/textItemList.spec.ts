@@ -29,8 +29,8 @@ describe('LineList', () => {
 		expect(list.start).toBe(start);
 		expect(list.end).toBe(end);
 		expect(list.length).toBe(end - start);
-		expect(list.isFirst()).toBe(true);
-		expect(list.isLast()).toBe(true);
+		expect(list.isFirstItem()).toBe(true);
+		expect(list.isLastItem()).toBe(true);
 	});
 
 
@@ -49,17 +49,17 @@ describe('LineList', () => {
 		list97.add(list40);
 		expect(list97.prev()).toBe(list40);
 		expect(list97.next()).toBe(undefined);
-		expect(list97.isLast()).toBe(true);
+		expect(list97.isLastItem()).toBe(true);
 		expect(list37.next()).toBe(list40);
 		list97.add(list0);
 		expect(list97.prev()).toBe(list40);
 		expect(list13.prev()).toBe(list0);
 		expect(list13.next()).toBe(list37);
-		expect(list13.isFirst()).toBe(false);
+		expect(list13.isFirstItem()).toBe(false);
 		list0.add(list80);
 		expect(list0.next()).toBe(list13);
 		expect(list0.prev()).toBe(undefined);
-		expect(list0.isFirst()).toBe(true);
+		expect(list0.isFirstItem()).toBe(true);
 		expect(list13.prev()).toBe(list0);
 	});
 
@@ -151,4 +151,191 @@ describe('LineList', () => {
 		list40.unwrapAddAfter(list0);
 		expect(list40.next()).toBe(list0);
 	});
+
+	test('hasNext', () => {
+		const list0 = new TextItemList({ start: 0, end: 7 });
+		const list80 = new TextItemList({ start: 80, end: 87 });
+		const list97 = new TextItemList({ start: 97, end: 137 });
+		
+		list0.add(list80);
+		expect(list0.hasNext()).toBe(true);
+		expect(list80.hasNext()).toBe(false);
+		expect(list97.hasNext()).toBe(false);
+		list0.add(list97);
+		expect(list0.hasNext()).toBe(true);
+		expect(list80.hasNext()).toBe(true);
+		expect(list97.hasNext()).toBe(false);
+	});
+
+	test('hasPrev', () => {
+		const list0 = new TextItemList({ start: 0, end: 7 });
+		const list80 = new TextItemList({ start: 80, end: 87 });
+		const list97 = new TextItemList({ start: 97, end: 137 });
+		
+		list0.add(list80);
+		expect(list0.hasPrev()).toBe(false);
+		expect(list80.hasPrev()).toBe(true);
+		expect(list97.hasPrev()).toBe(false);
+		list0.add(list97);
+		expect(list0.hasPrev()).toBe(false);
+		expect(list80.hasPrev()).toBe(true);
+		expect(list97.hasPrev()).toBe(true);
+	});
+
+	describe('Test with reverse', () => {
+
+		test('getLastReverse', () => {
+			const list0 = new TextItemList({ start: 0, end: 7, });
+			const list8 = new TextItemList({ start: 8, end: 12 });
+			const list13 = new TextItemList({ start: 13, end: 20 });
+			const list37 = new TextItemList({ start: 37, end: 39 });
+			const list40 = new TextItemList({ start: 40, end: 42, readReverse: true });
+			const list80 = new TextItemList({ start: 80, end: 87, readReverse: true });
+			const list200 = new TextItemList({ start: 200, end: 300, readReverse: true });
+		
+			list0.add(list13);
+			list0.add(list37);
+			list0.add(list80);
+			list0.add(list40);
+			list13.add(list200);
+			list200.add(list8);
+
+			expect(list0.getLastReverse()).toBe(list40);
+			expect(list40.getLastReverse()).toBe(list40);
+			expect(list80.getLastReverse()).toBe(list40);
+			expect(list37.getLastReverse()).toBe(list40);
+			expect(list200.getLastReverse()).toBe(list40);
+			expect(list13.getLastReverse()).toBe(list40);
+
+		});
+
+		test('getLastReverse with no reverse', () => {
+			const list0 = new TextItemList({ start: 0, end: 7, });
+			const list8 = new TextItemList({ start: 8, end: 12 });
+			const list13 = new TextItemList({ start: 13, end: 20 });
+			const list37 = new TextItemList({ start: 37, end: 39 });
+			const list40 = new TextItemList({ start: 40, end: 42});
+			const list80 = new TextItemList({ start: 80, end: 87});
+			const list200 = new TextItemList({ start: 200, end: 300});
+		
+			list0.add(list13);
+			list0.add(list37);
+			list0.add(list80);
+			list0.add(list40);
+			list13.add(list200);
+			list200.add(list8);
+
+			expect(list8.getLastReverse()).toBeUndefined();
+			expect(list200.getLastReverse()).toBeUndefined();
+			expect(list13.getLastReverse()).toBeUndefined();
+			expect(list37.getLastReverse()).toBeUndefined();
+			expect(list80.getLastReverse()).toBeUndefined();
+			expect(list40.getLastReverse()).toBeUndefined();
+			expect(list0.getLastReverse()).toBeUndefined();
+		});
+
+		test('getLastReverse with only reverse', () => {
+			const list0 = new TextItemList({ start: 0, end: 7, readReverse: true });
+			const list8 = new TextItemList({ start: 8, end: 12, readReverse: true });
+			const list13 = new TextItemList({ start: 13, end: 20, readReverse: true });
+			const list37 = new TextItemList({ start: 37, end: 39, readReverse: true });
+			const list40 = new TextItemList({ start: 40, end: 42, readReverse: true });
+			const list80 = new TextItemList({ start: 80, end: 87, readReverse: true });
+			const list200 = new TextItemList({ start: 200, end: 300, readReverse: true });
+		
+			list0.add(list13);
+			list0.add(list37);
+			list0.add(list80);
+			list0.add(list40);
+			list13.add(list200);
+			list200.add(list8);
+
+			expect(list8.getLastReverse()).toBe(list0);
+			expect(list200.getLastReverse()).toBe(list0);
+			expect(list13.getLastReverse()).toBe(list0);
+			expect(list37.getLastReverse()).toBe(list0);
+			expect(list80.getLastReverse()).toBe(list0);
+			expect(list40.getLastReverse()).toBe(list0);
+			expect(list0.getLastReverse()).toBe(list0);
+		});
+
+		test('getLastForward', () => {
+			const list0 = new TextItemList({ start: 0, end: 7, });
+			const list8 = new TextItemList({ start: 8, end: 12 });
+			const list13 = new TextItemList({ start: 13, end: 20 });
+			const list37 = new TextItemList({ start: 37, end: 39 });
+			const list40 = new TextItemList({ start: 40, end: 42, readReverse: true });
+			const list80 = new TextItemList({ start: 80, end: 87, readReverse: true });
+			const list97 = new TextItemList({ start: 97, end: 137, readReverse: true });
+		
+			list0.add(list13);
+			list0.add(list37);
+			list0.add(list80);
+			list0.add(list40);
+			list40.add(list97);
+			list13.add(list8);
+
+			expect(list0.getLastForward()).toBe(list37);
+			expect(list40.getLastForward()).toBe(list37);
+			expect(list80.getLastForward()).toBe(list37);
+			expect(list37.getLastForward()).toBe(list37);
+			expect(list97.getLastForward()).toBe(list37);
+			expect(list13.getLastForward()).toBe(list37);
+
+		});
+
+		test('getLastForward with only reverse', () => {
+			const list0 = new TextItemList({ start: 0, end: 7, readReverse: true });
+			const list8 = new TextItemList({ start: 8, end: 12, readReverse: true });
+			const list13 = new TextItemList({ start: 13, end: 20, readReverse: true });
+			const list37 = new TextItemList({ start: 37, end: 39, readReverse: true });
+			const list40 = new TextItemList({ start: 40, end: 42, readReverse: true });
+			const list80 = new TextItemList({ start: 80, end: 87, readReverse: true });
+			const list97 = new TextItemList({ start: 97, end: 137, readReverse: true });
+		
+			list0.add(list13);
+			list0.add(list37);
+			list0.add(list80);
+			list0.add(list40);
+			list40.add(list97);
+			list13.add(list8);
+
+			expect(list8.getLastForward()).toBeUndefined();
+			expect(list97.getLastForward()).toBeUndefined();
+			expect(list13.getLastForward()).toBeUndefined();
+			expect(list37.getLastForward()).toBeUndefined();
+			expect(list80.getLastForward()).toBeUndefined();
+			expect(list40.getLastForward()).toBeUndefined();
+			expect(list0.getLastForward()).toBeUndefined();
+
+		});
+
+		test('getLastForward with no reverse', () => {
+			const list0 = new TextItemList({ start: 0, end: 7, });
+			const list8 = new TextItemList({ start: 8, end: 12 });
+			const list13 = new TextItemList({ start: 13, end: 20 });
+			const list37 = new TextItemList({ start: 37, end: 39 });
+			const list40 = new TextItemList({ start: 40, end: 42 });
+			const list80 = new TextItemList({ start: 80, end: 87 });
+			const list97 = new TextItemList({ start: 97, end: 137 });
+		
+			list0.add(list13);
+			list0.add(list37);
+			list0.add(list80);
+			list0.add(list40);
+			list40.add(list97);
+			list13.add(list8);
+
+			expect(list8.getLastForward()).toBe(list97);
+			expect(list13.getLastForward()).toBe(list97);
+			expect(list37.getLastForward()).toBe(list97);
+			expect(list80.getLastForward()).toBe(list97);
+			expect(list40.getLastForward()).toBe(list97);
+			expect(list97.getLastForward()).toBe(list97);
+			expect(list0.getLastForward()).toBe(list97);
+
+		});
+
+	});
+
 });

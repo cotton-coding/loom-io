@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
 import { DataInvalidException } from '../exceptions.js';
 
 export interface TextMeta {
 	start: number,
 	end: number,
-	last?: boolean,
 	readReverse?: boolean
+	first?: boolean,
+	last?: boolean
 }
 
 export class TextItemList {
@@ -32,11 +34,48 @@ export class TextItemList {
 		return this.end - this.start;
 	}
 
-	isFirst() {
+	get first() {
+		return !!this.content.first;
+	}
+
+	get last() {
+		return !!this.content.last;
+	}
+
+	isReverseRead() {
+		return !!this.content.readReverse;
+	}
+
+	getLastForward(): TextItemList | undefined{
+		if(!this.isReverseRead() && (this.after === undefined || this.after.isReverseRead())) {
+			return this;
+		} else if(this.isReverseRead() && (this.before === undefined || !this.before.isReverseRead())) {
+			return this.before;
+		} else if (this.isReverseRead()) {
+			return this.before?.getLastForward();
+		} else {
+			return this.after?.getLastForward();
+		}
+	}
+
+	getLastReverse(): TextItemList | undefined{
+		if(this.isReverseRead() && (this.before === undefined || !this.before.isReverseRead())) {
+			return this;
+		} else if (!this.isReverseRead() && (this.after === undefined || this.after.isReverseRead())) {
+			return this.after;
+		} else if (this.isReverseRead()) {
+			return this.before?.getLastReverse();
+		} else {
+			return this.after?.getLastReverse();
+		}
+
+	}
+
+	isFirstItem() {
 		return this.before === undefined;
 	}
 
-	isLast() {
+	isLastItem() {
 		return this.after === undefined;
 	}	
 
@@ -111,9 +150,16 @@ export class TextItemList {
 	}
 
 
+	hasNext(): boolean {
+		return this.after !== undefined;
+	}
 
 	next(): TextItemList | undefined {
 		return this.after;
+	}
+
+	hasPrev(): boolean {
+		return this.before !== undefined;
 	}
 
 	prev(): TextItemList | undefined{
