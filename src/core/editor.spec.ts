@@ -7,8 +7,6 @@ import { LoomFile } from './file';
 import * as fs from 'node:fs/promises';
 import { faker } from '@faker-js/faker';
 import { TextItemList } from './helper/textItemList';
-import exp from 'node:constants';
-
 
 function createEditor(testFile: string) {
 	const dir = new Directory(dirname(testFile));
