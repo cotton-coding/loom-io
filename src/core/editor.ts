@@ -1,10 +1,14 @@
 import { LoomFile } from './file';
 import * as fs from 'fs/promises';
-import { Result } from './helper/result';
+import { BaseResult, LineResult, Result, SearchResult } from './helper/result';
 import { TextItemList } from './helper/textItemList';
 
 export interface Reader {
-	search(value: string, start?: number): Promise<Result | undefined>;
+	search(value: string | Buffer): Promise<Result | undefined>;
+	search(value: string | Buffer, start: number): Promise<Result | undefined>;
+	searchLast(value: string | Buffer): Promise<Result | undefined>;
+	searchLast(value: string | Buffer, start: number): Promise<Result | undefined>;
+	read(start: number, length: number): Promise<Buffer>;
 	close(): Promise<void>;
 }
 
@@ -57,45 +61,76 @@ export class Editor implements Reader, Writer{
 	 * Search for a string in the file by chunking the file into pieces to avoid memory overflow.
 	 * set start to 'EOF' to search from the end of the file.
 	 * 
-	 * @param value 
-	 * @param start 
+	 * @param value - value to search
+	 * @param start - start position in the file
 	 */
-	async search(value: string): Promise<Result | undefined>;
-	async search(value: string, start: number = 0): Promise<Result | undefined> {
-		return await this.loopForward(value, start);
+	async search<T extends BaseResult = SearchResult>(value: string | Buffer, start: number = 0): Promise<T | undefined> {
+		const searchValue = Buffer.from(value);
+		const item =  await this.loopForward(searchValue, start);
+		if(item === undefined) {
+			return undefined;
+		}
+		return (new Result(item, searchValue, this)) as unknown as T;
 	}
 
-	async searchReverse(value: string, start: number | 'EOF' = 'EOF'): Promise<Result | undefined> {
-		return this.loopReverse(value, 0, start);
+	/**
+	 * Search for a string in the file by chunking the file into pieces to avoid memory overflow.
+	 * set start to 'EOF' to search from the end of the file.
+	 * 
+	 * @param value - value to search
+	 * @param start - last value included in the search
+	 */
+	async searchLast<T extends BaseResult = SearchResult>(value: string | Buffer, start: number | 'EOF' = 'EOF'): Promise<T | undefined> {
+		const searchValue = Buffer.from(value);
+		const item = await this.loopReverse(searchValue, 0, start);
+		if(item === undefined) {
+			return undefined;
+		}
+		return new Result(item, searchValue, this) as unknown as T;
 	}
 
 	protected calcChunkSize(valueLength: number): number {
 		return this.chunkSize > valueLength ? this.chunkSize : valueLength*3;
 	}
 
-	protected async loopForward(search: string | Buffer, start: number = 0, end: number | 'EOF' = 'EOF'): Promise<Result | undefined> {
+	protected async loopForward(value: Buffer, start: number = 0, end: number | 'EOF' = 'EOF'): Promise<TextItemList | undefined> {
 		let position = start;
 		const last = await this.convertEOF(end);
-		const value = Buffer.from(search);
 
 		const valueLength = value.length;
 		const chunkSize = this.calcChunkSize(valueLength);
 		let item: TextItemList | undefined = undefined;
 		const length = chunkSize + valueLength;
 		do {
-			const chunk = (await this.file.read({position, length})).buffer;
-			console.log(chunk.toString());
+			const chunk = await this.read(position, length);
 			const matches = this.searchInChunk(value, chunk);
 			item = this.convertChunkMatchesToItems(matches, valueLength, position);
 			position += (chunkSize - valueLength/2);
 		} while (item === undefined && position < last);
 
-		if(item === undefined) {
+		return item?.getFirstItem();
+	}
+
+	protected async loopReverse(value: Buffer, first: number = 0, last: number | 'EOF' = 'EOF'): Promise<TextItemList | undefined> {
+		let position = await this.convertEOF(last);
+		if(first > position) {
 			return undefined;
 		}
+		const valueLength = value.length;
+		const chunkSize = this.calcChunkSize(valueLength);
+		let item: TextItemList | undefined;
+		do {
+			const param = this.loopReverseCalcNextChunk(position, chunkSize, valueLength, first);
+			({position} = param);
+			const chunk = (await this.file.read(param)).buffer;
+			const matches = this.searchInChunk(value, chunk);
+			
+			item = this.convertChunkMatchesToItems(matches, valueLength, position, true);
+			
+		} while (item === undefined && position > first);
 
-		return new Result(item, this);
-	}
+		return item?.getLastItem();
+	}	
 
 	protected async convertEOF(value: number | 'EOF'): Promise<number> {
 		if(value === 'EOF') {
@@ -107,13 +142,13 @@ export class Editor implements Reader, Writer{
 	}
 
 	protected searchInChunk(value: Buffer, chunk: Buffer): number[] {
-		const result: number[] = [];
+		const results: number[] = [];
 		let i = 0;
 		while((i = chunk.indexOf(value, i)) !== -1) {
-			result.push(i);
+			results.push(i);
 			i += value.length;
 		}
-		return result;
+		return results;
 	}
 
 
@@ -140,44 +175,47 @@ export class Editor implements Reader, Writer{
 	}
 	
 
-	protected convertChunkMatchesToItems(matches: number[], valueLength: number, chunkPosition: number): TextItemList | undefined{
+	protected convertChunkMatchesToItems(matches: number[], valueLength: number, chunkPosition: number, isReverseRead: boolean = false): TextItemList | undefined{
 		return matches.reduce<TextItemList | undefined>((item, match) => {
 			const start = chunkPosition + match;
 			const end = start + valueLength;
-			const newItem = new TextItemList({start, end});
+			const newItem = new TextItemList({start, end, readReverse: isReverseRead});
 			item?.add(newItem);	
 			return item ?? newItem;
 		}, undefined);
 	}
 
+	async read(start: number, length: number): Promise<Buffer> {
+		const data = await this.file.read({position: start, length});
+		return data.buffer;
+	}
 
-	protected async loopReverse(search: string | Buffer, start: number = 0, end: number | 'EOF' = 'EOF'): Promise<Result | undefined> {
-		let position = await this.convertEOF(end);
-		if(start > position) {
-			return undefined;
-		}
-		const value = Buffer.from(search);
-		const valueLength = value.length;
-		const chunkSize = this.calcChunkSize(valueLength);
-		
-		let item: TextItemList | undefined;
-		do {
-			const param = this.loopReverseCalcNextChunk(position, chunkSize, valueLength, start);
-			({position} = param);
-			const chunk = (await this.file.read(param)).buffer;
-			const matches = this.searchInChunk(value, chunk);
-			
-			item = this.convertChunkMatchesToItems(matches, valueLength, position - chunkSize);
-			
-		} while (item === undefined && position > start);
-
+	async readAsString(start: number, length: number): Promise<string>
+	async readAsString(start: number, length: number, encoding: BufferEncoding): Promise<string>
+	async readAsString(start: number, length: number, encoding: BufferEncoding = 'utf8'): Promise<string> {
+		const buffer = await this.read(start, length);
+		return buffer.toString(encoding);
+	}
+	
+	async getFirstLine(separator: Buffer | string = '\n'): Promise<LineResult | undefined>{
+		const bSeparator = Buffer.from(separator);
+		const item = await this.loopForward(bSeparator);
 		if(item === undefined) {
 			return undefined;
 		}
 
-		return new Result(item, this);
-	}	
+		return new Result(item, bSeparator, this);
+	}
 
+	async getLastLine(separator: Buffer | string = '\n'): Promise<LineResult | undefined>{
+		const bSeparator = Buffer.from(separator);
+		const item = await this.loopReverse(bSeparator);
+		if(item === undefined) {
+			return undefined;
+		}
+
+		return new Result(item, bSeparator, this);
+	}
 
 
 

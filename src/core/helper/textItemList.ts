@@ -9,6 +9,11 @@ export interface TextMeta {
 	last?: boolean
 }
 
+export interface SearchItem {
+	readonly start: number;
+	readonly end: number;
+	readonly length: number;
+}
 export class TextItemList {
 
 	protected before: TextItemList | undefined;
@@ -75,18 +80,50 @@ export class TextItemList {
 		return this.before === undefined;
 	}
 
+	getFirstItem(): TextItemList {
+		if(this.before === undefined) {
+			return this;
+		}
+		return this.before.getFirstItem();
+	}
+
 	isLastItem() {
 		return this.after === undefined;
 	}	
 
-	add(item: TextItemList) {
-		if(item.start < this.start) {
-			return this.searchAndAddBefore(item);
-		} else {
-			return this.searchAndAddAfter(item);
+	getLastItem(): TextItemList {
+		if(this.after === undefined) {
+			return this;
 		}
-
+		return this.after.getLastItem();
 	}
+
+	add(item: TextItemList) {
+		let f = item.getFirstItem();
+		let n;
+		do {
+			n = f.next();
+			f.separate();
+			if(item.start < this.start) {
+				this.searchAndAddBefore(item);
+			} else {
+				this.searchAndAddAfter(item);
+			}
+			f = n!;
+		}while(n !== undefined);
+		
+		return this;
+	}
+
+	separate() {
+		if(this.before !== undefined) {
+			this.before.after = this.after;
+		}
+		if(this.after !== undefined) {
+			this.after.before = this.before;
+		}
+	}
+
 
 	protected searchAndAddBefore(item: TextItemList): TextItemList {
 		if( item.start < this.start ) {
@@ -123,7 +160,6 @@ export class TextItemList {
 				return this.addAfter(item);
 			}
 		}
-
 		throw new DataInvalidException('Item could not be added');
 	}
 

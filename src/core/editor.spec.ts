@@ -69,6 +69,18 @@ describe('Editor', () => {
 			reader.close();
 		});
 
+		test('find next value', async () => {
+			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
+			const reader = await createEditor(testFile);
+			const result = await reader.search('some');
+			expect(result).toBeDefined();
+			const next = await result?.next();
+			expect(next).toBeDefined();
+			expect(next?.meta).not.toBe(result?.meta);
+			expect(next?.meta.start).toBeGreaterThan(result!.meta.start);
+			reader.close();
+		});
+
 		test('find no value', async () => {
 			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
 			const reader = await createEditor(testFile);
@@ -80,8 +92,21 @@ describe('Editor', () => {
 		test('find last value', async () => {
 			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
 			const reader = await createEditor(testFile);
-			const result = await reader.searchReverse('sure');
+			const result = await reader.searchLast('some');
 			expect(result).toBeDefined();
+			expect(result?.meta.start).toBeGreaterThan(1000);
+			reader.close();
+		});
+
+		test('find previous value', async () => {
+			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
+			const reader = await createEditor(testFile);
+			const result = await reader.searchLast('some');
+			expect(result).toBeDefined();
+			const prev = await result?.prev();
+			expect(prev).toBeDefined();
+			expect(prev?.meta).not.toBe(result?.meta);
+			expect(prev?.meta.start).toBeLessThan(result!.meta.start);
 			reader.close();
 		});
 
