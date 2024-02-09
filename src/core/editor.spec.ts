@@ -100,17 +100,13 @@ describe('Editor', () => {
 			const reader = await createEditor(testFile);
 			const result = await reader.searchFirst('co');
 			expect(result).toBeDefined();
-			console.log(result?.meta.start);
 			let count = 1;
 			while(await result?.hasNext()) {
 				
 				await result?.next();
 				expect(result).toBeDefined();
-				console.log(result?.meta.start);
 				count++;
 			}
-			console.log(Buffer.from('co'));
-			console.log(Buffer.from('Co'));
 			//find 5 with small letter, search is case insensitive
 			expect(count).toBe(5);
 			reader.close();
