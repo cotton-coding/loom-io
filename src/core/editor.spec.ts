@@ -24,12 +24,6 @@ class TestEditor extends Editor {
 
 	}
 
-	unwrappedConvertEOF(
-		...values: Parameters<Editor['convertEOF']>
-	): ReturnType<Editor['convertEOF']> {
-		return this.convertEOF(...values);
-	}
-
 	unwrappedSearchInChunk(
 		...values: Parameters<Editor['searchInChunk']>
 	): ReturnType<Editor['searchInChunk']> {
@@ -64,28 +58,89 @@ describe('Editor', () => {
 		test('find first value', async () => {
 			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
 			const reader = await createEditor(testFile);
-			const result = await reader.search('sure');
+			const result = await reader.searchFirst('sure');
 			expect(result).toBeDefined();
+			reader.close();
+		});
+
+		test('has next value', async () => {
+			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
+			const reader = await createEditor(testFile);
+			const result = await reader.searchFirst('some');
+			expect(result).toBeDefined();
+			const hasNext = await result?.hasNext();
+			expect(hasNext).toBe(true);
+			reader.close();
+		});
+
+		test('has no next value', async () => {
+			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
+			const reader = await createEditor(testFile);
+			const result = await reader.searchFirst('opportunity');
+			expect(result).toBeDefined();
+			expect(await result?.hasNext()).toBe(false);
 			reader.close();
 		});
 
 		test('find next value', async () => {
 			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
 			const reader = await createEditor(testFile);
-			const result = await reader.search('some');
+			const result = await reader.searchFirst('some');
 			expect(result).toBeDefined();
+			const resultValue = result!.meta;
 			const next = await result?.next();
 			expect(next).toBeDefined();
-			expect(next?.meta).not.toBe(result?.meta);
-			expect(next?.meta.start).toBeGreaterThan(result!.meta.start);
+			expect(next?.meta).not.toBe(resultValue);
+			expect(next?.meta.start).toBeGreaterThan(resultValue.start);
+			reader.close();
+		});
+
+		test('find all values forward', async () => {
+			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
+			const reader = await createEditor(testFile);
+			const result = await reader.searchFirst('co');
+			expect(result).toBeDefined();
+			console.log(result?.meta.start);
+			let count = 1;
+			while(await result?.hasNext()) {
+				
+				await result?.next();
+				expect(result).toBeDefined();
+				console.log(result?.meta.start);
+				count++;
+			}
+			console.log(Buffer.from('co'));
+			console.log(Buffer.from('Co'));
+			//find 5 with small letter, search is case insensitive
+			expect(count).toBe(5);
 			reader.close();
 		});
 
 		test('find no value', async () => {
 			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
 			const reader = await createEditor(testFile);
-			const result = await reader.search('surely not');
+			const result = await reader.searchFirst('surely not');
 			expect(result).toBeUndefined();
+			reader.close();
+		});
+
+		test('has prev value', async () => {
+			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
+			const reader = await createEditor(testFile);
+			const result = await reader.searchLast('it');
+			expect(result).toBeDefined();
+			const hasPrev = await result?.hasPrev();
+			expect(hasPrev).toBe(true);
+			reader.close();
+		});
+
+		test('has no prev value', async () => {
+			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
+			const reader = await createEditor(testFile);
+			const result = await reader.searchLast('itself');
+			expect(result).toBeDefined();
+			const hasPrev = await result?.hasPrev();
+			expect(hasPrev).toBe(false);
 			reader.close();
 		});
 
@@ -103,24 +158,32 @@ describe('Editor', () => {
 			const reader = await createEditor(testFile);
 			const result = await reader.searchLast('some');
 			expect(result).toBeDefined();
+			const resultValue = result!.meta;
 			const prev = await result?.prev();
 			expect(prev).toBeDefined();
-			expect(prev?.meta).not.toBe(result?.meta);
-			expect(prev?.meta.start).toBeLessThan(result!.meta.start);
+			expect(prev?.meta).not.toBe(resultValue);
+			expect(prev?.meta.start).toBeLessThan(resultValue.start);
+			reader.close();
+		});
+
+		test('find all values reverse', async () => {
+			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
+			const reader = await createEditor(testFile);
+			const result = await reader.searchLast('in');
+			expect(result).toBeDefined();
+			
+			let count = 1;
+			while(await result?.hasPrev()) {
+				await result!.prev();
+				expect(result).toBeDefined();
+				count++;
+			}
+			expect(count).toBe(17);
 			reader.close();
 		});
 
 
 		describe('test loop and background function', () => {
-
-			test('convertEOF', async () => {
-				const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/test.txt`;
-				const editor = await TestEditor.fromPath(testFile);
-				const result = await editor.unwrappedConvertEOF('EOF');
-				expect(result).toBeDefined();
-				expect(result).toBeTypeOf('number');
-				expect(result).toBe(9);
-			});
 
 			test('searchInChunk', async () => {
 				const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;

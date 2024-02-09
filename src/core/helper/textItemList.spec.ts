@@ -1,6 +1,5 @@
 import { describe, expect, test } from 'vitest';
 import { TextItemList } from './textItemList';
-import { DataInvalidException } from '../exceptions';
 import { faker } from '@faker-js/faker';
 
 class TestTextItemList extends TextItemList {
@@ -63,13 +62,87 @@ describe('LineList', () => {
 		expect(list13.prev()).toBe(list0);
 	});
 
+	test('add with adding other list', () => {
+		const list0 = new TextItemList({ start: 0, end: 7 });
+		const list13 = new TextItemList({ start: 13, end: 20 });
+		const list37 = new TextItemList({ start: 37, end: 39 });
+		const list40 = new TextItemList({ start: 40, end: 42 });
+		const list80 = new TextItemList({ start: 80, end: 87 });
+		const list97 = new TextItemList({ start: 97, end: 137 });
+
+		list0.add(list80);
+		list0.add(list40);
+
+		list37.add(list13);
+		list37.add(list97);
+
+		list80.add(list37);
+
+		expect(list0.next()).toBe(list13);
+		expect(list0.prev()).toBe(undefined);
+		expect(list13.next()).toBe(list37);
+		expect(list13.prev()).toBe(list0);
+		expect(list37.next()).toBe(list40);
+		expect(list37.prev()).toBe(list13);
+		expect(list40.next()).toBe(list80);
+		expect(list40.prev()).toBe(list37);
+		expect(list80.next()).toBe(list97);
+		expect(list80.prev()).toBe(list40);
+		expect(list97.next()).toBe(undefined);
+		expect(list97.prev()).toBe(list80);
+
+
+	});
+
+
+	test('add with large list', () => {
+		const amount = faker.number.int({min: 10000, max: 13000});
+		const elements: TextItemList[] = [];
+		const elementSize = faker.number.int({min: 1, max: 300});
+		let lastElement;
+		for(let i = 0; i < amount; i++) {
+			const randomNumber = faker.number.int();
+			const nextStart = lastElement?.end ?? 0 + randomNumber;
+			lastElement = new TextItemList({ start: nextStart, end: nextStart+elementSize});
+			elements.push(lastElement);
+		}
+
+		expect(elements.length).toBe(amount);
+
+		let list0 = elements.shift()!;
+		while(elements.length > 7) {
+			const random = faker.number.int({min: 1, max: elements.length-2});
+			if(elements.length < random) {
+				break;
+			}
+			const subList = elements.shift();
+			for(let i = 0; i < random; i++) {
+				subList!.add(elements.shift()!);
+			}
+			list0.add(subList!);
+			list0 = list0.getLastItem();
+		}
+
+		while(elements.length > 0) {
+			list0.add(elements.shift()!);
+		}
+
+		let count = 1;
+		let item = list0.getFirstItem();
+		while(item.hasNext()) {
+			item = item.next()!;
+			count++;
+		}
+
+		expect(count).toBe(amount);
+	});
+
 	test('searchAndAddBefore via unwrap', () => {
 		const list0 = new TestTextItemList({ start: 0, end: 7 });
 		const list37 = new TestTextItemList({ start: 37, end: 39 });
 		const list13 = new TestTextItemList({ start: 13, end: 20 });
 		const list40 = new TestTextItemList({ start: 40, end: 42 });
 		const list80 = new TestTextItemList({ start: 80, end: 87 });
-		const list97 = new TestTextItemList({ start: 97, end: 137 });
 		
 		list80.unwrapSearchAndAddBefore(list13);
 		expect(list80.prev()).toBe(list13);
@@ -80,26 +153,19 @@ describe('LineList', () => {
 		list40.unwrapSearchAndAddBefore(list0);
 		expect(list40.prev()).toBe(list13);
 		expect(list13.prev()).toEqual(list0);
-
-		expect(() => list40.unwrapSearchAndAddBefore(list97)).toThrow(DataInvalidException);
 		
 		list40.unwrapSearchAndAddBefore(list37);
 		expect(list40.prev()).toBe(list37);
 		expect(list40.next()).toBe(list80);
 		expect(list37.prev()).toBe(list13);
 
-		list80.unwrapSearchAndAddBefore(list97);
-		expect(list80.next()).toBe(list97);
-
 	});
 
 	test('searchAndAddAfter via unwrap', () => {
-		const list0 = new TestTextItemList({ start: 0, end: 7 });
 		const list37 = new TestTextItemList({ start: 37, end: 39 });
 		const list13 = new TestTextItemList({ start: 13, end: 20 });
 		const list40 = new TestTextItemList({ start: 40, end: 42 });
 		const list80 = new TestTextItemList({ start: 80, end: 87 });
-		const list97 = new TestTextItemList({ start: 97, end: 137 });
 		
 		list13.unwrapSearchAndAddAfter(list80);
 		expect(list13.next()).toBe(list80);
@@ -110,13 +176,6 @@ describe('LineList', () => {
 		
 		list13.unwrapSearchAndAddAfter(list37);
 		expect(list13.next()).toBe(list37);
-		
-		expect(() => list40.unwrapSearchAndAddAfter(list0)).toThrow(DataInvalidException);
-
-		list13.unwrapSearchAndAddAfter(list0);
-		expect(list13.prev()).toBe(list0);
-		list40.unwrapSearchAndAddAfter(list97);
-		expect(list97.prev()).toBe(list80);
 
 	});
 

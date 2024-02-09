@@ -1,6 +1,6 @@
 import * as fs from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { PLUGIN_TYPE, type LoomFSFileConverter } from './types.js';
+import { PLUGIN_TYPE, type LoomFSFileConverter, FILE_SIZE_UNIT } from './types.js';
 import { FileConvertException, PluginNotFoundException } from './exceptions.js';
 import { Directory } from './dir.js';
 import { join as joinPath, extname, dirname, basename } from 'node:path';
@@ -69,6 +69,18 @@ export class LoomFile {
 
 	get parent() {
 		return this.dir;
+	}
+
+	async getSizeInBytes() {
+		const stats = await fs.stat(this.path);
+		return stats.size;
+	}
+
+	async getSize(unit: FILE_SIZE_UNIT = FILE_SIZE_UNIT.BYTE) {
+		const bytes = await this.getSizeInBytes();
+
+		const index = Object.values(FILE_SIZE_UNIT).indexOf(unit);
+		return bytes / Math.pow(1024, index);
 	}
 
 	async json<T>() {

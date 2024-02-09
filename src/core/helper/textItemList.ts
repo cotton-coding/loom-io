@@ -1,19 +1,12 @@
 /* eslint-disable @typescript-eslint/no-this-alias */
-import { DataInvalidException } from '../exceptions.js';
-
 export interface TextMeta {
-	start: number,
-	end: number,
-	readReverse?: boolean
-	first?: boolean,
-	last?: boolean
+	readonly start: number,
+	readonly end: number,
+	readonly readReverse?: boolean
+	readonly first?: boolean,
+	readonly last?: boolean
 }
 
-export interface SearchItem {
-	readonly start: number;
-	readonly end: number;
-	readonly length: number;
-}
 export class TextItemList {
 
 	protected before: TextItemList | undefined;
@@ -104,10 +97,10 @@ export class TextItemList {
 		do {
 			n = f.next();
 			f.separate();
-			if(item.start < this.start) {
-				this.searchAndAddBefore(item);
+			if(f.start < this.start) {
+				this.searchAndAddBefore(f);
 			} else {
-				this.searchAndAddAfter(item);
+				this.searchAndAddAfter(f);
 			}
 			f = n!;
 		}while(n !== undefined);
@@ -118,49 +111,53 @@ export class TextItemList {
 	separate() {
 		if(this.before !== undefined) {
 			this.before.after = this.after;
+			this.before = undefined;
 		}
 		if(this.after !== undefined) {
 			this.after.before = this.before;
+			this.after = undefined;
 		}
 	}
 
 
 	protected searchAndAddBefore(item: TextItemList): TextItemList {
-		if( item.start < this.start ) {
-			if(this.before == null) {
-				return this.addBefore(item);
-			}
-			return this.before.searchAndAddBefore(item);
-		} else if (this.after == null) {
-			return this.addAfter(item);
-		} else if (item.start < this.after.start) {
-			if (item.end > this.end) {
-				return this.addAfter(item);
-			} else {
-				return this.addBefore(item);
-			}
+		if (item.start === this.start && item.end === this.end) {
+			return this;
 		}
+		let cur: TextItemList = this;
+		let prev: TextItemList | undefined;
+		do {
+			prev = cur.prev();
+			if(prev === undefined) {
+				return cur.addBefore(item);
+			} else if ( item.start > prev.start && item.start < cur.start) { 
+				return cur.addBefore(item);
+			}
+			cur = prev;
+		} while (cur.hasPrev());
 
-		throw new DataInvalidException('Item could not be added');
+		return cur.addBefore(item);
 
 	}
 
 	protected searchAndAddAfter(item: TextItemList): TextItemList {
-		if( item.start > this.start ) {
-			if(this.after == null) {
-				return this.addAfter(item);
-			}
-			return this.after.searchAndAddAfter(item);
-		} else if (this.before == null) {
-			return this.addBefore(item);
-		} else if ( item.start > this.before.start) { 
-			if (item.end < this.end) {
-				return this.addBefore(item);
-			} else {
-				return this.addAfter(item);
-			}
+
+		if (item.start === this.start && item.end === this.end) {
+			return this;
 		}
-		throw new DataInvalidException('Item could not be added');
+		let cur: TextItemList = this;
+		let next: TextItemList | undefined;
+		do {
+			next = cur.next();
+			if(next === undefined) {
+				return cur.addAfter(item);
+			} else if ( item.start > cur.start && item.start < next.start) { 
+				return cur.addAfter(item);
+			}
+			cur = next;
+		} while (cur.hasNext());
+
+		return cur.addAfter(item);
 	}
 
 
@@ -200,5 +197,10 @@ export class TextItemList {
 
 	prev(): TextItemList | undefined{
 		return this.before;
+	}
+
+
+	static patch (item: TextItemList, data: TextMeta) {
+		item._content = {...item._content, ...data};
 	}
 }

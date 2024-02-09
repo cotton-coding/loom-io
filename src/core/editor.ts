@@ -1,22 +1,32 @@
 import { LoomFile } from './file';
 import * as fs from 'fs/promises';
-import { BaseResult, LineResult, Result, SearchResult } from './helper/result';
+import { BaseResult, LineResult, SearchResult } from './helper/result';
 import { TextItemList } from './helper/textItemList';
 
-export interface Reader {
-	search(value: string | Buffer): Promise<Result | undefined>;
-	search(value: string | Buffer, start: number): Promise<Result | undefined>;
-	searchLast(value: string | Buffer): Promise<Result | undefined>;
-	searchLast(value: string | Buffer, start: number): Promise<Result | undefined>;
+interface ReadWrite {
+	getSizeInBytes(): Promise<number>;
+}
+
+export interface Reader extends ReadWrite {
+	searchFirst(value: string | Buffer): Promise<SearchResult | undefined>;
+	searchFirst(value: string | Buffer, start: number): Promise<SearchResult | undefined>;
+	searchLast(value: string | Buffer): Promise<SearchResult | undefined>;
+	searchLast(value: string | Buffer, start: number): Promise<SearchResult | undefined>;
 	read(start: number, length: number): Promise<Buffer>;
+	readAsString(start: number, length: number): Promise<string>;
 	close(): Promise<void>;
+}
+
+export interface ReaderInternal extends Reader {
+	loopForward(value: Buffer, first: number, last: number): Promise<TextItemList | undefined>;
+	loopReverse(value: Buffer, first: number, last: number): Promise<TextItemList | undefined>;
 }
 
 export interface Writer {
 	close(): Promise<void>;
 }
 
-export class Editor implements Reader, Writer{
+export class Editor implements Reader, Writer, ReaderInternal{
 
 	protected chunkSize: number = 1024;
 	protected lineInfo: TextItemList | undefined;
@@ -43,6 +53,10 @@ export class Editor implements Reader, Writer{
 		return this.file;
 	}
 
+	async getSizeInBytes(): Promise<number> {
+		return await this.ref.getSizeInBytes();
+	}
+
 	async close(): Promise<void> {
 		await this.file.close();
 	}
@@ -64,13 +78,14 @@ export class Editor implements Reader, Writer{
 	 * @param value - value to search
 	 * @param start - start position in the file
 	 */
-	async search<T extends BaseResult = SearchResult>(value: string | Buffer, start: number = 0): Promise<T | undefined> {
+	async searchFirst<T extends BaseResult = SearchResult>(value: string | Buffer, start: number = 0): Promise<T | undefined> {
 		const searchValue = Buffer.from(value);
-		const item =  await this.loopForward(searchValue, start);
+		const fileSize = await this.getSizeInBytes();
+		const item =  await this.loopForward(searchValue, start, fileSize);
 		if(item === undefined) {
 			return undefined;
 		}
-		return (new Result(item, searchValue, this)) as unknown as T;
+		return (new SearchResult(item, searchValue, this)) as unknown as T;
 	}
 
 	/**
@@ -80,22 +95,21 @@ export class Editor implements Reader, Writer{
 	 * @param value - value to search
 	 * @param start - last value included in the search
 	 */
-	async searchLast<T extends BaseResult = SearchResult>(value: string | Buffer, start: number | 'EOF' = 'EOF'): Promise<T | undefined> {
+	async searchLast<T extends BaseResult = SearchResult>(value: string | Buffer, start?: number): Promise<T | undefined> {
 		const searchValue = Buffer.from(value);
-		const item = await this.loopReverse(searchValue, 0, start);
+		const item = await this.loopReverse(searchValue, 0, start || await this.getSizeInBytes());
 		if(item === undefined) {
 			return undefined;
 		}
-		return new Result(item, searchValue, this) as unknown as T;
+		return new SearchResult(item, searchValue, this) as unknown as T;
 	}
 
 	protected calcChunkSize(valueLength: number): number {
-		return this.chunkSize > valueLength ? this.chunkSize : valueLength*3;
+		return this.chunkSize > valueLength ? this.chunkSize : valueLength*7;
 	}
 
-	protected async loopForward(value: Buffer, start: number = 0, end: number | 'EOF' = 'EOF'): Promise<TextItemList | undefined> {
-		let position = start;
-		const last = await this.convertEOF(end);
+	async loopForward(value: Buffer, first: number, last: number): Promise<TextItemList | undefined> {
+		let position = first;
 
 		const valueLength = value.length;
 		const chunkSize = this.calcChunkSize(valueLength);
@@ -111,8 +125,8 @@ export class Editor implements Reader, Writer{
 		return item?.getFirstItem();
 	}
 
-	protected async loopReverse(value: Buffer, first: number = 0, last: number | 'EOF' = 'EOF'): Promise<TextItemList | undefined> {
-		let position = await this.convertEOF(last);
+	async loopReverse(value: Buffer, first: number = 0, last: number): Promise<TextItemList | undefined> {
+		let position = last;
 		if(first > position) {
 			return undefined;
 		}
@@ -131,15 +145,6 @@ export class Editor implements Reader, Writer{
 
 		return item?.getLastItem();
 	}	
-
-	protected async convertEOF(value: number | 'EOF'): Promise<number> {
-		if(value === 'EOF') {
-			const stat = await this.file.stat();
-			return stat.size;
-		} else {
-			return value;
-		}
-	}
 
 	protected searchInChunk(value: Buffer, chunk: Buffer): number[] {
 		const results: number[] = [];
@@ -196,25 +201,51 @@ export class Editor implements Reader, Writer{
 		const buffer = await this.read(start, length);
 		return buffer.toString(encoding);
 	}
+
+	async handleFileWithOnlyOneLine(): Promise<LineResult> {
+		const fileSize = await this.getSizeInBytes();
+		const item = new TextItemList({start: 0, end: fileSize});
+		return new LineResult(item.getFirstItem(), this.newLineCharacter, this);
+	}
 	
-	async getFirstLine(separator: Buffer | string = '\n'): Promise<LineResult | undefined>{
+	async getFirstLine(separator: Buffer | string = '\n'): Promise<LineResult>{
 		const bSeparator = Buffer.from(separator);
-		const item = await this.loopForward(bSeparator);
+		const fileSize = await this.getSizeInBytes();
+		const item = await this.loopForward(bSeparator, 0, fileSize);
+		
 		if(item === undefined) {
-			return undefined;
+			return await this.handleFileWithOnlyOneLine();
 		}
 
-		return new Result(item, bSeparator, this);
+		const first = item.getFirstItem();
+
+		TextItemList.patch(first, {
+			...first.content,
+			first: true,
+			start: 0
+		});
+
+		return new LineResult(first, bSeparator, this);
 	}
 
-	async getLastLine(separator: Buffer | string = '\n'): Promise<LineResult | undefined>{
+	async getLastLine(separator: Buffer | string = '\n'): Promise<LineResult>{
 		const bSeparator = Buffer.from(separator);
-		const item = await this.loopReverse(bSeparator);
+		const fileSize = await this.getSizeInBytes();
+		const item = await this.loopReverse(bSeparator, 0, fileSize);
 		if(item === undefined) {
-			return undefined;
+			return await this.handleFileWithOnlyOneLine();
 		}
 
-		return new Result(item, bSeparator, this);
+		const last = item.getLastItem();
+
+		TextItemList.patch(last, {
+			...last.content,
+			last: true,
+			start: last.content.end,
+			end: await this.getSizeInBytes()
+		});
+
+		return new LineResult(last, bSeparator, this);
 	}
 
 
