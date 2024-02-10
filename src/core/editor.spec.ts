@@ -458,7 +458,7 @@ describe('Editor', () => {
 
 		test('read file with only one line', async () => {
 			const fileContentLength = 591;
-			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/oneline.txt`;
+			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/line.txt`;
 			const reader = await createEditor(testFile);
 			const resultForward = await reader.getFirstLine();
 			expect(resultForward).toBeDefined();
