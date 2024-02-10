@@ -1,6 +1,6 @@
 import { LoomFile } from './file';
 import * as fs from 'fs/promises';
-import { BaseResult, LineResult, SearchResult } from './helper/result';
+import { LineResult, SearchResult } from './helper/result';
 import { TextItemList } from './helper/textItemList';
 
 interface ReadWrite {
