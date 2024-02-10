@@ -179,6 +179,8 @@ describe('Editor', () => {
 		});
 
 
+
+
 		describe('test loop and background function', () => {
 
 			test('searchInChunk', async () => {
@@ -263,7 +265,7 @@ describe('Editor', () => {
 				const chunkSize = faker.number.int({min: 100, max: 200});
 				const p = editor.unwrappedLoopReverseCalcNextChunk(cur, chunkSize, valueLength, min);
 				expect(p).toBeDefined();
-				expect(p!.position).toBe(cur - (chunkSize + valueLength/2));
+				expect(p!.position).toBe(cur - (chunkSize + Math.floor(valueLength/2)));
 				expect(p!.length).toBe(chunkSize + valueLength);
 			});
 
@@ -277,10 +279,119 @@ describe('Editor', () => {
 				const p = editor.unwrappedLoopReverseCalcNextChunk(cur, chunkSize, valueLength, min);
 				expect(p).toBeDefined();
 				expect(p!.position).toBe(min);
-				expect(p!.length).toBe(cur - min + valueLength/2);
+				expect(p!.length).toBe(cur - min + Math.floor(valueLength/2));
 			});
 
 
+		});
+
+	});
+
+	describe('line read', () => {
+
+		test('read first line as string', async () => {
+			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
+			const reader = await createEditor(testFile);
+			const result = await reader.getFirstLine();
+			expect(result).toBeDefined();
+			const line = await result?.read('utf8');
+			expect(line).toBeDefined();
+			expect(line).toBeTypeOf('string');
+			expect(line).toBe('---');
+			reader.close();
+		});
+
+		test('read line', async () => {
+			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
+			const reader = await createEditor(testFile);
+			const result = await reader.getFirstLine();
+			expect(result).toBeDefined();
+			const line = await result?.read();
+			expect(line).toBeDefined();
+			expect(line).toBeInstanceOf(Buffer);
+			reader.close();
+		});
+
+		test('get next line', async () => {
+			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
+			const reader = await createEditor(testFile);
+			const result = await reader.getFirstLine();
+			expect(result).toBeDefined();
+			await result.next();
+			expect(result).toBeDefined();
+			expect(result.read('utf8')).resolves.toBe('createdAt: 2020-12-17');
+			reader.close();
+		});
+
+		test('read till last lines', async () => {
+			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
+			const reader = await createEditor(testFile);
+			const result = await reader.getFirstLine();
+			expect(result).toBeDefined();
+			let count = 0;
+			while(await result.hasNext()) {
+				const line = await result.read('utf8');
+				if(line === '---') {
+					count++;
+				}
+				await result.next();
+			}
+			expect(result.read('utf8')).resolves.toBe('### EOF');
+			expect(count).toBe(2);
+			reader.close();
+		});
+
+		test('read last line', async () => {
+			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
+			const reader = await createEditor(testFile);
+			const result = await reader.getLastLine();
+			expect(result).toBeDefined();
+			const line = await result.read();
+			expect(line).toBeDefined();
+			expect(line).toBeInstanceOf(Buffer);
+			reader.close();
+		});
+
+		test('read last line as string', async () => {
+			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
+			const reader = await createEditor(testFile);
+			const result = await reader.getLastLine();
+			expect(result).toBeDefined();
+			const line = await result.read('utf8');
+			expect(line).toBeDefined();
+			expect(line).toBeTypeOf('string');
+			expect(line).toBe('### EOF');
+			reader.close();
+		});
+
+		test('get prev line', async () => {
+			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
+			const reader = await createEditor(testFile);
+			const result = await reader.getLastLine();
+			expect(result).toBeDefined();
+			await result.prev();
+			expect(result).toBeDefined();
+			expect(result.read('utf8')).resolves.toContain('e some ideas in my mind, but not sure if they');
+			reader.close();
+		});
+
+		test('read till first lines', async () => {
+			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
+			const reader = await createEditor(testFile);
+			const result = await reader.getLastLine();
+			expect(result).toBeDefined();
+
+			let count = 0;
+			while(await result.hasPrev()) {
+				await result.prev();
+				const line = await result.read('utf8');
+				if(line === '---') {
+					count++;
+				}
+			}
+			expect(result.read('utf8')).resolves.toBe('---');
+			expect(count).toBe(2);
+			reader.close();
 		});
 
 	});

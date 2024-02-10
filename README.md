@@ -1,6 +1,6 @@
 # loom-io
 
-This repository should include service to handle and work with files. The goal is to handle git and filesystem operations and offer more functionality the nodejs fs functions
+Currently this library helps to read files and directories. There is also planned to offer functions to edit and load sources like git
 
 ## How to
 

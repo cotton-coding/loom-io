@@ -1,6 +1,7 @@
 import { ReaderInternal } from '../editor';
 import { TextItemList, TextMeta } from './textItemList';
 
+
 export interface BaseResult {
 	hasNext(): Promise<boolean>;
 	next(): Promise<BaseResult | undefined>;
@@ -80,7 +81,6 @@ export class SearchResult implements BaseResult{
 		if(await this.hasPrev()) {
 			this._listItem = this._listItem.prev() as TextItemList;
 			return this;
-			//return this.generateInstance(this._listItem.prev() as TextItemList);
 		} else {
 			return undefined;
 		}
@@ -89,23 +89,6 @@ export class SearchResult implements BaseResult{
 	get searchValue(): Buffer {
 		return this._searchValue;
 	}
-
-	// async readLine(): Promise<Buffer>
-	// async readLine(encoding: BufferEncoding): Promise<string>
-	// async readLine(encoding?: BufferEncoding): Promise<Buffer | string> {
-	// 	const end = this._listItem.end;
-	// 	const prev = await this.prev();
-	// 	const start = prev?._listItem.end ?? 0;
-
-
-	// 	const line = await this.reader.read(start, end);
-	// 	if(encoding !== undefined) {
-	// 		return line.toString(encoding);
-	// 	} else {
-	// 		return line;
-	// 	}
-	// }
-	
 }
 
 export class LineResult implements BaseResult {
@@ -114,35 +97,118 @@ export class LineResult implements BaseResult {
 		protected _listItem: TextItemList,
 		protected lineEnd: Buffer,
 		protected reader: ReaderInternal
-	) {}
+	) {
+		this.patchPrevItems();
+		this.patchNextItems();
+	}
 
+	protected patchPrevItems() {
+		let cur = this._listItem;
+		while(cur.hasPrev()) {
+			const prev = cur.prev()!;
+				
+			TextItemList.patch(prev, {
+				...prev.content,
+				start: prev.end,
+				end: cur.start
+			});
+			cur = prev;
+		}
+	}
+
+	protected patchNextItems() {
+		let cur = this._listItem;
+		while(cur.hasNext()) {
+			const next = cur.next()!;
+			TextItemList.patch(next, {
+				...next.content,
+				start: cur.end
+			});
+			cur = next;
+		}
+	}
 
 	async hasNext(): Promise<boolean> {
 		if(this._listItem.hasNext()) {
 			return true;
 		}
 
+		const fileEnd = await this.reader.getSizeInBytes();
+		if(this._listItem.end >= fileEnd) {
+			return false;
+		}
+
 		const fileSize = await this.reader.getSizeInBytes();
 		const newResult = await this.reader.loopForward(this.lineEnd, this._listItem.end, fileSize);
-		if(newResult === undefined) {
-			return false;
+		
+		
+		if(newResult === undefined || newResult.getLastItem().end === this._listItem.end) {
+			const listItem = new TextItemList({
+				start: this._listItem.end, 
+				end: fileEnd + this.lineEnd.length
+			});
+			this._listItem.add(listItem);
+			return true;
 		} else {
-			
+			this._listItem.add(newResult);
+			this.patchNextItems();
 			return true;
 		}
 	}
 
 	async next() {
-		const next = this._listItem.next();
-		if(next === undefined) {
-			const fileSize = await this.reader.getSizeInBytes();
-			const newResult = await this.reader.loopForward(this.lineEnd, this._listItem.end, fileSize);
-			if(newResult === undefined) {
-				return undefined;
-			}
-
+		if(await this.hasNext()) {
+			this._listItem = this._listItem.next()!;
+			return this;
 		} else {
-			return new LineResult(next, this.reader);
+			return undefined;
 		}
 	}
+
+	async hasPrev(): Promise<boolean> {
+		if(this._listItem.hasPrev()) {
+			return true;
+		}
+
+		if(this._listItem.start === 0) {
+			return false;
+		}
+
+		const newResult = await this.reader.loopReverse(this.lineEnd, 0, this._listItem.start);
+		if(newResult === undefined || newResult.getFirstItem().end === this._listItem.start) {
+			const listItem = new TextItemList({
+				start: 0, 
+				end: this._listItem.start
+			});
+			this._listItem.add(listItem);
+			return true;
+		} else {
+			this._listItem.add(newResult);
+			this.patchPrevItems();
+			return true;
+		}
+	}
+
+	async prev() {
+		if(await this.hasPrev()) {
+			this._listItem = this._listItem.prev()!;
+			return this;
+		} else {
+			return undefined;
+		}
+	}
+
+	async read(encoding: BufferEncoding): Promise<string>
+	async read(): Promise<Buffer>
+	async read(encoding?: BufferEncoding): Promise<Buffer | string> {
+		const start = this._listItem.start;
+		const length = this._listItem.length - this.lineEnd.length;
+		const line = length === 0 ? Buffer.from('') : await this.reader.read(start, length);
+		if(encoding == null) {
+			return line;
+		} else {
+			return line.toString(encoding);
+		}
+	}
+
 }

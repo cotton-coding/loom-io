@@ -11,17 +11,24 @@ export class TextItemList {
 
 	protected before: TextItemList | undefined;
 	protected after: TextItemList | undefined;
+	protected _content: TextMeta[];
 
 	constructor(
-		protected _content: TextMeta) {
+		content: TextMeta) {
+		this._content = [];
+		this._content.push(content);
 	}
 
 	get content() {
-		return this._content;
+		return this._content[0];
+	}
+
+	get original() {
+		return this._content[this._content.length-1];
 	}
 
 	get start() {
-		return this._content.start;
+		return this.content.start;
 	}
 
 	get end() {
@@ -121,7 +128,7 @@ export class TextItemList {
 
 
 	protected searchAndAddBefore(item: TextItemList): TextItemList {
-		if (item.start === this.start && item.end === this.end) {
+		if (item.original.start === this.original.start && item.original.end === this.original.end) {
 			return this;
 		}
 		let cur: TextItemList = this;
@@ -130,7 +137,7 @@ export class TextItemList {
 			prev = cur.prev();
 			if(prev === undefined) {
 				return cur.addBefore(item);
-			} else if ( item.start > prev.start && item.start < cur.start) { 
+			} else if ( item.original.start > prev.original.start && item.original.start < cur.original.start) { 
 				return cur.addBefore(item);
 			}
 			cur = prev;
@@ -142,7 +149,7 @@ export class TextItemList {
 
 	protected searchAndAddAfter(item: TextItemList): TextItemList {
 
-		if (item.start === this.start && item.end === this.end) {
+		if (item.original.start === this.original.start && item.original.end === this.original.end) {
 			return this;
 		}
 		let cur: TextItemList = this;
@@ -151,7 +158,7 @@ export class TextItemList {
 			next = cur.next();
 			if(next === undefined) {
 				return cur.addAfter(item);
-			} else if ( item.start > cur.start && item.start < next.start) { 
+			} else if ( item.original.start > cur.original.start && item.original.start < next.original.start) { 
 				return cur.addAfter(item);
 			}
 			cur = next;
@@ -201,6 +208,6 @@ export class TextItemList {
 
 
 	static patch (item: TextItemList, data: TextMeta) {
-		item._content = {...item._content, ...data};
+		item._content.unshift({...item.content, ...data});
 	}
 }

@@ -167,12 +167,12 @@ export class Editor implements Reader, Writer, ReaderInternal{
 	 * @returns 
 	 */
 	protected loopReverseCalcNextChunk(current: number, chunkSize: number, valueLength: number, min: number): {position: number, length: number} {
-		let nextPosition = current - (chunkSize + valueLength/2);
+		let nextPosition = current - (chunkSize + Math.floor(valueLength/2));
 		let length: number = chunkSize + valueLength;
 		
 		if(nextPosition < min) {
 			nextPosition = min;
-			length = current - min + valueLength/2;
+			length = current - min + Math.floor(valueLength/2);
 		} 
 		
 
@@ -191,7 +191,8 @@ export class Editor implements Reader, Writer, ReaderInternal{
 	}
 
 	async read(start: number, length: number): Promise<Buffer> {
-		const data = await this.file.read({position: start, length});
+		const buffer = Buffer.alloc(length);
+		const data = await this.file.read({position: start, buffer});
 		return data.buffer;
 	}
 
@@ -240,9 +241,8 @@ export class Editor implements Reader, Writer, ReaderInternal{
 
 		TextItemList.patch(last, {
 			...last.content,
-			last: true,
 			start: last.content.end,
-			end: await this.getSizeInBytes()
+			end: fileSize + bSeparator.length
 		});
 
 		return new LineResult(last, bSeparator, this);
