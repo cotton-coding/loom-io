@@ -201,7 +201,6 @@ export class Editor implements Reader, Writer, ReaderInternal{
 
 		TextItemList.patch(first, {
 			...first.content,
-			first: true,
 			start: 0
 		});
 
