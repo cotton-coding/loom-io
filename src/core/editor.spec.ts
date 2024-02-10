@@ -8,7 +8,6 @@ import * as fs from 'node:fs/promises';
 
 import { faker } from '@faker-js/faker';
 import { TextItemList } from './helper/textItemList';
-import exp from 'node:constants';
 
 function createEditor(testFile: string) {
 	const dir = new Directory(dirname(testFile));
@@ -129,14 +128,15 @@ describe('Editor', () => {
 			const result = await reader.searchFirst('co');
 			expect(result).toBeDefined();
 			let count = 1;
-			while(await result?.hasNext()) {
+			while(await result!.hasNext()) {
 				
-				await result?.next();
+				await result!.next();
 				expect(result).toBeDefined();
 				count++;
 			}
 			//find 5 with small letter, search is case insensitive
 			expect(count).toBe(5);
+			expect(await result!.next()).toBeUndefined();
 			reader.close();
 		});
 
@@ -206,6 +206,7 @@ describe('Editor', () => {
 				count++;
 			}
 			expect(count).toBe(17);
+			expect(result?.prev()).resolves.toBeUndefined();
 			reader.close();
 		});
 
@@ -383,6 +384,7 @@ describe('Editor', () => {
 			}
 			expect(result.read('utf8')).resolves.toBe('### EOF');
 			expect(count).toBe(2);
+			expect(result.next()).resolves.toBeUndefined();
 			reader.close();
 		});
 
@@ -435,6 +437,7 @@ describe('Editor', () => {
 				}
 			}
 			expect(result.read('utf8')).resolves.toBe('---');
+			expect(result.prev()).resolves.toBeUndefined();
 			expect(count).toBe(2);
 			reader.close();
 		});

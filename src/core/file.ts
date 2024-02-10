@@ -99,6 +99,10 @@ export class LoomFile {
 		
 	}
 
+	async exists() {
+		return await LoomFile.exists(this.dir, this.name);
+	}
+
 	async reader() {
 		return await Editor.from(this);
 	}

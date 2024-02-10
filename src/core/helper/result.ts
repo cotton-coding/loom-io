@@ -21,17 +21,6 @@ export class SearchResult implements BaseResult{
 	get meta(): TextMeta {
 		return this._listItem.content;
 	}
-	
-	protected handleSearchResult(result: SearchResult | undefined): SearchResult | undefined {
-		if(result !== undefined) {
-			result._listItem.add(this._listItem);
-		}
-		return result;
-	}
-
-	protected generateInstance(item: TextItemList): SearchResult {
-		return new SearchResult(item, this._searchValue, this.reader);
-	}
 
 	async hasNext(): Promise<boolean> {
 		if(this._listItem.hasNext()) {
@@ -40,9 +29,7 @@ export class SearchResult implements BaseResult{
 
 		const fileSize = await this.reader.getSizeInBytes();
 		const nextItem = await this.reader.loopForward(this._searchValue, this._listItem.end, fileSize);
-		if(nextItem === undefined) {
-			return false;
-		} else if (nextItem.getLastItem().end === this._listItem.end) {
+		if(nextItem === undefined || nextItem.getLastItem().end === this._listItem.end) {
 			return false;
 		} else {
 			this._listItem.add(nextItem);
@@ -55,7 +42,6 @@ export class SearchResult implements BaseResult{
 		if(await this.hasNext()) {
 			this._listItem = this._listItem.next() as TextItemList;
 			return this;
-			//return this.generateInstance(this._listItem.next() as TextItemList);
 		} else {
 			return undefined;
 		}
@@ -66,9 +52,7 @@ export class SearchResult implements BaseResult{
 			return true;
 		}
 		const prevItem = await this.reader.loopReverse(this._searchValue, 0, this._listItem.start);
-		if(prevItem === undefined) {
-			return false;
-		} else if (prevItem.getFirstItem().start === this._listItem.start ) {
+		if(prevItem === undefined || prevItem.getFirstItem().end === this._listItem.start) {
 			return false;
 		} else {
 			this._listItem.add(prevItem);

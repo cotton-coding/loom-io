@@ -3,11 +3,13 @@ import { LoomFile } from './file.js';
 import { FileConvertException, PluginNotFoundException } from './exceptions.js';
 import { TestFilesystemHelper } from '../../test/helpers/testFilesystemHelper.js';
 
-
 import jsonConverter from '../plugins/jsonConverter.js';
 import yamlConverter from '../plugins/yamlConverter.js';
 import { basename, dirname } from 'node:path';
 import { Directory } from './dir.js';
+import { FILE_SIZE_UNIT } from './types.js';
+import { faker } from '@faker-js/faker';
+import { Editor } from './editor.js';
 
 class FileTest extends LoomFile {
 
@@ -58,6 +60,28 @@ describe('Test File Service', () => {
 		expect(exists).toBeFalsy();
 	});
 
+	test('Get file size', async () => {
+		const helper = await TestFilesystemHelper.init();
+		const path = 'test/data/test.txt';
+		const content = faker.lorem.words(10000);
+		const testFilePath = (await helper.createFile(content, { path })).includeBasePath().getPath();
+		const file = LoomFile.from(testFilePath);
+		const bytes = await file.getSize(FILE_SIZE_UNIT.BYTE);
+		expect(bytes).toBe(content.length);
+		const megaBytes = await file.getSize(FILE_SIZE_UNIT.MEGABYTE);
+		expect(megaBytes).toBe(content.length / 1024 / 1024);
+		const yottaBytes = await file.getSize(FILE_SIZE_UNIT.YOTTABYTE);
+		expect(yottaBytes).toBe(content.length / 1024 / 1024 / 1024 / 1024 / 1024 / 1024 / 1024 / 1024);
+		const gigaByte = await file.getSize(FILE_SIZE_UNIT.GIGABYTE);
+		expect(gigaByte).toBe(content.length / 1024 / 1024 / 1024);
+	});
+
+	test('If File exists on Object', async () => {
+		const file = LoomFile.from('./test/data/test.json');
+		const exists = await file.exists();
+		expect(exists).toBeTruthy();
+	});
+
 	test('Register plugins', async () => {
 		const plugins = FileTest.getConvertPlugins();
 		expect(plugins).toHaveLength(2);
@@ -69,8 +93,15 @@ describe('Test File Service', () => {
 		expect(file.dir.path).toBe(`${process.cwd()}/test/data`);
 		expect(file.dir).toBe(file.parent);
 	});
-    
 
+	test('get reader object', async () => {
+		const file = LoomFile.from('./test/data/test.json');
+		const reader = await file.reader();
+		expect(reader).toBeDefined();
+		expect(reader).toBeInstanceOf(Editor);
+		reader.close();
+	});
+  
 	describe('Test with generated file', () => {
 
 		beforeEach(async () => {

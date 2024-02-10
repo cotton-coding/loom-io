@@ -3,8 +3,6 @@ export interface TextMeta {
 	readonly start: number,
 	readonly end: number,
 	readonly readReverse?: boolean
-	readonly first?: boolean,
-	readonly last?: boolean
 }
 
 export class TextItemList {
@@ -37,14 +35,6 @@ export class TextItemList {
 
 	get length() {
 		return this.end - this.start;
-	}
-
-	get first() {
-		return !!this.content.first;
-	}
-
-	get last() {
-		return !!this.content.last;
 	}
 
 	isReverseRead() {
