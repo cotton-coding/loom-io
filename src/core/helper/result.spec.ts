@@ -3,8 +3,6 @@ import { LineResult, SearchResult } from './result';
 import { TextItemList } from './textItemList';
 import { ReaderInternal } from '../editor';
 import { faker } from '@faker-js/faker';
-import exp from 'constants';
-
 
 class MockReader implements ReaderInternal {
 
