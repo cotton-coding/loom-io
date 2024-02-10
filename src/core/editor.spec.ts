@@ -5,8 +5,10 @@ import { dirname, basename } from 'node:path';
 import { Directory } from './dir';
 import { LoomFile } from './file';
 import * as fs from 'node:fs/promises';
+
 import { faker } from '@faker-js/faker';
 import { TextItemList } from './helper/textItemList';
+import exp from 'node:constants';
 
 function createEditor(testFile: string) {
 	const dir = new Directory(dirname(testFile));
@@ -22,6 +24,16 @@ class TestEditor extends Editor {
 		const handler = await fs.open(file.path);
 		return new TestEditor(file, handler);
 
+	}
+
+	getDefaultChunkSize(): number {
+		return this.chunkSize;
+	}
+
+	unwrappedCalcChunkSize (
+		...values: Parameters<Editor['calcChunkSize']>
+	): ReturnType<Editor['calcChunkSize']> {
+		return this.calcChunkSize(...values);
 	}
 
 	unwrappedSearchInChunk(
@@ -50,6 +62,22 @@ describe('Editor', () => {
 		const file = new LoomFile(dir, 'test.txt');
 		const reader: Reader = await Editor.from(file);
 		expect(reader).toBeInstanceOf(Editor);
+		reader.close();
+	});
+
+	test('from', async () => {
+		const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
+		const dir = new Directory(dirname(testFile));
+		const file = new LoomFile(dir, basename(testFile));
+		const reader: Reader = await Editor.from(file);
+		expect(reader).toBeInstanceOf(Editor);
+		reader.close();
+	});
+
+	test('raw', async () => {
+		const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
+		const reader = await createEditor(testFile);
+		expect(reader.raw).toBeDefined();
 		reader.close();
 	});
 
@@ -115,8 +143,11 @@ describe('Editor', () => {
 		test('find no value', async () => {
 			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
 			const reader = await createEditor(testFile);
-			const result = await reader.searchFirst('surely not');
+			const searchValue = 'surely not';
+			const result = await reader.searchFirst(searchValue);
 			expect(result).toBeUndefined();
+			const result2 = await reader.searchLast(searchValue);
+			expect(result2).toBeUndefined();
 			reader.close();
 		});
 
@@ -193,6 +224,20 @@ describe('Editor', () => {
 				expect(result).toBeInstanceOf(Array);
 				expect(result).toHaveLength(1);
 				expect(result[0]).toBe(20);
+			});
+
+			test('calcChunkSize', async () => {
+				const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
+				const editor = await TestEditor.fromPath(testFile);
+				const valueLength = 10;
+				const chunkSize = editor.unwrappedCalcChunkSize(valueLength);
+				expect(chunkSize).toBeDefined();
+				expect(chunkSize).toBe(editor.getDefaultChunkSize());
+				expect(chunkSize).toBeGreaterThan(valueLength);
+				const largeValue = editor.unwrappedCalcChunkSize(5000+chunkSize);
+				expect(largeValue).toBeDefined();
+				expect(largeValue).toBeGreaterThan(5000);
+				expect(largeValue).toBeGreaterThan(chunkSize);
 			});
 
 			test('searchInChunk random strings', async () => {
@@ -391,6 +436,37 @@ describe('Editor', () => {
 			}
 			expect(result.read('utf8')).resolves.toBe('---');
 			expect(count).toBe(2);
+			reader.close();
+		});
+
+		test('read empty file', async () => {
+			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/empty.txt`;
+			const reader = await createEditor(testFile);
+			const resultForward = await reader.getFirstLine();
+			expect(resultForward).toBeDefined();
+			const line = await resultForward?.read('utf8');
+			expect(line).toBe('');
+			const resultBackward = await reader.getLastLine();
+			expect(resultBackward).toBeDefined();
+			const line2 = await resultBackward?.read('utf8');
+			expect(line2).toBe('');
+			reader.close();
+		});
+
+		test('read file with only one line', async () => {
+			const fileContentLength = 591;
+			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/oneLine.txt`;
+			const reader = await createEditor(testFile);
+			const resultForward = await reader.getFirstLine();
+			expect(resultForward).toBeDefined();
+			const line = await resultForward?.read('utf8');
+			expect(line.length).toBe(fileContentLength);
+			expect(line).toContain('Lorem ipsum');
+			const resultBackward = await reader.getLastLine();
+			expect(resultBackward).toBeDefined();
+			const line2 = await resultBackward?.read('utf8');
+			expect(line2).toContain('Lorem ipsum');
+			expect(line2.length).toBe(fileContentLength);
 			reader.close();
 		});
 
