@@ -1,5 +1,7 @@
 # loom-io
 
+[![codecov](https://codecov.io/gh/cotton-coding/loom/graph/badge.svg?token=HA5N9V34OE)](https://codecov.io/gh/cotton-coding/loom)
+
 Currently this library helps to read files and directories. There is also planned to offer functions to edit and load sources like git
 
 ## How to
