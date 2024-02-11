@@ -24,6 +24,9 @@ export class TestFilesystemHelper {
 
 	}
 
+	static TEST_DIR = 'test/tmp';
+	static STATIC_TEST_DIR = 'test/data';
+
 	async createFile(content: string = faker.lorem.paragraph(), option: TestFilesystemHelperFileOptions = {}) {
 		const mimeType =  option.mimeType ?? 'text/plain';
 		const extension = option.extension ?? faker.system.fileExt(mimeType);

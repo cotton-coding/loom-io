@@ -1,15 +1,17 @@
 import { expect, test, describe, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
-import { File } from './file.js';
+import { LoomFile } from './file.js';
 import { FileConvertException, PluginNotFoundException } from './exceptions.js';
 import { TestFilesystemHelper } from '../../test/helpers/testFilesystemHelper.js';
-
 
 import jsonConverter from '../plugins/jsonConverter.js';
 import yamlConverter from '../plugins/yamlConverter.js';
 import { basename, dirname } from 'node:path';
 import { Directory } from './dir.js';
+import { FILE_SIZE_UNIT } from './types.js';
+import { faker } from '@faker-js/faker';
+import { Editor } from './editor.js';
 
-class FileTest extends File {
+class FileTest extends LoomFile {
 
 	constructor(path: string){
 		const dir = new Directory(dirname(path));
@@ -17,11 +19,11 @@ class FileTest extends File {
 	}
 
 	static getConvertPlugins() {
-		return Array.from(new Set(File.converterPlugins.values()));
+		return Array.from(new Set(LoomFile.converterPlugins.values()));
 	}
 
 	static emptyPlugins() {
-		File.converterPlugins = new Map();
+		LoomFile.converterPlugins = new Map();
 	}
 }
 
@@ -31,8 +33,8 @@ describe('Test File Service', () => {
 
 	beforeAll(() => {
 		FileTest.emptyPlugins();
-		File.register(jsonConverter);
-		File.register(yamlConverter);
+		LoomFile.register(jsonConverter);
+		LoomFile.register(yamlConverter);
 	});
 
 	afterAll(() => {
@@ -41,21 +43,43 @@ describe('Test File Service', () => {
 
 	test('Create Instance and set path', () => {
 		const path = 'test/data/test.txt';
-		const file = File.from(path);
-		expect(file).toBeInstanceOf(File);
+		const file = LoomFile.from(path);
+		expect(file).toBeInstanceOf(LoomFile);
 		expect(file.path).toBe(`${process.cwd()}/${path}`);
 	});
 
 	test('Test if path exits', async () => {
 		const path = './test/data/test.json';
-		const exists = File.exists(path);
+		const exists = LoomFile.exists(path);
 		expect(exists).toBeTruthy();
 	});
 
 	test('Test if path do not exits', async () => {
 		const path = './test/data/test2.txt';
-		const exists = await File.exists(path);
+		const exists = await LoomFile.exists(path);
 		expect(exists).toBeFalsy();
+	});
+
+	test('Get file size', async () => {
+		const helper = await TestFilesystemHelper.init();
+		const path = 'test/data/test.txt';
+		const content = faker.lorem.words(10000);
+		const testFilePath = (await helper.createFile(content, { path })).includeBasePath().getPath();
+		const file = LoomFile.from(testFilePath);
+		const bytes = await file.getSize(FILE_SIZE_UNIT.BYTE);
+		expect(bytes).toBe(content.length);
+		const megaBytes = await file.getSize(FILE_SIZE_UNIT.MEGABYTE);
+		expect(megaBytes).toBe(content.length / 1024 / 1024);
+		const yottaBytes = await file.getSize(FILE_SIZE_UNIT.YOTTABYTE);
+		expect(yottaBytes).toBe(content.length / 1024 / 1024 / 1024 / 1024 / 1024 / 1024 / 1024 / 1024);
+		const gigaByte = await file.getSize(FILE_SIZE_UNIT.GIGABYTE);
+		expect(gigaByte).toBe(content.length / 1024 / 1024 / 1024);
+	});
+
+	test('If File exists on Object', async () => {
+		const file = LoomFile.from('./test/data/test.json');
+		const exists = await file.exists();
+		expect(exists).toBeTruthy();
 	});
 
 	test('Register plugins', async () => {
@@ -64,13 +88,20 @@ describe('Test File Service', () => {
 	});
 
 	test('get parent or dir', () => {
-		const file = File.from('./test/data/test.json');
+		const file = LoomFile.from('./test/data/test.json');
 		expect(file.dir).instanceOf(Directory);
 		expect(file.dir.path).toBe(`${process.cwd()}/test/data`);
 		expect(file.dir).toBe(file.parent);
 	});
-    
 
+	test('get reader object', async () => {
+		const file = LoomFile.from('./test/data/test.json');
+		const reader = await file.reader();
+		expect(reader).toBeDefined();
+		expect(reader).toBeInstanceOf(Editor);
+		reader.close();
+	});
+  
 	describe('Test with generated file', () => {
 
 		beforeEach(async () => {
@@ -84,14 +115,14 @@ describe('Test File Service', () => {
 		test('Read text file', async () => {
 
 			const testFile = await testHelper.createFile();
-			const file = File.from(testFile.includeBasePath().getPath());
+			const file = LoomFile.from(testFile.includeBasePath().getPath());
 			const content = await file.text();
 			expect(content).toBe(testFile.getContent());
 		});
 
 		test.each(['json', 'yaml', 'yml', 'log', 'txt'])('Get extension %s', async (extension) => {
 			const testFile = await testHelper.createFile('', { extension });
-			const file = File.from(testFile.includeBasePath().getPath());
+			const file = LoomFile.from(testFile.includeBasePath().getPath());
 			expect(file.extension).toBe(extension);
 
 		});
@@ -101,7 +132,7 @@ describe('Test File Service', () => {
 			const testContent = {test: true};
 			const testFile = await testHelper.createFile(JSON.stringify(testContent), { extension: 'json' });
 
-			const file = File.from(testFile.includeBasePath().getPath());
+			const file = LoomFile.from(testFile.includeBasePath().getPath());
 			const content = await file.json();
 			expect(content).toStrictEqual(testContent);
 		});
@@ -111,7 +142,7 @@ describe('Test File Service', () => {
 			const testContent = 'test: true';
 			const testFile = await testHelper.createFile(testContent, { extension: 'yaml' });
 
-			const file = File.from(testFile.includeBasePath().getPath());
+			const file = LoomFile.from(testFile.includeBasePath().getPath());
 			const content = await file.json<{test: boolean}>();
 			expect(content.test).toBe(true);
 		});
@@ -121,7 +152,7 @@ describe('Test File Service', () => {
 			const testContent = 'test: true';
 			const testFile = await testHelper.createFile(testContent, { extension: 'yml' });
 
-			const file = File.from(testFile.includeBasePath().getPath());
+			const file = LoomFile.from(testFile.includeBasePath().getPath());
 			const content = await file.json<{test: boolean}>();
 			expect(content.test).toBe(true);
 		});
@@ -131,7 +162,7 @@ describe('Test File Service', () => {
 			const testFile = await testHelper.createFile(testContent, { extension: 'rtx' });
 			const path = testFile.includeBasePath().getPath();
 
-			const file = File.from(path);
+			const file = LoomFile.from(path);
 			const content = await file.plain();
 			expect(content).toBeInstanceOf(Buffer);
 			expect(content.toString()).toBe(testContent);
@@ -164,7 +195,7 @@ describe('Test Error handling'	, () => {
 		const testContent = 'test: true';
 		const testFile = await testHelper.createFile(testContent, { extension: 'json' });
 	
-		const file = File.from(testFile.includeBasePath().getPath());
+		const file = LoomFile.from(testFile.includeBasePath().getPath());
 		expect(() => file.json()).rejects.toThrow(PluginNotFoundException);
 	});
 
@@ -173,7 +204,7 @@ describe('Test Error handling'	, () => {
 		const testFile = testHelper.createFile('test', { extension: 'md' });
 		const path = (await testFile).includeBasePath().getPath();
 					
-		const file = File.from(path);
+		const file = LoomFile.from(path);
 		expect(() => file.json()).rejects.toThrow(PluginNotFoundException);
 	});
 
@@ -182,7 +213,7 @@ describe('Test Error handling'	, () => {
 		const testFile = testHelper.createFile('{test: true}', { path: 'test/test' });
 		const path = (await testFile).includeBasePath().getPath();
 					
-		const file = File.from(path);
+		const file = LoomFile.from(path);
 		expect(file.text()).resolves.toBe('{test: true}');
 		expect(file.json()).rejects.toThrow(FileConvertException);
 	});

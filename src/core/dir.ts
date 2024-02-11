@@ -1,6 +1,6 @@
 import * as fs from 'node:fs/promises';
 import { join as joinPath, relative as relativePath, resolve as resolvePath} from 'node:path';
-import { File } from './file.js';
+import { LoomFile } from './file.js';
 import { List } from './list.js';
 
 
@@ -49,17 +49,17 @@ export class Directory {
 	/**
 	 * Returns the relative path to the given path or undefined if the given dir or file is parent or not related
 	 */
-	relativePath(dir: Directory | File): string | undefined {
+	relativePath(dir: Directory | LoomFile): string | undefined {
 		const p = relativePath(this.path, dir.path);
 		return p === '' ? undefined : p;
 	}
 
 
-	file(name: string): File {
-		return new File(this, name);
+	file(name: string): LoomFile {
+		return new LoomFile(this, name);
 	}
 
-	protected async filesRecursion(list: List): Promise<List<File>>{
+	protected async filesRecursion(list: List): Promise<List<LoomFile>>{
 
 		const dirList = list.only('dirs');
 		let fileList = list.only('files');
@@ -72,7 +72,7 @@ export class Directory {
 		return fileList;
 	}
 
-	async files(recursive: boolean = false): Promise<List<File>> {
+	async files(recursive: boolean = false): Promise<List<LoomFile>> {
 		const list = await this.list();
 
 		if(recursive) {

@@ -1,22 +1,23 @@
 import * as fs from 'node:fs/promises';
 import { existsSync } from 'node:fs';
-import { PLUGIN_TYPE, type LoomFSFileConverter } from './types.js';
+import { PLUGIN_TYPE, type LoomFSFileConverter, FILE_SIZE_UNIT } from './types.js';
 import { FileConvertException, PluginNotFoundException } from './exceptions.js';
 import { Directory } from './dir.js';
 import { join as joinPath, extname, dirname, basename } from 'node:path';
+import { Editor } from './editor.js';
 
 export interface PrefixDefinition {
 	dept: number,
 	separator: string
 }
 
-export class File {
+export class LoomFile {
 
 	protected static converterPlugins: Map<string, LoomFSFileConverter> = new Map();
 	protected _extension: string | undefined;
 
-	static from(dir: Directory, name: string): File
-	static from(path: string): File
+	static from(dir: Directory, name: string): LoomFile
+	static from(path: string): LoomFile
 	static from(dirOrPath: Directory | string, name: string = ''){
 		
 		if(typeof dirOrPath === 'string') {
@@ -24,7 +25,7 @@ export class File {
 			dirOrPath = new Directory(dirname(dirOrPath));
 		}
 
-		return new File(dirOrPath, name);
+		return new LoomFile(dirOrPath, name);
 	}
 
 	static async exists(path: string): Promise<boolean>
@@ -70,12 +71,24 @@ export class File {
 		return this.dir;
 	}
 
+	async getSizeInBytes() {
+		const stats = await fs.stat(this.path);
+		return stats.size;
+	}
+
+	async getSize(unit: FILE_SIZE_UNIT = FILE_SIZE_UNIT.BYTE) {
+		const bytes = await this.getSizeInBytes();
+
+		const index = Object.values(FILE_SIZE_UNIT).indexOf(unit);
+		return bytes / Math.pow(1024, index);
+	}
+
 	async json<T>() {
 		if(this.extension === undefined) {
 			throw new FileConvertException(this.path, 'File has no extension');
 		}
 	
-		const plugin = File.converterPlugins.get(this.extension);
+		const plugin = LoomFile.converterPlugins.get(this.extension);
 
 		if(plugin === undefined) {
 			throw new PluginNotFoundException(this.path);
@@ -84,6 +97,14 @@ export class File {
 		const text = await this.text();
 		return plugin.parse<T>(text);
 		
+	}
+
+	async exists() {
+		return await LoomFile.exists(this.dir, this.name);
+	}
+
+	async reader() {
+		return await Editor.from(this);
 	}
 
 	async plain() {
@@ -97,7 +118,7 @@ export class File {
 	static register(plugin: LoomFSFileConverter) {
 		if(plugin.type === PLUGIN_TYPE.FILE_CONVERTER) {
 			plugin.extensions.forEach(ext => {
-				File.converterPlugins.set(ext, plugin);
+				LoomFile.converterPlugins.set(ext, plugin);
 			});
 		}
 	}
