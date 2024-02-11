@@ -18,9 +18,13 @@ const str = await file.text();
 const json = await file.json();
 const buffer = await file.plain();
 
+// get file size
+const size = await file.getSize('MB') // B KB MB GB TB ... YB
+
 // read line by line or search in large files without loading the file into heap memory (see below for more details)
 const reader = await file.reader();
-reader.searchFirst('cotton-coding');
+const { start, end } = (await reader.search('cotton-coding')).meta;
+await reader.close();
 
 // If you want to have the directory just call
 file.parent // it is the same as for a directory 
@@ -121,6 +125,9 @@ do {
   const line = await lineResult.read();
   //do something with the line
 } while ( await lineResult.next() ) 
+
+// Do not forget to close the reader
+await reader.close();
 
 ```
 

@@ -8,6 +8,7 @@ interface ReadWrite {
 }
 
 export interface Reader extends ReadWrite {
+	search(value: string | Buffer): Promise<SearchResult | undefined>;
 	searchFirst(value: string | Buffer): Promise<SearchResult | undefined>;
 	searchFirst(value: string | Buffer, start: number): Promise<SearchResult | undefined>;
 	searchLast(value: string | Buffer): Promise<SearchResult | undefined>;
@@ -48,6 +49,9 @@ export class Editor implements Reader, Writer, ReaderInternal{
 		//fs.watch(ref.path);
 	}
 
+	/**
+	 * Get the raw file handle
+	 */
 	get raw() {
 		return this.file;
 	}
@@ -56,8 +60,21 @@ export class Editor implements Reader, Writer, ReaderInternal{
 		return await this.ref.getSizeInBytes();
 	}
 
+	/**
+	 * Close the file
+	 */
 	async close(): Promise<void> {
 		await this.file.close();
+	}
+
+	/**
+	 * Alias for searchFirst
+	 * 
+	 * @param value - value to search
+	 * @returns 
+	 */
+	async search(value: string | Buffer): Promise<SearchResult | undefined> {
+		return await this.searchFirst(value);
 	}
 
 	/**
@@ -176,18 +193,32 @@ export class Editor implements Reader, Writer, ReaderInternal{
 		}, undefined);
 	}
 
+	/**
+	 * Read a chunk of the file
+	 * 
+	 * @param start - start position in the file
+	 * @param length - length of the data to read
+	 * @returns - return a buffer with the data read from the file
+	 */
 	async read(start: number, length: number): Promise<Buffer> {
 		const buffer = Buffer.alloc(length);
 		const data = await this.file.read({position: start, buffer});
 		return data.buffer;
 	}
 
-	async handleFileWithOnlyOneLine(separator: Buffer): Promise<LineResult> {
+	protected async handleFileWithOnlyOneLine(separator: Buffer): Promise<LineResult> {
 		const fileSize = await this.getSizeInBytes();
 		const item = new TextItemList({start: 0, end: fileSize + separator.length});
 		return new LineResult(item.getFirstItem(), separator, this);
 	}
 	
+	/**
+	 * Analyze the file junkvisely till the first line is found 
+	 * and return a LineResult object to read the line or step to the next one. 
+	 *  
+	 * @param separator - line separator to use, default is new line character LF 
+	 * @returns - return a LineResult object witch allow you to read line by line forward (next) and backward (prev)  
+	 */
 	async firstLine(separator: Buffer | string = this.newLineCharacter): Promise<LineResult>{
 		const bSeparator = Buffer.from(separator);
 		const fileSize = await this.getSizeInBytes();
@@ -207,6 +238,13 @@ export class Editor implements Reader, Writer, ReaderInternal{
 		return new LineResult(first, bSeparator, this);
 	}
 
+	/**
+	 * Analyze the file junkvisely from the end till the last line is found
+	 * and return a LineResult object to read the line or step to the previous one.
+	 * 
+	 * @param separator - line separator to use, default is new line character LF
+	 * @returns - return a LineResult object witch allow you to read line by line forward (next) and backward (prev)
+	 */
 	async lastLine(separator: Buffer | string = this.newLineCharacter): Promise<LineResult>{
 		const bSeparator = Buffer.from(separator);
 		const fileSize = await this.getSizeInBytes();
