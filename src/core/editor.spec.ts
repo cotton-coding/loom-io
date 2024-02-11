@@ -338,7 +338,7 @@ describe('Editor', () => {
 		test('read first line as string', async () => {
 			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
 			const reader = await createEditor(testFile);
-			const result = await reader.getFirstLine();
+			const result = await reader.firstLine();
 			expect(result).toBeDefined();
 			const line = await result?.read('utf8');
 			expect(line).toBeDefined();
@@ -350,7 +350,7 @@ describe('Editor', () => {
 		test('read line', async () => {
 			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
 			const reader = await createEditor(testFile);
-			const result = await reader.getFirstLine();
+			const result = await reader.firstLine();
 			expect(result).toBeDefined();
 			const line = await result?.read();
 			expect(line).toBeDefined();
@@ -361,7 +361,7 @@ describe('Editor', () => {
 		test('get next line', async () => {
 			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
 			const reader = await createEditor(testFile);
-			const result = await reader.getFirstLine();
+			const result = await reader.firstLine();
 			expect(result).toBeDefined();
 			await result.next();
 			expect(result).toBeDefined();
@@ -372,7 +372,7 @@ describe('Editor', () => {
 		test('read till last lines', async () => {
 			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
 			const reader = await createEditor(testFile);
-			const result = await reader.getFirstLine();
+			const result = await reader.firstLine();
 			expect(result).toBeDefined();
 			let count = 0;
 			while(await result.hasNext()) {
@@ -391,7 +391,7 @@ describe('Editor', () => {
 		test('read last line', async () => {
 			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
 			const reader = await createEditor(testFile);
-			const result = await reader.getLastLine();
+			const result = await reader.lastLine();
 			expect(result).toBeDefined();
 			const line = await result.read();
 			expect(line).toBeDefined();
@@ -402,7 +402,7 @@ describe('Editor', () => {
 		test('read last line as string', async () => {
 			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
 			const reader = await createEditor(testFile);
-			const result = await reader.getLastLine();
+			const result = await reader.lastLine();
 			expect(result).toBeDefined();
 			const line = await result.read('utf8');
 			expect(line).toBeDefined();
@@ -414,7 +414,7 @@ describe('Editor', () => {
 		test('get prev line', async () => {
 			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
 			const reader = await createEditor(testFile);
-			const result = await reader.getLastLine();
+			const result = await reader.lastLine();
 			expect(result).toBeDefined();
 			await result.prev();
 			expect(result).toBeDefined();
@@ -425,7 +425,7 @@ describe('Editor', () => {
 		test('read till first lines', async () => {
 			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
 			const reader = await createEditor(testFile);
-			const result = await reader.getLastLine();
+			const result = await reader.lastLine();
 			expect(result).toBeDefined();
 
 			let count = 0;
@@ -445,11 +445,11 @@ describe('Editor', () => {
 		test('read empty file', async () => {
 			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/empty.txt`;
 			const reader = await createEditor(testFile);
-			const resultForward = await reader.getFirstLine();
+			const resultForward = await reader.firstLine();
 			expect(resultForward).toBeDefined();
 			const line = await resultForward?.read('utf8');
 			expect(line).toBe('');
-			const resultBackward = await reader.getLastLine();
+			const resultBackward = await reader.lastLine();
 			expect(resultBackward).toBeDefined();
 			const line2 = await resultBackward?.read('utf8');
 			expect(line2).toBe('');
@@ -460,12 +460,12 @@ describe('Editor', () => {
 			const fileContentLength = 591;
 			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/line.txt`;
 			const reader = await createEditor(testFile);
-			const resultForward = await reader.getFirstLine();
+			const resultForward = await reader.firstLine();
 			expect(resultForward).toBeDefined();
 			const line = await resultForward?.read('utf8');
 			expect(line.length).toBe(fileContentLength);
 			expect(line).toContain('Lorem ipsum');
-			const resultBackward = await reader.getLastLine();
+			const resultBackward = await reader.lastLine();
 			expect(resultBackward).toBeDefined();
 			const line2 = await resultBackward?.read('utf8');
 			expect(line2).toContain('Lorem ipsum');

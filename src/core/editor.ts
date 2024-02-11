@@ -188,7 +188,7 @@ export class Editor implements Reader, Writer, ReaderInternal{
 		return new LineResult(item.getFirstItem(), separator, this);
 	}
 	
-	async getFirstLine(separator: Buffer | string = this.newLineCharacter): Promise<LineResult>{
+	async firstLine(separator: Buffer | string = this.newLineCharacter): Promise<LineResult>{
 		const bSeparator = Buffer.from(separator);
 		const fileSize = await this.getSizeInBytes();
 		const item = await this.loopForward(bSeparator, 0, fileSize);
@@ -207,7 +207,7 @@ export class Editor implements Reader, Writer, ReaderInternal{
 		return new LineResult(first, bSeparator, this);
 	}
 
-	async getLastLine(separator: Buffer | string = this.newLineCharacter): Promise<LineResult>{
+	async lastLine(separator: Buffer | string = this.newLineCharacter): Promise<LineResult>{
 		const bSeparator = Buffer.from(separator);
 		const fileSize = await this.getSizeInBytes();
 		const item = await this.loopReverse(bSeparator, 0, fileSize);

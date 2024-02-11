@@ -18,6 +18,10 @@ const str = await file.text();
 const json = await file.json();
 const buffer = await file.plain();
 
+// read line by line or search in large files without loading the file into heap memory (see below for more details)
+const reader = await file.reader();
+reader.searchFirst('cotton-coding');
+
 // If you want to have the directory just call
 file.parent // it is the same as for a directory 
 
@@ -88,6 +92,37 @@ for(let file of await dir.files()) {
 
 ```
 
+
+## Reader
+
+The reader makes it possible to search or read lines in files without loading them completely. It is your decision if you do this from the top or the end of a file.
+
+```ts
+import Loom from 'loom-io/fs';
+
+const file = Loom.file('some/file/readable.md');
+const reader = await file.reader();
+
+const result = await reader.searchLast('a better world');
+
+if( result !== undefined ) {
+  do {
+    const { start, end } = result.meta;
+    //do something with meta data e.g. read the result + one symbol before and after
+    const length = end - start;
+    const data = await reader.read(start - 1, length + 1)
+  } while ( await result.prev() )
+}
+
+
+const lineResult = await reader.firstLine();
+
+do {
+  const line = await lineResult.read();
+  //do something with the line
+} while ( await lineResult.next() ) 
+
+```
 
 
 

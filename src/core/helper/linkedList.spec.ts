@@ -54,7 +54,7 @@ describe('LinkedList', () => {
 		const list3 = new ListItem(2);
 		list.addAfter(list2);
 		list2.addAfter(list3);
-		expect(list.getFirst()).toBe(list);
+		expect(list.getLast()).toBe(list3);
 	});
 
 });
