@@ -1,12 +1,12 @@
 name: Core-Pipeline
-on: 
+on:
   push:
     branches:
-      - master
+      - main
       - develop
-      - 'hotfix/**'
-      - 'feature/**'
-  pull_request: 
+      - "hotfix/**"
+      - "feature/**"
+  pull_request:
 
 jobs:
   test:
@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: latest
       - name: Install
-        run: npm ci     
+        run: npm ci
       - name: Lint & Fix
         run: npm run lint:fix
       - name: Test
