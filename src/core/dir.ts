@@ -2,17 +2,22 @@ import * as fs from 'node:fs/promises';
 import { join as joinPath, relative as relativePath, resolve as resolvePath} from 'node:path';
 import { LoomFile } from './file.js';
 import { List } from './list.js';
-
-
+import { isErrnoException } from './helper/typechecks.js';
 
 export class Directory {
 
 	protected readonly _path: string;
+	protected _strict: boolean = false;
 
 	constructor(
-		path: string = process.cwd()
+		path: string = process.cwd(), ...paths: string[]
 	) {
-		this._path = resolvePath(path);
+		this._path = resolvePath(path, ...(paths || []));
+	}
+
+	strict(strictMode: boolean = true) {
+		this._strict = strictMode;
+		return this;
 	}
 
 	get path() {
@@ -35,17 +40,27 @@ export class Directory {
 		}
 	}
 
-	subDir(name: string) {
-		return new Directory(joinPath(this.path, name));
+	async create(): Promise<void> {
+		await fs.mkdir(this.path, {recursive: true});
 	}
 
-	/**
-	 * @deprecated use subDir
-	 * @param subDir 
-	 * @returns 
-	 */
-	subdir(subDir: string) {
-		return this.subDir(subDir);
+	async delete(recursive: boolean = false): Promise<void> {
+		try {
+			await fs.rmdir(this.path, {recursive});
+		} catch (err) {
+			if(this._strict){
+				throw err;
+			} 
+			if(isErrnoException(err)) {
+				if((err as NodeJS.ErrnoException).code !== 'ENOENT' && (err as NodeJS.ErrnoException).errno !== -2) {
+					throw err;
+				}
+			}
+		}
+	}
+
+	subDir(name: string) {
+		return new Directory(joinPath(this.path, name));
 	}
 
 	async list(): Promise<List> {

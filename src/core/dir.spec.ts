@@ -72,6 +72,46 @@ describe('Test Directory Service', () => {
 			const exists = await dir.exists();
 			expect(exists).toBeTruthy();
 		});
+
+		describe('delete', () => {
+
+			test('create and delete a file non recursive', async () => {
+				const dir = new Directory(testHelper.getBasePath(), 'to_delete');
+				await dir.create();
+				expect(await dir.exists()).toBeTruthy();
+				await dir.delete();
+				expect(await dir.exists()).toBeFalsy();
+			});
+
+			test('delete a non existing file', async () => {
+				const dir = new Directory(testHelper.getBasePath(), 'to_delete');
+				await dir.delete();
+				expect(await dir.exists()).toBeFalsy();
+			});
+
+			test('try to delete a non existing file with strict mode', async () => {
+				const dir = new Directory(testHelper.getBasePath(), 'to_delete');
+				dir.strict();
+				await expect(dir.delete()).rejects.toThrow();
+			});
+
+			test('delete a non empty directory', async () => {
+				const dir = new Directory(testHelper.getBasePath(), 'to_delete');
+				await dir.create();
+				await testHelper.createFile('some content', {path: 'to_delete/test.txt'});
+				await expect(dir.delete()).rejects.toThrow();
+				await expect(dir.exists()).resolves.toBeTruthy();
+			});
+
+			test('delete a non empty directory recursive', async () => {
+				const dir = new Directory(testHelper.getBasePath(), 'to_delete');
+				await dir.create();
+				await testHelper.createFile('some content', {path: 'to_delete/test_some_other'});
+				await dir.delete(true);
+				expect(await dir.exists()).toBeFalsy();
+			});
+
+		});
 		describe('list method', () => {
 
 			test('list directory amount', async () => {
