@@ -1,5 +1,4 @@
 import * as fs from 'node:fs/promises';
-import { existsSync } from 'node:fs';
 import { PLUGIN_TYPE, type LoomFSFileConverter, FILE_SIZE_UNIT } from './types.js';
 import { FileConvertException, PluginNotFoundException } from './exceptions.js';
 import { Directory } from './dir.js';
@@ -36,10 +35,12 @@ export class LoomFile {
 				? dirOrPath 
 				: joinPath((dirOrPath as Directory).path, name);
 	
-		return new Promise((resolve) => {
-			const exists = existsSync(path);
-			resolve(exists);
-		});
+		try {
+			await fs.access(path, fs.constants.F_OK);
+			return true;
+		} catch {
+			return false;
+		}
 	}
 
 	constructor(

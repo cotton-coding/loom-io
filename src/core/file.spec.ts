@@ -81,6 +81,11 @@ describe('Test File Service', () => {
 		const exists = await file.exists();
 		expect(exists).toBeTruthy();
 	});
+	test('If File exists on Object', async () => {
+		const file = LoomFile.from('./test/data/notexists.json');
+		const exists = await file.exists();
+		expect(exists).toBeFalsy();
+	});
 
 	test('Register plugins', async () => {
 		const plugins = FileTest.getConvertPlugins();
