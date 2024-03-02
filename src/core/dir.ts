@@ -26,6 +26,15 @@ export class Directory {
 		return new Directory(`/${split.join('/')}`);
 	}
 
+	async exists(): Promise<boolean> {
+		try {
+			await fs.access(this.path, fs.constants.R_OK);
+			return true;
+		} catch {
+			return false;
+		}
+	}
+
 	subDir(name: string) {
 		return new Directory(joinPath(this.path, name));
 	}

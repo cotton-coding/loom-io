@@ -2,7 +2,7 @@ import { describe, test, expect, beforeEach, afterEach } from 'vitest';
 import { Directory } from './dir.js';
 
 import { TestFilesystemHelper } from '../../test/helpers/testFilesystemHelper.js';
-import { File } from './file.js';
+import { LoomFile } from './file.js';
 
 describe('Test Directory Service', () => {
 	test('Create Instance and set path', () => {
@@ -16,6 +16,18 @@ describe('Test Directory Service', () => {
 		const dir = new Directory('./test/');
 		const dir2 = new Directory('./test/data');
 		expect(dir.relativePath(dir2)).toBe('data');
+	});
+
+	test('exists', async () => {
+		const dir = new Directory('./test/data/');
+		const exists = await dir.exists();
+		expect(exists).toBeTruthy();
+	});
+
+	test('not exists', async () => {
+		const dir = new Directory('./test/data-not-exists');
+		const exists = await dir.exists();
+		expect(exists).toBeFalsy();
 	});
 
 	test('path', () => {
@@ -54,8 +66,12 @@ describe('Test Directory Service', () => {
 			testHelper.destroy();
 		});
 
-
-
+		test('create', async () => {
+			const dir = new Directory(testHelper.getBasePath(), 'to_delete');
+			await dir.create();
+			const exists = await dir.exists();
+			expect(exists).toBeTruthy();
+		});
 		describe('list method', () => {
 
 			test('list directory amount', async () => {
@@ -131,7 +147,7 @@ describe('Test Directory Service', () => {
                 
 				for(const f of files) {
 					expect(f).toBeInstanceOf;
-					expect(await (f as File).text()).toBe('lorem');
+					expect(await (f as LoomFile).text()).toBe('lorem');
 				}
 
 
@@ -150,7 +166,7 @@ describe('Test Directory Service', () => {
 								
 				for(const f of files) {
 					expect(f).toBeInstanceOf;
-					expect(await (f as File).text()).toBe('lorem');
+					expect(await (f as LoomFile).text()).toBe('lorem');
 				}
 			});
 
