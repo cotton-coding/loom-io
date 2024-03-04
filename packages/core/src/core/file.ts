@@ -1,5 +1,5 @@
 import * as fs from 'node:fs/promises';
-import { PLUGIN_TYPE, type LoomFSFileConverter, FILE_SIZE_UNIT } from './types.js';
+import { PLUGIN_TYPE, type LoomFileConverter, FILE_SIZE_UNIT } from './types.js';
 import { FileConvertException, PluginNotFoundException } from './exceptions.js';
 import { Directory } from './dir.js';
 import { join as joinPath, extname, dirname, basename } from 'node:path';
@@ -12,7 +12,7 @@ export interface PrefixDefinition {
 
 export class LoomFile {
 
-	protected static converterPlugins: Map<string, LoomFSFileConverter> = new Map();
+	protected static converterPlugins: Map<string, LoomFileConverter> = new Map();
 	protected _extension: string | undefined;
 
 	static from(dir: Directory, name: string): LoomFile
@@ -116,7 +116,7 @@ export class LoomFile {
 		return await fs.readFile(this.path, encoding);
 	}
 
-	static register(plugin: LoomFSFileConverter) {
+	static register(plugin: LoomFileConverter) {
 		if(plugin.type === PLUGIN_TYPE.FILE_CONVERTER) {
 			plugin.extensions.forEach(ext => {
 				LoomFile.converterPlugins.set(ext, plugin);

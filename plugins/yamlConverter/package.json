@@ -1,0 +1,31 @@
+{
+  "name": "@loom-io/yamlConverter",
+  "version": "0.6.0",
+  "description": "",
+  "main": "dist/yamlConverter.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm run build && publint"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.0",
+    "@loom-io/core": "workspace:^0.6.0"
+  },
+  "peerDependencies": {
+    "@loom-io/core": "workspace:^0.6.0"
+  },
+  "dependencies": {
+    "yaml": "^2.3.4"
+  },
+  "keywords": [],
+  "author": "Wolfgang Rathgeb",
+  "license": "MIT",
+  "exports": {
+    ".": {
+      "types": "./dist/yamlConverter.d.ts",
+      "import": "./dist/yamlConverter.js"
+    }
+  }
+}

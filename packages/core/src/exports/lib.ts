@@ -1,14 +1,12 @@
 import { Directory } from '../core/dir.js';
 import { LoomFile } from '../core/file.js';
-import { PLUGIN_TYPE, type LoomFSPlugin } from '../core/types.js';
+import { PLUGIN_TYPE, type LoomPlugin, type LoomFileConverter } from '../core/types.js';
 import crypto from 'node:crypto';
 
-import jsonConverter from '../plugins/jsonConverter.js';
-import yamlConverter from '../plugins/yamlConverter.js';
-
-export type { LoomFSPlugin, PLUGIN_TYPE };
+export type { LoomPlugin, LoomFileConverter };
+export { PLUGIN_TYPE };
 export type { LoomFile as File, Directory };
-export class LoomFs {
+export class LoomIO {
 
 	protected static pluginHashes: string[] = [];
 
@@ -26,7 +24,7 @@ export class LoomFs {
 		return LoomFile.from(path);
 	}
 
-	static register(plugin: LoomFSPlugin) {
+	static register(plugin: LoomPlugin) {
 		const pluginHash = crypto.createHash('sha1').update(JSON.stringify(plugin)).digest('hex');
 		if(this.pluginHashes.includes(pluginHash)) {
 			return;
@@ -38,7 +36,4 @@ export class LoomFs {
 	}
 }
 
-export default LoomFs;
-
-LoomFs.register(jsonConverter);
-LoomFs.register(yamlConverter);
+export default LoomIO;

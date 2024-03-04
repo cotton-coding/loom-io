@@ -1,0 +1,25 @@
+{
+  "name": "@loom-io/base",
+  "version": "0.6.0",
+  "description": "",
+  "main": "dist/bundle.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@loom-io/core": "workspace:^0.6.0",
+    "@loom-io/yamlConverter": "workspace:^0.6.0",
+    "@loom-io/jsonConverter": "workspace:^0.6.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/bundle.js",
+      "require": "./dist/bundle.js"
+    }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

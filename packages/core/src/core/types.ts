@@ -14,13 +14,13 @@ export enum FILE_SIZE_UNIT {
     YOTTABYTE = 'YB'
 }
 
-export type LoomFSFileConverter = {
+export type LoomFileConverter = {
     type: PLUGIN_TYPE.FILE_CONVERTER,
     extensions: string[],
     parse<T = unknown>(content: string): T
     stringify<T = unknown>(content: T): string
 }
 
-export type LoomFSPlugin = LoomFSFileConverter;
+export type LoomPlugin = LoomFileConverter;
 
 export type MaybePromise<T> = Promise<T> | T;
