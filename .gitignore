@@ -175,4 +175,4 @@ dist
 .DS_Store
 
 # Test directory
-test/tmp/
+**/test/tmp/

@@ -1,0 +1,66 @@
+{
+  "name": "@loom-io/fs",
+  "module": "dist/exports/lib.js",
+  "main": "dist/exports/lib.js",
+  "types": "dist/exports/lib.d.ts",
+  "author": "Cotton Coding",
+  "license": "MIT",
+  "version": "0.6.0",
+  "description": "A file system wrapper for Node.js and Bun",
+  "keywords": [
+    "bun",
+    "fs",
+    "directory",
+    "dir",
+    "file",
+    "file system",
+    "filesystem",
+    "node",
+    "nodejs",
+    "wrapper"
+  ],
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "scripts": {
+    "test": "vitest --typecheck.enabled --test-timeout=500",
+    "test:ci": "npm run test -- --run --coverage",
+    "lint": "eslint --ext .ts .",
+    "lint:fix": "eslint --ext .ts . --fix",
+    "build": "tsc --project tsconfig.json",
+    "prepublishOnly": "npm run build && publint"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^8.4.0",
+    "@types/node": "^20.11.0",
+    "@typescript-eslint/eslint-plugin": "latest",
+    "@typescript-eslint/parser": "latest",
+    "@vitest/coverage-v8": "^1.2.2",
+    "eslint": "^8.56.0",
+    "publint": "^0.2.7",
+    "vitest": "^1.2.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "yaml": "^2.3.4"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/exports/lib.d.ts",
+      "import": "./dist/exports/lib.js"
+    }
+  },
+  "maintainers": [
+    {
+      "name": "Wolfgang Rathgeb",
+      "email": "ghost+npm@dropanote.de"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cotton-coding/loom.git"
+  }
+}
