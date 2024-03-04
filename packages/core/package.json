@@ -31,6 +31,9 @@
     "build": "tsc --project tsconfig.json",
     "prepublishOnly": "npm run build && publint"
   },
+  "devDependencies": {
+    "@loom-io/test-utils": "workspace:*"
+  },
   "exports": {
     ".": {
       "types": "./dist/exports/lib.d.ts",

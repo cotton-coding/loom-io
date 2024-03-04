@@ -2,3 +2,4 @@ packages:
   - "packages/*"
   - "adapters/source/*"
   - "plugins/*"
+  - "tests/*"

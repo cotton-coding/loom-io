@@ -48,7 +48,11 @@ importers:
         specifier: workspace:^0.6.0
         version: link:../../plugins/yamlConverter
 
-  packages/core: {}
+  packages/core:
+    devDependencies:
+      '@loom-io/test-utils':
+        specifier: workspace:*
+        version: link:../../tests/test-utils
 
   plugins/jsonConverter:
     devDependencies:
@@ -71,6 +75,23 @@ importers:
       typescript:
         specifier: ^5.3.0
         version: 5.3.3
+
+  tests/integration:
+    devDependencies:
+      '@loom-io/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+      '@loom-io/jsonConverter':
+        specifier: workspace:*
+        version: link:../../plugins/jsonConverter
+      '@loom-io/test-utils':
+        specifier: workspace:*
+        version: link:../test-utils
+      '@loom-io/yamlConverter':
+        specifier: workspace:*
+        version: link:../../plugins/yamlConverter
+
+  tests/test-utils: {}
 
 packages:
 

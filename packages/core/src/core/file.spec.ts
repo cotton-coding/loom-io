@@ -66,6 +66,7 @@ describe('Test File Service', () => {
 		expect(yottaBytes).toBe(content.length / 1024 / 1024 / 1024 / 1024 / 1024 / 1024 / 1024 / 1024);
 		const gigaByte = await file.getSize(FILE_SIZE_UNIT.GIGABYTE);
 		expect(gigaByte).toBe(content.length / 1024 / 1024 / 1024);
+		await helper.destroy();
 	});
 
 	test('If File exists on Object', async () => {
