@@ -12,20 +12,26 @@ jobs:
   test:
     name: lint & test
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20]
     steps:
       - uses: actions/checkout@v4
-      - name: Setup NodeJs
-        uses: actions/setup-node@v4
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
         with:
-          node-version: latest
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
       - name: pnpm-setup
-        uses: pnpm/action-setup@v2
+        uses: pnpm/action-setup@v3
+        with:
+          version: latest
       - name: Install
-        run: pnpm ci
+        run: pnpm install
       - name: Lint & Fix
-        run: pnpm run lint:fix
+        run: pnpm lint:fix
       - name: Test
-        run: pnpm run test:ci
+        run: pnpm test:ci
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         env:
