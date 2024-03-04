@@ -176,3 +176,5 @@ dist
 
 # Test directory
 **/test/tmp/
+
+tests/integration/test-tmp/
