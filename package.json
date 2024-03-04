@@ -6,7 +6,9 @@
   "scripts": {
     "build": "pnpm run --recursive build",
     "prepublishOnly": "pnpm run --recursive prepublishOnly",
-    "test:ci": "pnpm run --recursive test:ci"
+    "test:ci": "pnpm run --recursive test:ci",
+    "lint": "pnpm run --recursive lint",
+    "lint:fix": "pnpm run --recursive lint:fix"
   },
   "keywords": [],
   "author": "",
