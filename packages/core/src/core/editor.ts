@@ -1,7 +1,7 @@
 import { LoomFile } from './file';
 import * as fs from 'fs/promises';
-import { LineResult, SearchResult } from './helper/result';
-import { TextItemList } from './helper/textItemList';
+import { LineResult, SearchResult } from '../helper/result';
+import { TextItemList } from '../helper/textItemList';
 
 interface ReadWrite {
 	getSizeInBytes(): Promise<number>;

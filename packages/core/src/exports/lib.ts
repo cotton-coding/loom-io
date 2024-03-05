@@ -2,30 +2,39 @@ import { Directory } from '../core/dir.js';
 import { LoomFile } from '../core/file.js';
 import { Editor, Reader } from '../core/editor.js';
 import { List } from '../core/list.js';
-import { PLUGIN_TYPE, FILE_SIZE_UNIT, type LoomPlugin, type LoomFileConverter } from '../core/types.js';
+import { PLUGIN_TYPE, FILE_SIZE_UNIT, type LoomPlugin, type LoomFileConverter, type SourceAdapter, type LoomSourceAdapter } from '../definitions.js';
 import crypto from 'node:crypto';
 
-export type { LoomPlugin, LoomFileConverter };
+export type { LoomPlugin, LoomFileConverter, SourceAdapter, LoomSourceAdapter };
 export { PLUGIN_TYPE, FILE_SIZE_UNIT };
-export * from '../core/exceptions.js';
+export * from '../exceptions.js';
 export { LoomFile, LoomFile as File, Directory, Editor, Reader, List};
 export class LoomIO {
 
 	protected static pluginHashes: string[] = [];
+	protected static sourceAdapters: LoomSourceAdapter[] = [];
 
 	protected constructor() {}
 
-	static root() {
-		return new Directory();
+	static async source(link: string): Promise<Directory> {
+		const dir = await Promise.race(this.sourceAdapters.map(adapter => adapter.source(link)));
+		if(dir) {
+			return dir;
+		}
+		throw new Error('No source adapter is matching the given link');
 	}
 
-	static dir(...path: string[]) {
-		return new Directory(...path);
-	}
+	// static root() {
+	// 	return new Directory();
+	// }
 
-	static file(path: string) {
-		return LoomFile.from(path);
-	}
+	// static dir(...path: string[]) {
+	// 	return new Directory(...path);
+	// }
+
+	// static file(path: string) {
+	// 	return LoomFile.from(path);
+	// }
 
 	static register(plugin: LoomPlugin) {
 		const pluginHash = crypto.createHash('sha1').update(JSON.stringify(plugin)).digest('hex');
@@ -35,6 +44,8 @@ export class LoomIO {
 		this.pluginHashes.push(pluginHash);
 		if(PLUGIN_TYPE.FILE_CONVERTER === plugin.type) {
 			LoomFile.register(plugin);
+		} else if(PLUGIN_TYPE.SOURCE_ADAPTER === plugin.type) {
+			this.sourceAdapters.push(plugin);
 		}
 	}
 }

@@ -2,8 +2,8 @@ import { describe, test, expect, beforeAll } from 'vitest';
 import * as fs from 'fs/promises';
 import type { Dirent } from 'fs';
 import { DirentWrapper } from './dirent.js';
-import { Directory } from '../dir';
-import { TestFilesystemHelper } from '../../../test/helpers/testFilesystemHelper';
+import { Directory } from '../core/dir.js';
+import { TestFilesystemHelper } from '../../test/helpers/testFilesystemHelper.js';
 
 describe('Test Dirent Service', () => {
 

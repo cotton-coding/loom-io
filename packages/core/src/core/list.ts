@@ -1,6 +1,6 @@
 import type { Dirent } from 'fs';
 import { Directory } from './dir.js';
-import { DirentWrapper } from './wrapper/dirent.js';
+import { DirentWrapper } from '../wrapper/dirent.js';
 import type { LoomFile } from './file.js';
 
 

@@ -1,5 +1,5 @@
 import { Dirent } from 'fs';
-import { Directory } from '../dir.js';
+import { Directory } from '../core/dir.js';
 import { join } from 'path';	
 
 export class DirentWrapper {

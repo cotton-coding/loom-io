@@ -1,6 +1,6 @@
 import * as fs from 'node:fs/promises';
-import { PLUGIN_TYPE, type LoomFileConverter, FILE_SIZE_UNIT } from './types.js';
-import { FileConvertException, PluginNotFoundException } from './exceptions.js';
+import { PLUGIN_TYPE, type LoomFileConverter, FILE_SIZE_UNIT } from '../definitions.js';
+import { FileConvertException, PluginNotFoundException } from '../exceptions.js';
 import { Directory } from './dir.js';
 import { join as joinPath, extname, dirname, basename } from 'node:path';
 import { Editor } from './editor.js';

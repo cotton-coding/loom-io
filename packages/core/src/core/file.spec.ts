@@ -1,11 +1,11 @@
 import { expect, test, describe, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
 import { LoomFile } from './file.js';
-import { FileConvertException, PluginNotFoundException } from './exceptions.js';
+import { FileConvertException, PluginNotFoundException } from '../exceptions.js';
 import { TestFilesystemHelper } from '../../test/helpers/testFilesystemHelper.js';
 
 import { basename, dirname } from 'node:path';
 import { Directory } from './dir.js';
-import { FILE_SIZE_UNIT } from './types.js';
+import { FILE_SIZE_UNIT } from '../definitions.js';
 import { faker } from '@faker-js/faker';
 import { Editor } from './editor.js';
 

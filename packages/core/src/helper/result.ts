@@ -1,4 +1,4 @@
-import { ReaderInternal } from '../editor';
+import { ReaderInternal } from '../core/editor';
 import { TextItemList, TextMeta } from './textItemList';
 
 

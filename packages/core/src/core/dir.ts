@@ -2,17 +2,22 @@ import * as fs from 'node:fs/promises';
 import { join as joinPath, relative as relativePath, resolve as resolvePath} from 'node:path';
 import { LoomFile } from './file.js';
 import { List } from './list.js';
-import { isErrnoException } from './helper/typechecks.js';
+import { isErrnoException } from '../helper/typechecks.js';
+import { SourceAdapter } from '../definitions.js';
 
 export class Directory {
 
 	protected readonly _path: string;
+	protected readonly _adapter: SourceAdapter;
 	protected _strict: boolean = false;
 
 	constructor(
-		path: string = process.cwd(), ...paths: string[]
+		adapter: SourceAdapter,
+		path: string = process.cwd(),
+		...paths: string[]
 	) {
 		this._path = resolvePath(path, ...(paths || []));
+		this._adapter = adapter;
 	}
 
 	strict(strictMode: boolean = true) {
@@ -28,7 +33,7 @@ export class Directory {
 		if(this._path === '/') return undefined;
 		const split = this.path.slice(1).split('/');
 		split.pop();
-		return new Directory(`/${split.join('/')}`);
+		return new Directory(this._adapter, `/${split.join('/')}`);
 	}
 
 	async exists(): Promise<boolean> {
@@ -50,8 +55,9 @@ export class Directory {
 		} catch (err) {
 			if(this._strict){
 				throw err;
-			} 
+			}
 			if(isErrnoException(err)) {
+				// File not found
 				if((err as NodeJS.ErrnoException).code !== 'ENOENT' && (err as NodeJS.ErrnoException).errno !== -2) {
 					throw err;
 				}
@@ -60,7 +66,7 @@ export class Directory {
 	}
 
 	subDir(name: string) {
-		return new Directory(joinPath(this.path, name));
+		return new Directory(this._adapter, joinPath(this.path, name));
 	}
 
 	async list(): Promise<List> {
