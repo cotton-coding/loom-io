@@ -1,26 +1,20 @@
-import type { Client }	from 'minio';
+import type { BucketItem, Client }	from 'minio';
 import { SourceAdapter } from '@loom-io/core';
-import { mkdirOptions, rmdirOptions } from '../definitions';
-import { join as joinPath } from 'node:path';
-import { isMinioException } from '../utils/typechecks';
+import { rmdirOptions } from '../definitions';
 
 export class Adapter implements SourceAdapter {
 	constructor(
 		protected s3: Client,
-		protected bucket?: string
+		protected bucket: string
 	) {
-
 	}
 
 	async exists(path: string): Promise<boolean> {
-		const [bucket, location] = await this.getBucketNameAndPath(path);
-		if(!location || location === '') {
-			return this.s3.bucketExists(bucket);
-		}
-
 		return new Promise((resolve, reject) => {
-			const bucketStream = this.s3.listObjects(bucket, location);
+			const pathWithTailSlash = path.endsWith('/') ? path : path + '/';
+			const bucketStream = this.s3.listObjects(this.bucket, pathWithTailSlash);
 			bucketStream.on('data', () => {
+				bucketStream.destroy();
 				resolve(true);
 			});
 			bucketStream.on('end', () => {
@@ -33,40 +27,9 @@ export class Adapter implements SourceAdapter {
 
 	}
 
-	protected async createBucket(path: string): Promise<void> {
-		try {
-			await this.s3.makeBucket(path);
-		}	catch (err) {
-			if(isMinioException(err)) {
-				switch(err.code) {
-				case 'BucketAlreadyOwnedByYou':
-				case 'BucketAlreadyExists':
-					return;
-				}
-			}
-			throw err;
-		}
-	}
-
-	protected async createEmptyDirectory(bucket: string, path: string): Promise<void> {
-		await this.s3.putObject(bucket, path, '');
-		return;
-	}
-
-	protected getBucketNameAndPath(path: string):[string, string] {
-		const split = path.split('/');
-		const bucket = this.bucket ?? split.shift();
-		if(bucket == null) throw new Error('Bucket not provided');
-		return [bucket, split.join('/')];
-	}
-
 	async mkdir(path: string): Promise<void> {
-		const [bucket, location] = this.getBucketNameAndPath(path);
-
-		await this.createBucket(bucket);
-		if(location && location !== '') {
-			await this.createEmptyDirectory(bucket, location);
-		}
+		const pathWithTailSlash = path.endsWith('/') ? '' : `${path}/`;
+		await this.s3.putObject(this.bucket, pathWithTailSlash, Buffer.alloc(0));
 	}
 
 	protected async rmdirRecursive(bucket: string, path: string): Promise<void> {
@@ -76,30 +39,75 @@ export class Adapter implements SourceAdapter {
 		}
 	}
 
+	protected async rmdirForce(path: string): Promise<void> {
+		const pathWithTailSlash = path.endsWith('/') ? path : `${path}/`;
+		await this.s3.removeObject(this.bucket, pathWithTailSlash, { forceDelete: true });
+	}
+
+	protected async rmDirRecursive(bucket: string, path: string): Promise<void> {
+		const objects = await this.filesInDir(path);
+		const names = objects.map((obj) => obj.name).filter<string>((name) => typeof name === 'string');
+		await this.s3.removeObjects(bucket, names);
+	}
+
+	protected async dirHasFiles(path: string): Promise<boolean> {
+		const pathWithTailSlash = path.endsWith('/') ? path : `${path}/`;
+		const bucketStream = await this.s3.listObjects(this.bucket, pathWithTailSlash);
+		return new Promise((resolve, reject) => {
+			bucketStream.on('data', (data) => {
+				if(data.name?.endsWith('/')) {
+					return;
+				}
+				resolve(true);
+				bucketStream.destroy();
+			});
+			bucketStream.on('end', () => {
+				console.log('end');
+				resolve(false);
+			});
+			bucketStream.on('error', (err) => {
+				reject(err);
+			});
+		});
+	}
+
+	protected async filesInDir(path: string): Promise<BucketItem[]> {
+		const pathWithTailSlash = path.endsWith('/') ? path : `${path}/`;
+		const bucketStream = await this.s3.listObjects(this.bucket, pathWithTailSlash);
+		return new Promise((resolve, reject) => {
+			const files: BucketItem[] = [];
+			bucketStream.on('data', (data) => {
+				files.push(data);
+			});
+			bucketStream.on('end', () => {
+				resolve(files);
+			});
+			bucketStream.on('error', (err) => {
+				reject(err);
+			});
+		});
+	}
+
 	async rmdir(path: string, options: rmdirOptions= {}): Promise<void> {
-		try {
-			const [bucket, location] = this.getBucketNameAndPath(path);
-			if(!location || location === '') {
-				// if(options.recursive) {
-				// 	await this.rmdirRecursive(bucket, location);
-				// }
-				await this.s3.removeBucket(bucket);
-				return;
+		// TODO: Check if directory is empty and throw error if not and force is not set
+		if(options.force) {
+			await this.rmdirForce(path);
+			return;
+		} else if (options.recursive) {
+			await this.rmdirRecursive(this.bucket, path);
+			return;
+		} else {
+			if(await this.dirHasFiles(path)) {
+				throw new Error('Directory is not empty');
 			}
-			await this.s3.removeObject(bucket, location, { forceDelete: options.force });
-			const parts = path.split('/');
-			parts.pop();
-			//await this.mkdir(parts.join('/'));
-		} catch (err) {
-			console.log('rmdir', err);
-			throw err;
+			const pathWithTailSlash = path.endsWith('/') ? path : `${path}/`;
+			await this.s3.removeObject(this.bucket, pathWithTailSlash);
 		}
 	}
 
 
 	async read(path: string, encoding?: BufferEncoding): Promise<Buffer | string> {
-		const [bucket, location] = this.getBucketNameAndPath(path);
-		const stream = await this.s3.getObject(bucket, location);
+		const stream = await this.s3.getObject(this.bucket, path);
 		return new Promise((resolve, reject) => {
 			const buffers: Buffer[] = [];
 			stream.on('data', (data) => {
@@ -118,9 +126,8 @@ export class Adapter implements SourceAdapter {
 	}
 
 	async write(path: string, data: Buffer | string): Promise<void> {
-		const [bucket, location] = this.getBucketNameAndPath(path);
 		const buffer = Buffer.from(data);
-		await this.s3.putObject(bucket, location, buffer, buffer.length, { 'Content-Type': 'text/plain' });
+		await this.s3.putObject(this.bucket, path, buffer, buffer.length, { 'Content-Type': 'text/plain' });
 		return;
 	}
 
