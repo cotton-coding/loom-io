@@ -1,6 +1,7 @@
 import type { BucketItem, Client }	from 'minio';
 import { SourceAdapter } from '@loom-io/core';
 import { rmdirOptions } from '../definitions';
+import { ObjectDirent } from './dirent';
 
 export class Adapter implements SourceAdapter {
 	constructor(
@@ -46,7 +47,7 @@ export class Adapter implements SourceAdapter {
 
 	protected async rmDirRecursive(bucket: string, path: string): Promise<void> {
 		const objects = await this.filesInDir(path);
-		const names = objects.map((obj) => obj.name).filter<string>((name) => typeof name === 'string');
+		const names = objects.map((obj) => obj.name).filter((name): name is string => typeof name === 'string');
 		await this.s3.removeObjects(bucket, names);
 	}
 
@@ -62,7 +63,6 @@ export class Adapter implements SourceAdapter {
 				bucketStream.destroy();
 			});
 			bucketStream.on('end', () => {
-				console.log('end');
 				resolve(false);
 			});
 			bucketStream.on('error', (err) => {
@@ -81,6 +81,27 @@ export class Adapter implements SourceAdapter {
 			});
 			bucketStream.on('end', () => {
 				resolve(files);
+			});
+			bucketStream.on('error', (err) => {
+				reject(err);
+			});
+		});
+	}
+
+	async readdir(path: string): Promise<ObjectDirent[]> {
+		const pathWithTailSlash = path.endsWith('/') ? path : `${path}/`;
+		const bucketStream = await this.s3.listObjects(this.bucket, pathWithTailSlash);
+		return new Promise((resolve, reject) => {
+			const pathObjects: ObjectDirent[] = [];
+			bucketStream.on('data', (data) => {
+				if(data.name === pathWithTailSlash || data.prefix === pathWithTailSlash) {
+					return;
+				}
+				const dirent = new ObjectDirent(data);
+				pathObjects.push(dirent);
+			});
+			bucketStream.on('end', () => {
+				resolve(pathObjects);
 			});
 			bucketStream.on('error', (err) => {
 				reject(err);

@@ -1,37 +1,37 @@
 {
-  "name": "loom-io",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "build": "pnpm run --recursive build",
-    "prepublishOnly": "pnpm run --recursive prepublishOnly",
-    "test:ci": "pnpm run --recursive test:ci",
-    "lint": "pnpm run --recursive lint",
-    "lint:fix": "pnpm run --recursive lint:fix"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
-  "maintainers": [
-    {
-      "name": "Wolfgang Rathgeb",
-      "email": "ghost+npm@dropanote.de"
-    }
-  ],
-  "devDependencies": {
-    "@faker-js/faker": "^8.4.0",
-    "@types/node": "^20.11.0",
-    "@typescript-eslint/eslint-plugin": "latest",
-    "@typescript-eslint/parser": "latest",
-    "@vitest/coverage-v8": "^1.2.2",
-    "eslint": "^8.56.0",
-    "publint": "^0.2.7",
-    "vitest": "^1.2.2",
-    "typescript": "^5.0.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/cotton-coding/loom.git"
-  }
+	"name": "loom-io",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"build": "pnpm run --recursive build",
+		"prepublishOnly": "pnpm run --recursive prepublishOnly",
+		"test:ci": "pnpm run --recursive test:ci",
+		"lint": "pnpm run --recursive lint",
+		"lint:fix": "pnpm run --recursive lint:fix"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "MIT",
+	"maintainers": [
+		{
+			"name": "Wolfgang Rathgeb",
+			"email": "ghost+npm@dropanote.de"
+		}
+	],
+	"devDependencies": {
+		"@faker-js/faker": "^8.4.0",
+		"@types/node": "^20.11.0",
+		"@typescript-eslint/eslint-plugin": "latest",
+		"@typescript-eslint/parser": "latest",
+		"@vitest/coverage-v8": "^1.2.2",
+		"eslint": "^8.56.0",
+		"publint": "^0.2.7",
+		"typescript": "^5.0.0",
+		"vitest": "^1.2.2"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/cotton-coding/loom.git"
+	}
 }
