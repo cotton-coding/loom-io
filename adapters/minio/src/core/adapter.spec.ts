@@ -78,7 +78,7 @@ describe('Adapter', () => {
 		const fileName = 'file.txt';
 		const adapter = await createAdapter(s3);
 		await adapter.mkdir(path);
-		await adapter.write(`${path}/${fileName}`, 'test');
+		await adapter.writeFile(`${path}/${fileName}`, 'test');
 		await expect(adapter.rmdir(path)).rejects.toThrow();
 		await expect(adapter.exists(path)).resolves.toBe(true);
 		await expect(adapter.exists('7/2/3')).resolves.toBe(true);
@@ -104,7 +104,7 @@ describe('Adapter', () => {
 
 	test('list dir content', async () => {
 		const adapter = await createAdapter(s3);
-		await adapter.write('list-dir-content/list/file.txt', 'test');
+		await adapter.writeFile('list-dir-content/list/file.txt', 'test');
 		const list = await adapter.readdir('list-dir-content/list/');
 		expect(list.length).toBe(1);
 		expect(list[0].name).toEqual('file.txt');
@@ -127,7 +127,7 @@ describe('Adapter', () => {
 		const filePromises = files.map(async (file) => {
 			const first = file.split('/')[0];
 			firstLevelDirsAndFiles.add(first);
-			await adapter.write(`${baseRepo}/${file}`, Math.random().toString());
+			await adapter.writeFile(`${baseRepo}/${file}`, Math.random().toString());
 		});
 
 		await Promise.all([...dirPromises, ...filePromises]);
@@ -153,8 +153,7 @@ describe('Adapter', () => {
 		const adapter = await createAdapter(s3);
 		const path = 'test/1/2/3/long/deep/path/test.txt';
 		const content = 'test-cotntent';
-		await adapter.write(path, content);
-		expect((await adapter.read(path)).toString('utf-8')).toBe(content);
-
+		await adapter.writeFile(path, content);
+		expect((await adapter.readFile(path)).toString('utf-8')).toBe(content);
 	});
 });

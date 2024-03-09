@@ -1,13 +1,14 @@
-import type { BucketItem } from 'minio';
+import { ObjectDirentInterface } from '@loom-io/core';
+import { BucketItem } from 'minio';
 
-export class ObjectDirent {
+export class ObjectDirent implements ObjectDirentInterface{
 
 	constructor(
 		protected _bucketItem: BucketItem
 	) {}
 
 	isDirectory() {
-		const { size, name, prefix } = this._bucketItem;
+		const { name, prefix } = this._bucketItem;
 		if(prefix?.endsWith('/') || name?.endsWith('/')) {
 			return true;
 		}
@@ -28,7 +29,10 @@ export class ObjectDirent {
 		if(this.isDirectory()) {
 			split.pop();
 		}
-		const currentObjectName = split.pop();
+		if(split.length === 0) {
+			throw new Error('No path or name found');
+		}
+		const currentObjectName = split.pop()!;
 		return [split.join('/'), currentObjectName];
 	}
 

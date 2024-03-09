@@ -2,10 +2,11 @@ import { Directory } from '../core/dir.js';
 import { LoomFile } from '../core/file.js';
 import { Editor, Reader } from '../core/editor.js';
 import { List } from '../core/list.js';
-import { PLUGIN_TYPE, FILE_SIZE_UNIT, type LoomPlugin, type LoomFileConverter, type SourceAdapter, type LoomSourceAdapter } from '../definitions.js';
+import { PLUGIN_TYPE, FILE_SIZE_UNIT } from '../definitions.js';
+import type { LoomPlugin, LoomFileConverter, SourceAdapter, LoomSourceAdapter, FileStat, rmdirOptions, ObjectDirentInterface } from '../definitions.js';
 import crypto from 'node:crypto';
 
-export type { LoomPlugin, LoomFileConverter, SourceAdapter, LoomSourceAdapter };
+export type { LoomPlugin, LoomFileConverter, SourceAdapter, LoomSourceAdapter, FileStat, rmdirOptions, ObjectDirentInterface};
 export { PLUGIN_TYPE, FILE_SIZE_UNIT };
 export * from '../exceptions.js';
 export { LoomFile, LoomFile as File, Directory, Editor, Reader, List};

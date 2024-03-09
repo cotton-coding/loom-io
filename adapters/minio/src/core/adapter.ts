@@ -1,13 +1,14 @@
 import type { BucketItem, Client }	from 'minio';
-import { SourceAdapter } from '@loom-io/core';
-import { rmdirOptions } from '../definitions';
-import { ObjectDirent } from './dirent';
-
+import { SourceAdapter, type ObjectDirentInterface, type rmdirOptions } from '@loom-io/core';
+import { ObjectDirent } from './objectDirent.js';
 export class Adapter implements SourceAdapter {
 	constructor(
 		protected s3: Client,
 		protected bucket: string
 	) {
+	}
+	deleteFile(path: string): Promise<void> {
+		throw new Error('Method not implemented.');
 	}
 
 	async exists(path: string): Promise<boolean> {
@@ -88,7 +89,7 @@ export class Adapter implements SourceAdapter {
 		});
 	}
 
-	async readdir(path: string): Promise<ObjectDirent[]> {
+	async readdir(path: string): Promise<ObjectDirentInterface[]> {
 		const pathWithTailSlash = path.endsWith('/') ? path : `${path}/`;
 		const bucketStream = await this.s3.listObjects(this.bucket, pathWithTailSlash);
 		return new Promise((resolve, reject) => {
@@ -126,8 +127,17 @@ export class Adapter implements SourceAdapter {
 		}
 	}
 
+	async stat (path: string) {
+		const stat = await this.s3.statObject(this.bucket, path);
+		return {
+			size: stat.size,
+			mtime: stat.lastModified
+		};
+	}
 
-	async read(path: string, encoding?: BufferEncoding): Promise<Buffer | string> {
+	async readFile(path: string): Promise<Buffer>
+	async readFile(path: string, encoding: BufferEncoding): Promise<string>
+	async readFile(path: string, encoding?: BufferEncoding): Promise<Buffer | string> {
 		const stream = await this.s3.getObject(this.bucket, path);
 		return new Promise((resolve, reject) => {
 			const buffers: Buffer[] = [];
@@ -146,7 +156,7 @@ export class Adapter implements SourceAdapter {
 		});
 	}
 
-	async write(path: string, data: Buffer | string): Promise<void> {
+	async writeFile(path: string, data: Buffer | string): Promise<void> {
 		const buffer = Buffer.from(data);
 		await this.s3.putObject(this.bucket, path, buffer, buffer.length, { 'Content-Type': 'text/plain' });
 		return;

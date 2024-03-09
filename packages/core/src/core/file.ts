@@ -1,5 +1,5 @@
 import * as fs from 'node:fs/promises';
-import { PLUGIN_TYPE, type LoomFileConverter, FILE_SIZE_UNIT } from '../definitions.js';
+import { PLUGIN_TYPE, type LoomFileConverter, FILE_SIZE_UNIT, SourceAdapter } from '../definitions.js';
 import { FileConvertException, PluginNotFoundException } from '../exceptions.js';
 import { Directory } from './dir.js';
 import { join as joinPath, extname, dirname, basename } from 'node:path';
@@ -15,26 +15,26 @@ export class LoomFile {
 	protected static converterPlugins: Map<string, LoomFileConverter> = new Map();
 	protected _extension: string | undefined;
 
-	static from(dir: Directory, name: string): LoomFile
-	static from(path: string): LoomFile
-	static from(dirOrPath: Directory | string, name: string = ''){
-		
+	static from(adapter: SourceAdapter ,dir: Directory, name: string): LoomFile
+	static from(adapter: SourceAdapter, path: string): LoomFile
+	static from(adapter: SourceAdapter, dirOrPath: Directory | string, name: string = ''){
+
 		if(typeof dirOrPath === 'string') {
 			name = basename(dirOrPath);
-			dirOrPath = new Directory(dirname(dirOrPath));
+			dirOrPath = new Directory(adapter, dirname(dirOrPath));
 		}
 
-		return new LoomFile(dirOrPath, name);
+		return new LoomFile(adapter, dirOrPath, name);
 	}
 
 	static async exists(path: string): Promise<boolean>
 	static async exists(dir: Directory, name: string): Promise<boolean>
 	static async exists(dirOrPath: Directory | string, name: string = ''){
-		const path = 
+		const path =
 			typeof dirOrPath === 'string'
-				? dirOrPath 
+				? dirOrPath
 				: joinPath((dirOrPath as Directory).path, name);
-	
+
 		try {
 			await fs.access(path, fs.constants.F_OK);
 			return true;
@@ -44,6 +44,7 @@ export class LoomFile {
 	}
 
 	constructor(
+		protected _adapter: SourceAdapter,
 		protected _dir: Directory,
     protected _name: string
 	) {}
@@ -88,7 +89,7 @@ export class LoomFile {
 		if(this.extension === undefined) {
 			throw new FileConvertException(this.path, 'File has no extension');
 		}
-	
+
 		const plugin = LoomFile.converterPlugins.get(this.extension);
 
 		if(plugin === undefined) {
@@ -97,7 +98,7 @@ export class LoomFile {
 
 		const text = await this.text();
 		return plugin.parse<T>(text);
-		
+
 	}
 
 	async exists() {

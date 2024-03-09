@@ -38,14 +38,32 @@ export type LoomPlugin = LoomFileConverter | LoomSourceAdapter;
 
 export type MaybePromise<T> = Promise<T> | T;
 
-export interface SourceAdapter {
-    read(path: string): MaybePromise<Buffer>
-    write(path: string, content: string): MaybePromise<void>
-    exists(path: string): MaybePromise<boolean>
-    delete(path: string): MaybePromise<void>
-    list(path: string): MaybePromise<string[]>
-    mkdir(path: string): MaybePromise<void>
-    rmdir(path: string): MaybePromise<void>
-    size(path: string): MaybePromise<number>
+export interface ObjectDirentInterface {
+    isDirectory(): boolean;
+    isFile(): boolean;
+    name: string;
+    path: string;
+}
 
+export type rmdirOptions = {
+	recursive?: boolean;
+	force?: boolean;
+}
+
+export interface SourceAdapter {
+    readFile(path: string): MaybePromise<Buffer>
+    readFile(path: string, encoding: BufferEncoding): MaybePromise<string>
+    readFile(path: string, encoding?: BufferEncoding): MaybePromise<Buffer | string>
+    writeFile(path: string, content: string): MaybePromise<void>
+    deleteFile(path: string): MaybePromise<void>
+    stat(path: string): MaybePromise<FileStat>
+    exists(path: string): MaybePromise<boolean>
+    readdir(path: string): MaybePromise<ObjectDirentInterface[]>
+    mkdir(path: string): MaybePromise<void>
+    rmdir(path: string, options?: rmdirOptions): MaybePromise<void>
+}
+
+export interface FileStat {
+    size: number,
+    mtime: Date,
 }

@@ -86,7 +86,7 @@ export class Directory {
 
 
 	file(name: string): LoomFile {
-		return new LoomFile(this, name);
+		return new LoomFile(this._adapter, this, name);
 	}
 
 	protected async filesRecursion(list: List): Promise<List<LoomFile>>{
