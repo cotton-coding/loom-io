@@ -7,14 +7,15 @@ export class Adapter implements SourceAdapter {
 		protected bucket: string
 	) {
 	}
-	deleteFile(path: string): Promise<void> {
-		throw new Error('Method not implemented.');
+	async deleteFile(path: string): Promise<void> {
+		await this.s3.removeObject(this.bucket, path);
 	}
 
-	async exists(path: string): Promise<boolean> {
+	protected async exists(path: string): Promise<boolean> {
+
+		const bucketStream = this.s3.listObjects(this.bucket, path);
 		return new Promise((resolve, reject) => {
-			const pathWithTailSlash = path.endsWith('/') ? path : path + '/';
-			const bucketStream = this.s3.listObjects(this.bucket, pathWithTailSlash);
+
 			bucketStream.on('data', () => {
 				bucketStream.destroy();
 				resolve(true);
@@ -26,8 +27,17 @@ export class Adapter implements SourceAdapter {
 				reject(err);
 			});
 		});
-
 	}
+
+	async fileExists(path: string): Promise<boolean> {
+		return this.exists(path);
+	}
+
+	async dirExists(path: string): Promise<boolean> {
+		const pathWithTailSlash = path.endsWith('/') ? path : path + '/';
+		return this.exists(pathWithTailSlash);
+	}
+
 
 	async mkdir(path: string): Promise<void> {
 		const pathWithTailSlash = path.endsWith('/') ? '' : `${path}/`;

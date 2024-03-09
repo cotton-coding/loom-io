@@ -54,14 +54,14 @@ describe('Adapter', () => {
 		const path = 'test/1/2/3/long/deep/path/empty';
 		const adapter = await createAdapter(s3);
 		await adapter.mkdir(path);
-		await expect(adapter.exists(path)).resolves.toBe(true);
+		await expect(adapter.dirExists(path)).resolves.toBe(true);
 	});
 
 	test('mkdir with bucket', async () => {
 		const path = '7/2/3/long/deep/path';
 		const adapter = await createAdapter(s3, 'test');
 		await adapter.mkdir(path);
-		await expect(adapter.exists(path)).resolves.toBe(true);
+		await expect(adapter.dirExists(path)).resolves.toBe(true);
 	});
 
 	test('rmdir', async () => {
@@ -69,8 +69,8 @@ describe('Adapter', () => {
 		const adapter = await createAdapter(s3);
 		await adapter.mkdir(path);
 		await adapter.rmdir(path);
-		await expect(adapter.exists(path)).resolves.toBe(false);
-		await expect(adapter.exists('test/1/2/3')).resolves.toBe(true);
+		await expect(adapter.dirExists(path)).resolves.toBe(false);
+		await expect(adapter.dirExists('test/1/2/3')).resolves.toBe(true);
 	});
 
 	test('rmdir with file should fail', async () => {
@@ -80,26 +80,26 @@ describe('Adapter', () => {
 		await adapter.mkdir(path);
 		await adapter.writeFile(`${path}/${fileName}`, 'test');
 		await expect(adapter.rmdir(path)).rejects.toThrow();
-		await expect(adapter.exists(path)).resolves.toBe(true);
-		await expect(adapter.exists('7/2/3')).resolves.toBe(true);
+		await expect(adapter.dirExists(path)).resolves.toBe(true);
+		await expect(adapter.dirExists('7/2/3')).resolves.toBe(true);
 	});
 
 	test('exists', async () => {
 		const adapter = await createAdapter(s3);
 		await adapter.mkdir('test/exists');
-		await expect(adapter.exists('test/exists')).resolves.toBe(true);
+		await expect(adapter.dirExists('test/exists')).resolves.toBe(true);
 	});
 
 	test('exists with path', async () => {
 		const adapter = await createAdapter(s3);
 		await adapter.mkdir('test/1/2/3/exists');
-		await expect(adapter.exists('test/1/2/3/exists')).resolves.toBe(true);
-		await expect(adapter.exists('test/1/2')).resolves.toBe(true);
+		await expect(adapter.dirExists('test/1/2/3/exists')).resolves.toBe(true);
+		await expect(adapter.dirExists('test/1/2')).resolves.toBe(true);
 	});
 
 	test('not exists', async () => {
 		const adapter = await createAdapter(s3);
-		await expect(adapter.exists('test-not-exists')).resolves.toBe(false);
+		await expect(adapter.dirExists('test-not-exists')).resolves.toBe(false);
 	});
 
 	test('list dir content', async () => {
@@ -134,7 +134,7 @@ describe('Adapter', () => {
 
 		const list = await adapter.readdir(baseRepo);
 		expect(list.length).toBe(firstLevelDirsAndFiles.size);
-		let [dirCount, fileCount] = list.reduce((acc, dirent) => {
+		const [dirCount, fileCount] = list.reduce((acc, dirent) => {
 			if (dirent.isDirectory()) {
 				acc[0]++;
 			}
@@ -155,5 +155,50 @@ describe('Adapter', () => {
 		const content = 'test-cotntent';
 		await adapter.writeFile(path, content);
 		expect((await adapter.readFile(path)).toString('utf-8')).toBe(content);
+	});
+
+	test('file exists', async () => {
+		const adapter = await createAdapter(s3);
+		const path = 'exists.js';
+		const content = 'export const exists = true';
+		await adapter.writeFile(path, content);
+		await expect(adapter.fileExists(path)).resolves.toBe(true);
+	});
+
+	test('file not exists', async () => {
+		const adapter = await createAdapter(s3);
+		await expect(adapter.fileExists('not-exists.js')).resolves.toBe(false);
+	});
+
+	test('file exists deep path', async () => {
+		const adapter = await createAdapter(s3);
+		const path = 'deep/path/test.txt';
+		const content = 'test-cotntent';
+		await adapter.mkdir('deep/path/test');
+		await expect(adapter.fileExists(path)).resolves.toBe(false);
+		await adapter.writeFile(path, content);
+		await expect(adapter.fileExists(path)).resolves.toBe(true);
+	});
+
+	test('stat for file', async () => {
+		const adapter = await createAdapter(s3);
+		const path = 'to-delete.txt';
+		const content = 'test-content';
+		await adapter.writeFile(path, content);
+		await expect(adapter.fileExists(path)).resolves.toBe(true);
+		const stat = await adapter.stat(path);
+		expect(stat.size).toBe(content.length);
+		expect(stat.mtime).toBeInstanceOf(Date);
+		expect(stat.mtime.getTime()).toBeGreaterThanOrEqual(Date.now() - 2000);
+	});
+
+	test('delete file', async () => {
+		const adapter = await createAdapter(s3);
+		const path = 'to-delete.txt';
+		const content = 'test-content';
+		await adapter.writeFile(path, content);
+		await expect(adapter.fileExists(path)).resolves.toBe(true);
+		await adapter.deleteFile(path);
+		await expect(adapter.fileExists(path)).resolves.toBe(false);
 	});
 });
