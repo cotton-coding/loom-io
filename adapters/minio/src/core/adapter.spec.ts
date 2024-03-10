@@ -1,9 +1,9 @@
-import { describe, test, expect, beforeAll, afterAll } from 'vitest';
+import { describe, test, expect, beforeAll } from 'vitest';
 import { Adapter } from './adapter';
 import { Client } from 'minio';
 import { afterEach, beforeEach } from 'node:test';
 
-const DEFAULT_BUCKET = `cotten-coding-${Math.random().toString(36).substring(7)}`;
+const DEFAULT_BUCKET = `cotton-coding-${Math.random().toString(36).substring(7)}`;
 const createdBuckets: string[] = [];
 
 async function createBucketIfNotExists(client: Client, bucket: string) {
@@ -200,5 +200,16 @@ describe('Adapter', () => {
 		await expect(adapter.fileExists(path)).resolves.toBe(true);
 		await adapter.deleteFile(path);
 		await expect(adapter.fileExists(path)).resolves.toBe(false);
+	});
+
+	test('delete file deep path', async () => {
+		const adapter = await createAdapter(s3);
+		const path = 'deep/path/file/to-delete.txt';
+		const content = 'test-content';
+		await adapter.writeFile(path, content);
+		await expect(adapter.fileExists(path)).resolves.toBe(true);
+		await adapter.deleteFile(path);
+		await expect(adapter.fileExists(path)).resolves.toBe(false);
+		await expect(adapter.dirExists('deep/path')).resolves.toBe(true);
 	});
 });
