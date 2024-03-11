@@ -212,4 +212,49 @@ describe('Adapter', () => {
 		await expect(adapter.fileExists(path)).resolves.toBe(false);
 		await expect(adapter.dirExists('deep/path')).resolves.toBe(true);
 	});
+
+	test('open file handler', async () => {
+		const adapter = await createAdapter(s3);
+		const path = 'open-file-handler.txt';
+		const content = 'test-content';
+		await adapter.writeFile(path, content);
+		const handler = await adapter.openFile(path);
+		expect(handler).toBeDefined();
+		await handler.close();
+	});
+
+	test('read partial file with buffer', async () => {
+		const adapter = await createAdapter(s3);
+		const path = 'read-partial-file.txt';
+		const content = 'test-content';
+		await adapter.writeFile(path, content);
+		const handler = await adapter.openFile(path);
+		const buffer = Buffer.alloc(7);
+		const { bytesRead, buffer: ref } = await handler.read(buffer, { position: 5 });
+		expect(bytesRead).toBe(7);
+		expect(ref).toBe(buffer);
+		expect(ref.toString('utf-8')).toBe('content');
+		expect(buffer.toString('utf-8')).toBe('content');
+		await handler.close();
+	});
+
+	test('read partial file with buffer and offset', async () => {
+		const adapter = await createAdapter(s3);
+		const path = 'read-partial-file.txt';
+		const content = 'test-content';
+		await adapter.writeFile(path, content);
+		const handler = await adapter.openFile(path);
+		const buffer = Buffer.alloc(12);
+		const { bytesRead, buffer: ref } = await handler.read(buffer, { position: 5 });
+		const convertToCleanString = (buffer: Buffer) => buffer.toString('utf-8').substring(0, buffer.indexOf('\0'));
+		expect(bytesRead).toBe(7);
+		expect(ref).toBe(buffer);
+		expect(buffer).toStrictEqual(Buffer.from('content\0\0\0\0\0')); // buffer allocated with 12 bytes
+		expect(convertToCleanString(buffer)).toBe('content');
+		await handler.read(buffer, { position: 4, length: 1, offset: bytesRead });
+		expect(convertToCleanString(buffer)).toBe('content-');
+		await handler.read(buffer, { length: 4, offset: bytesRead + 1 });
+		expect(buffer.toString('utf-8')).toBe('content-test');
+		await handler.close();
+	});
 });

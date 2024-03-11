@@ -1,6 +1,7 @@
 import type { BucketItem, Client }	from 'minio';
 import { SourceAdapter, type ObjectDirentInterface, type rmdirOptions } from '@loom-io/core';
-import { ObjectDirent } from './objectDirent.js';
+import { ObjectDirent } from './object-dirent.js';
+import { FileHandler } from './file-handler.js';
 export class Adapter implements SourceAdapter {
 	constructor(
 		protected s3: Client,
@@ -9,6 +10,14 @@ export class Adapter implements SourceAdapter {
 	}
 	async deleteFile(path: string): Promise<void> {
 		await this.s3.removeObject(this.bucket, path);
+	}
+
+	get raw() {
+		return this.s3;
+	}
+
+	get bucketName() {
+		return this.bucket;
 	}
 
 	protected async exists(path: string): Promise<boolean> {
@@ -170,6 +179,10 @@ export class Adapter implements SourceAdapter {
 		const buffer = Buffer.from(data);
 		await this.s3.putObject(this.bucket, path, buffer, buffer.length, { 'Content-Type': 'text/plain' });
 		return;
+	}
+
+	async openFile(path: string): Promise<FileHandler> {
+		return new FileHandler(this, this.bucket, path);
 	}
 
 }
