@@ -178,3 +178,5 @@ dist
 **/test/tmp/
 
 tests/integration/test-tmp/
+
+test-tmp/
