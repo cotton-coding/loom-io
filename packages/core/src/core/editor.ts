@@ -1,7 +1,7 @@
-import { LoomFile } from './file';
+import { LoomFile } from './file.js';
 import * as fs from 'fs/promises';
-import { LineResult, SearchResult } from '../helper/result';
-import { TextItemList } from '../helper/textItemList';
+import { LineResult, SearchResult } from '../helper/result.js';
+import { TextItemList } from '../helper/textItemList.js';
 
 interface ReadWrite {
 	getSizeInBytes(): Promise<number>;
@@ -69,9 +69,9 @@ export class Editor implements Reader, Writer, ReaderInternal{
 
 	/**
 	 * Alias for searchFirst
-	 * 
+	 *
 	 * @param value - value to search
-	 * @returns 
+	 * @returns
 	 */
 	async search(value: string | Buffer): Promise<SearchResult | undefined> {
 		return await this.searchFirst(value);
@@ -80,7 +80,7 @@ export class Editor implements Reader, Writer, ReaderInternal{
 	/**
 	 * Search for a string in the file by chunking the file into pieces to avoid memory overflow.
 	 * set start to 'EOF' to search from the end of the file.
-	 * 
+	 *
 	 * @param value - value to search
 	 * @param start - start position in the file
 	 */
@@ -97,7 +97,7 @@ export class Editor implements Reader, Writer, ReaderInternal{
 	/**
 	 * Search for a string in the file by chunking the file into pieces to avoid memory overflow.
 	 * set start to 'EOF' to search from the end of the file.
-	 * 
+	 *
 	 * @param value - value to search
 	 * @param start - last value included in the search
 	 */
@@ -141,13 +141,13 @@ export class Editor implements Reader, Writer, ReaderInternal{
 			({position} = param);
 			const chunk = (await this.file.read(param)).buffer;
 			const matches = this.searchInChunk(value, chunk);
-			
+
 			item = this.convertChunkMatchesToItems(matches, valueLength, position, true);
-			
+
 		} while (item === undefined && position > first);
 
 		return item?.getLastItem();
-	}	
+	}
 
 	protected searchInChunk(value: Buffer, chunk: Buffer): number[] {
 		const results: number[] = [];
@@ -162,40 +162,40 @@ export class Editor implements Reader, Writer, ReaderInternal{
 
 	/**
 	 * Generate the next chunk position and length for fs.read function
-	 * 
+	 *
 	 * @param current - Start position of the last chunk
 	 * @param chunkSize - chunk size of the last chunk
 	 * @param valueLength - length of the value to search
 	 * @param min - minimum positive position in file
-	 * @returns 
+	 * @returns
 	 */
 	protected loopReverseCalcNextChunk(current: number, chunkSize: number, valueLength: number, min: number): {position: number, length: number} {
 		let nextPosition = current - (chunkSize + Math.floor(valueLength/2));
 		let length: number = chunkSize + valueLength;
-		
+
 		if(nextPosition < min) {
 			nextPosition = min;
 			length = current - min + Math.floor(valueLength/2);
-		} 
-		
+		}
+
 
 		return {position: nextPosition, length};
 	}
-	
+
 
 	protected convertChunkMatchesToItems(matches: number[], valueLength: number, chunkPosition: number, isReverseRead: boolean = false): TextItemList | undefined{
 		return matches.reduce<TextItemList | undefined>((item, match) => {
 			const start = chunkPosition + match;
 			const end = start + valueLength;
 			const newItem = new TextItemList({start, end, readReverse: isReverseRead});
-			item?.add(newItem);	
+			item?.add(newItem);
 			return item ?? newItem;
 		}, undefined);
 	}
 
 	/**
 	 * Read a chunk of the file
-	 * 
+	 *
 	 * @param start - start position in the file
 	 * @param length - length of the data to read
 	 * @returns - return a buffer with the data read from the file
@@ -211,19 +211,19 @@ export class Editor implements Reader, Writer, ReaderInternal{
 		const item = new TextItemList({start: 0, end: fileSize + separator.length});
 		return new LineResult(item.getFirstItem(), separator, this);
 	}
-	
+
 	/**
-	 * Analyze the file junkvisely till the first line is found 
-	 * and return a LineResult object to read the line or step to the next one. 
-	 *  
-	 * @param separator - line separator to use, default is new line character LF 
-	 * @returns - return a LineResult object witch allow you to read line by line forward (next) and backward (prev)  
+	 * Analyze the file junkvisely till the first line is found
+	 * and return a LineResult object to read the line or step to the next one.
+	 *
+	 * @param separator - line separator to use, default is new line character LF
+	 * @returns - return a LineResult object witch allow you to read line by line forward (next) and backward (prev)
 	 */
 	async firstLine(separator: Buffer | string = this.newLineCharacter): Promise<LineResult>{
 		const bSeparator = Buffer.from(separator);
 		const fileSize = await this.getSizeInBytes();
 		const item = await this.loopForward(bSeparator, 0, fileSize);
-		
+
 		if(item === undefined) {
 			return await this.handleFileWithOnlyOneLine(bSeparator);
 		}
@@ -241,7 +241,7 @@ export class Editor implements Reader, Writer, ReaderInternal{
 	/**
 	 * Analyze the file junkvisely from the end till the last line is found
 	 * and return a LineResult object to read the line or step to the previous one.
-	 * 
+	 *
 	 * @param separator - line separator to use, default is new line character LF
 	 * @returns - return a LineResult object witch allow you to read line by line forward (next) and backward (prev)
 	 */

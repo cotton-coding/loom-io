@@ -1,7 +1,7 @@
 import type { BucketItem, Client }	from 'minio';
-import { SourceAdapter, type ObjectDirentInterface, type rmdirOptions } from '@loom-io/core';
 import { ObjectDirent } from './object-dirent.js';
 import { FileHandler } from './file-handler.js';
+import type { SourceAdapter, rmdirOptions, ObjectDirentInterface } from '@loom-io/core';
 export class Adapter implements SourceAdapter {
 	constructor(
 		protected s3: Client,

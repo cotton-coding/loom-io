@@ -4,11 +4,11 @@ import { Editor, Reader } from '../core/editor.js';
 import { List } from '../core/list.js';
 import { PLUGIN_TYPE, FILE_SIZE_UNIT } from '../definitions.js';
 import { LoomPlugin, LoomSourceAdapter } from '../definitions.js';
-export * from '../definitions.js';
 import crypto from 'node:crypto';
 
 export { PLUGIN_TYPE, FILE_SIZE_UNIT };
 export * from '../exceptions.js';
+export * from '../definitions.js';
 export type { LoomFile, LoomFile as File, Directory, Editor, Reader, List};
 export class LoomIO {
 

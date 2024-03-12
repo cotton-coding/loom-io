@@ -23,21 +23,21 @@
 	],
 	"type": "module",
 	"scripts": {
-		"clean": "rm -fr dist",
 		"test": "vitest --typecheck.enabled --test-timeout=500",
 		"test:ci": "npm run test -- --run --coverage",
 		"lint": "eslint --ext .ts .",
 		"lint:fix": "eslint --ext .ts . --fix",
-		"build": "pnpm run clean & tsc --project tsconfig.json",
+		"build": "tsc --project tsconfig.json",
 		"prepublishOnly": "npm run build && publint"
-	},
-	"devDependencies": {
-		"@loom-io/test-utils": "workspace:*"
 	},
 	"exports": {
 		".": {
 			"types": "./dist/exports/lib.d.ts",
 			"import": "./dist/exports/lib.js"
+		},
+		"./internal": {
+			"types": "./dist/exports/internal.d.ts",
+			"import": "./dist/exports/internal.js"
 		}
 	},
 	"maintainers": [

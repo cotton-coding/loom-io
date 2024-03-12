@@ -1,5 +1,5 @@
 {
-	"name": "@loom-io/core",
+	"name": "@loom-io/s3-adapter",
 	"main": "dist/exports/lib.js",
 	"types": "dist/exports/lib.d.ts",
 	"author": "Cotton Coding",
@@ -35,7 +35,7 @@
 		"@loom-io/interface-tests": "workspace:*"
 	},
 	"peerDependencies": {
-		"@loom-io/core": "^0.6.0"
+		"@loom-io/core": "workspace:*"
 	},
 	"exports": {
 		".": {

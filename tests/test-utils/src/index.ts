@@ -1,1 +1,1 @@
-export * from './filesystemHelper';
+export * from './filesystemHelper.js';

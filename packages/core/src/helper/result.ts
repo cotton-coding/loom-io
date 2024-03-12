@@ -1,5 +1,5 @@
-import { ReaderInternal } from '../core/editor';
-import { TextItemList, TextMeta } from './textItemList';
+import { ReaderInternal } from '../core/editor.js';
+import { TextItemList, TextMeta } from './textItemList.js';
 
 
 export interface BaseResult {
@@ -17,7 +17,7 @@ export class SearchResult implements BaseResult{
 		protected readonly _searchValue: Buffer,
 		protected readonly reader: ReaderInternal
 	) {}
-	
+
 	get meta(): TextMeta {
 		return this._listItem.content;
 	}
@@ -90,7 +90,7 @@ export class LineResult implements BaseResult {
 		let cur = this._listItem;
 		while(cur.hasPrev()) {
 			const prev = cur.prev()!;
-				
+
 			TextItemList.patch(prev, {
 				...prev.content,
 				start: prev.end,
@@ -124,11 +124,11 @@ export class LineResult implements BaseResult {
 
 		const fileSize = await this.reader.getSizeInBytes();
 		const newResult = await this.reader.loopForward(this.lineEnd, this._listItem.end, fileSize);
-		
-		
+
+
 		if(newResult === undefined || newResult.getLastItem().end === this._listItem.end) {
 			const listItem = new TextItemList({
-				start: this._listItem.end, 
+				start: this._listItem.end,
 				end: fileEnd + this.lineEnd.length
 			});
 			this._listItem.add(listItem);
@@ -161,7 +161,7 @@ export class LineResult implements BaseResult {
 		const newResult = await this.reader.loopReverse(this.lineEnd, 0, this._listItem.start);
 		if(newResult === undefined || newResult.getFirstItem().end === this._listItem.start) {
 			const listItem = new TextItemList({
-				start: 0, 
+				start: 0,
 				end: this._listItem.start
 			});
 			this._listItem.add(listItem);

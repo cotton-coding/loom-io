@@ -1,4 +1,4 @@
-import type { Directory } from './core/dir';
+import type { Directory } from './core/dir.js';
 
 export enum PLUGIN_TYPE {
     FILE_CONVERTER,
@@ -31,7 +31,7 @@ export interface LoomFileConverter extends LoomPluginBase {
 
 export interface LoomSourceAdapter extends LoomPluginBase{
     $type: PLUGIN_TYPE.SOURCE_ADAPTER,
-    source: (link: string) => Promise<Directory> | void
+    source: (link: string) => MaybePromise<Directory> | void
 }
 
 export type LoomPlugin = LoomFileConverter | LoomSourceAdapter;
