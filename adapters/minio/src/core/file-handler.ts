@@ -1,17 +1,7 @@
 import { Adapter } from './adapter';
+import { FileHandler as FileHandlerInterface, ReadBuffer, FileHandlerReadOptions } from '@loom-io/core';
 
-export interface FileHandlerReadOptions {
-	offset?: number;
-	length?: number;
-	position?: number;
-}
-
-export interface ReadBuffer {
-	bytesRead: number;
-	buffer: Buffer;
-}
-
-export class FileHandler {
+export class FileHandler implements FileHandlerInterface{
 
 	constructor(
 		protected adapter: Adapter,
