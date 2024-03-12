@@ -31,8 +31,8 @@
 		"prepublishOnly": "npm run build && publint"
 	},
 	"devDependencies": {
-		"@loom-io/core": "^0.6.0",
-		"@loom-io/test-utils": "workspace:*"
+		"@loom-io/test-utils": "workspace:*",
+		"@loom-io/interface-tests": "workspace:*"
 	},
 	"peerDependencies": {
 		"@loom-io/core": "^0.6.0"
