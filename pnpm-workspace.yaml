@@ -1,5 +1,5 @@
 packages:
   - "packages/*"
-  - "adapters/source/*"
+  - "adapters/*"
   - "plugins/*"
   - "tests/*"

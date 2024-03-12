@@ -38,7 +38,7 @@ By default the system can read json and yml and convert it to json. To Support m
 Reading a dir Works similar.
 
 ```ts
-import Loom, {type LoomFile, type Directory} from '@loom-io/fs'
+import Loom, { isFile, isDirectory } from '@loom-io/fs'
 
 const root = Loom.root(); // Returns a directory object of the project root, to call the system root call Loom.dir('/)
 const dir = Loom.dir('some/dir');
@@ -54,9 +54,9 @@ for(let file of files) {
 const list = await dir.list() // returns a iterable to get Files and Directories
 
 for(let el of list) {
-  if(el instanceOf LoomFile) { // check if it is a File
+  if( isFile(el) ) { // check if it is a File
     console.log(await el.text()); // do some Stuff with the file content
-  } else (el instanceOf Directory) {
+  } else ( isDirectory(el) ) {
     console.log((await el.list()).length) // in the other case it is an directory and you can go on working with it
   }
 }
@@ -88,8 +88,8 @@ const listOfDirs = (await dir.list()).only("dirs");
 
 // see more examples for iteration above
 for (let file of await dir.files()) {
-  const json = file.json();
-  // do something with the content
+	const json = file.json();
+	// do something with the content
 }
 ```
 
@@ -106,19 +106,19 @@ const reader = await file.reader();
 const result = await reader.searchLast("a better world");
 
 if (result !== undefined) {
-  do {
-    const { start, end } = result.meta;
-    //do something with meta data e.g. read the result + one symbol before and after
-    const length = end - start;
-    const data = await reader.read(start - 1, length + 1);
-  } while (await result.prev());
+	do {
+		const { start, end } = result.meta;
+		//do something with meta data e.g. read the result + one symbol before and after
+		const length = end - start;
+		const data = await reader.read(start - 1, length + 1);
+	} while (await result.prev());
 }
 
 const lineResult = await reader.firstLine();
 
 do {
-  const line = await lineResult.read();
-  //do something with the line
+	const line = await lineResult.read();
+	//do something with the line
 } while (await lineResult.next());
 
 // Do not forget to close the reader
@@ -132,10 +132,10 @@ To handle and covert more file types to json loom-io/fs allow to register plugin
 ```ts
 // Plugin type to convert file content to json
 export type LoomFileConverter = {
-  type: PLUGIN_TYPE.FILE_CONVERTER;
-  extensions: string[];
-  parse<T = unknown>(content: string): T;
-  stringify<T = unknown>(content: T): string;
+	type: PLUGIN_TYPE.FILE_CONVERTER;
+	extensions: string[];
+	parse<T = unknown>(content: string): T;
+	stringify<T = unknown>(content: T): string;
 };
 ```
 
@@ -146,10 +146,10 @@ import { PLUGIN_TYPE, type LoomFileConverter } from "loom-io/fs";
 
 //example for the plugin to convert json strings.
 export default {
-  type: PLUGIN_TYPE.FILE_CONVERTER,
-  extensions: ["json"],
-  parse: JSON.parse,
-  stringify: JSON.stringify,
+	type: PLUGIN_TYPE.FILE_CONVERTER,
+	extensions: ["json"],
+	parse: JSON.parse,
+	stringify: JSON.stringify,
 } satisfies LoomFileConverter;
 ```
 

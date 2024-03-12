@@ -18,19 +18,19 @@ export enum FILE_SIZE_UNIT {
 }
 
 export interface LoomPluginBase {
-    type: PLUGIN_TYPE,
+    $type: PLUGIN_TYPE,
     nonce?: string | number
 }
 
 export interface LoomFileConverter extends LoomPluginBase {
-    type: PLUGIN_TYPE.FILE_CONVERTER,
+    $type: PLUGIN_TYPE.FILE_CONVERTER,
     extensions: string[],
     parse<T = unknown>(content: string): T
     stringify<T = unknown>(content: T): string
 }
 
 export interface LoomSourceAdapter extends LoomPluginBase{
-    type: PLUGIN_TYPE.SOURCE_ADAPTER,
+    $type: PLUGIN_TYPE.SOURCE_ADAPTER,
     source: (link: string) => Promise<Directory> | void
 }
 
@@ -50,17 +50,38 @@ export type rmdirOptions = {
 	force?: boolean;
 }
 
+export interface FileHandlerReadOptions {
+	offset?: number;
+	length?: number;
+	position?: number;
+}
+
+export interface ReadBuffer {
+	bytesRead: number;
+	buffer: Buffer;
+}
+
+export interface FileHandler {
+    read(options: FileHandlerReadOptions): MaybePromise<ReadBuffer>
+	read(buffer: Buffer): MaybePromise<ReadBuffer>
+	read(buffer: Buffer, options: FileHandlerReadOptions): MaybePromise<ReadBuffer>
+    close(): MaybePromise<void>
+}
+
 export interface SourceAdapter {
     readFile(path: string): MaybePromise<Buffer>
     readFile(path: string, encoding: BufferEncoding): MaybePromise<string>
     readFile(path: string, encoding?: BufferEncoding): MaybePromise<Buffer | string>
     writeFile(path: string, content: string): MaybePromise<void>
     deleteFile(path: string): MaybePromise<void>
+    openFile(path: string): MaybePromise<FileHandler>
     stat(path: string): MaybePromise<FileStat>
-    exists(path: string): MaybePromise<boolean>
     readdir(path: string): MaybePromise<ObjectDirentInterface[]>
     mkdir(path: string): MaybePromise<void>
     rmdir(path: string, options?: rmdirOptions): MaybePromise<void>
+    dirExists(path: string): MaybePromise<boolean>
+    fileExists(path: string): MaybePromise<boolean>
+
 }
 
 export interface FileStat {

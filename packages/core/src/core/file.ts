@@ -118,7 +118,7 @@ export class LoomFile {
 	}
 
 	static register(plugin: LoomFileConverter) {
-		if(plugin.type === PLUGIN_TYPE.FILE_CONVERTER) {
+		if(plugin.$type === PLUGIN_TYPE.FILE_CONVERTER) {
 			plugin.extensions.forEach(ext => {
 				LoomFile.converterPlugins.set(ext, plugin);
 			});

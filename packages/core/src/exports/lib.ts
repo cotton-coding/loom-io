@@ -3,13 +3,13 @@ import { LoomFile } from '../core/file.js';
 import { Editor, Reader } from '../core/editor.js';
 import { List } from '../core/list.js';
 import { PLUGIN_TYPE, FILE_SIZE_UNIT } from '../definitions.js';
-import type { LoomPlugin, LoomFileConverter, SourceAdapter, LoomSourceAdapter, FileStat, rmdirOptions, ObjectDirentInterface } from '../definitions.js';
+import { LoomPlugin, LoomSourceAdapter } from '../definitions.js';
+export * from '../definitions.js';
 import crypto from 'node:crypto';
 
-export type { LoomPlugin, LoomFileConverter, SourceAdapter, LoomSourceAdapter, FileStat, rmdirOptions, ObjectDirentInterface};
 export { PLUGIN_TYPE, FILE_SIZE_UNIT };
 export * from '../exceptions.js';
-export { LoomFile, LoomFile as File, Directory, Editor, Reader, List};
+export type { LoomFile, LoomFile as File, Directory, Editor, Reader, List};
 export class LoomIO {
 
 	protected static pluginHashes: string[] = [];
@@ -43,12 +43,32 @@ export class LoomIO {
 			return;
 		}
 		this.pluginHashes.push(pluginHash);
-		if(PLUGIN_TYPE.FILE_CONVERTER === plugin.type) {
+		if(PLUGIN_TYPE.FILE_CONVERTER === plugin.$type) {
 			LoomFile.register(plugin);
-		} else if(PLUGIN_TYPE.SOURCE_ADAPTER === plugin.type) {
+		} else if(PLUGIN_TYPE.SOURCE_ADAPTER === plugin.$type) {
 			this.sourceAdapters.push(plugin);
 		}
 	}
+}
+
+export function isDirectory(obj: unknown): obj is Directory {
+	return obj instanceof Directory;
+}
+
+export function isFile(obj: unknown): obj is LoomFile {
+	return obj instanceof LoomFile;
+}
+
+export function isEditor(obj: unknown): obj is Editor {
+	return obj instanceof Editor;
+}
+
+export function isReader(obj: unknown): obj is Reader {
+	return obj instanceof Editor;
+}
+
+export function isList(obj: unknown): obj is List {
+	return obj instanceof List;
 }
 
 export default LoomIO;
