@@ -32,8 +32,7 @@
 	},
 	"devDependencies": {
 		"@loom-io/test-utils": "workspace:*",
-		"@loom-io/interface-tests": "workspace:*",
-		"@loom-io/test-utils": "workspace:*"
+		"@loom-io/interface-tests": "workspace:*"
 	},
 	"peerDependencies": {
 		"@loom-io/core": "workspace:*"
