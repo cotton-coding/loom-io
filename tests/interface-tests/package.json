@@ -9,7 +9,7 @@
 		"build": "pnpm clean && tsc -p tsconfig.json"
 	},
 	"devDependencies": {
-		"@loom-io/core": "workspace:*"
+		"@faker-js/faker": "^8.4.1"
 	},
 	"peerDependencies": {
 		"@loom-io/core": "workspace:*",
@@ -24,5 +24,6 @@
 	},
 	"keywords": [],
 	"author": "",
-	"license": "ISC"
+	"license": "MIT",
+	"dependencies": {}
 }

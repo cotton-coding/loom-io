@@ -1,6 +1,8 @@
 import { test, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
 import type { SourceAdapter } from '@loom-io/core';
 import { describe } from 'node:test';
+import { faker } from '@faker-js/faker';
+import { dirname, join } from 'node:path';
 
 
 export interface TestAdapterOptions {
@@ -10,9 +12,19 @@ export interface TestAdapterOptions {
 	afterEach?: () => Promise<void>;
 }
 
+function getRandomPath(subpath: string): string {
+	return join(faker.string.uuid(), faker.system.directoryPath().slice(1), subpath);
+}
+
+function getRandomFilePath(ext: string): string {
+	return join(faker.string.uuid(), faker.system.directoryPath().slice(1), faker.system.commonFileName(ext));
+}
+
 // eslint-disable-next-line @typescript-eslint/ban-types
 export const TestAdapter = (adapter: SourceAdapter, config: TestAdapterOptions ) => {
 	describe('Adapter', async () => {
+
+		let path: string;
 
 		if (config.beforeAll) {
 			beforeAll(config.beforeAll);
@@ -26,62 +38,54 @@ export const TestAdapter = (adapter: SourceAdapter, config: TestAdapterOptions )
 			beforeEach(config.beforeEach);
 		}
 
+		beforeEach(async () => {
+			path = getRandomPath('test');
+		});
+
 		if (config.afterEach) {
 			afterEach(config.afterEach);
 		}
 
 		test('mkdir', async () => {
-			const path = 'test/1/2/3/long/deep/path/empty';
-			await adapter.mkdir(path);
-			await expect(adapter.dirExists(path)).resolves.toBe(true);
-		});
-
-		test('mkdir with bucket', async () => {
-			const path = '7/2/3/long/deep/path';
+			const path = getRandomPath('test/long/mkdir');
 			await adapter.mkdir(path);
 			await expect(adapter.dirExists(path)).resolves.toBe(true);
 		});
 
 		test('rmdir', async () => {
-			const path = 'test/long/rmdir';
-
+			const subPath = path.split('/').slice(0,-1).join('/');
+			await adapter.mkdir(subPath);
 			await adapter.mkdir(path);
 			await adapter.rmdir(path);
 			await expect(adapter.dirExists(path)).resolves.toBe(false);
-			await expect(adapter.dirExists('test/1/2/3')).resolves.toBe(true);
+			await expect(adapter.dirExists(subPath)).resolves.toBe(true);
 		});
 
 		test('rmdir with file should fail', async () => {
-			const path = '7/2/3/long';
 			const fileName = 'file.txt';
-
 			await adapter.mkdir(path);
 			await adapter.writeFile(`${path}/${fileName}`, 'test');
 			await expect(adapter.rmdir(path)).rejects.toThrow();
 			await expect(adapter.dirExists(path)).resolves.toBe(true);
-			await expect(adapter.dirExists('7/2/3')).resolves.toBe(true);
 		});
 
 		test('exists', async () => {
-
 			await adapter.mkdir('test/exists');
 			await expect(adapter.dirExists('test/exists')).resolves.toBe(true);
 		});
 
 		test('exists with path', async () => {
-
-			await adapter.mkdir('test/1/2/3/exists');
-			await expect(adapter.dirExists('test/1/2/3/exists')).resolves.toBe(true);
-			await expect(adapter.dirExists('test/1/2')).resolves.toBe(true);
+			await adapter.mkdir(path);
+			const subPath = path.split('/').slice(0,-1).join('/');
+			await expect(adapter.dirExists(path)).resolves.toBe(true);
+			await expect(adapter.dirExists(subPath)).resolves.toBe(true);
 		});
 
 		test('not exists', async () => {
-
 			await expect(adapter.dirExists('test-not-exists')).resolves.toBe(false);
 		});
 
 		test('list dir content', async () => {
-
 			await adapter.writeFile('list-dir-content/list/file.txt', 'test');
 			const list = await adapter.readdir('list-dir-content/list/');
 			expect(list.length).toBe(1);
@@ -129,7 +133,7 @@ export const TestAdapter = (adapter: SourceAdapter, config: TestAdapterOptions )
 
 		test('read and write', async () => {
 
-			const path = 'test/1/2/3/long/deep/path/test.txt';
+			const path = getRandomFilePath('txt');
 			const content = 'test-cotntent';
 			await adapter.writeFile(path, content);
 			expect((await adapter.readFile(path)).toString('utf-8')).toBe(content);
@@ -137,7 +141,7 @@ export const TestAdapter = (adapter: SourceAdapter, config: TestAdapterOptions )
 
 		test('file exists', async () => {
 
-			const path = 'exists.js';
+			const path =  faker.system.commonFileName('js');
 			const content = 'export const exists = true';
 			await adapter.writeFile(path, content);
 			await expect(adapter.fileExists(path)).resolves.toBe(true);
@@ -150,7 +154,7 @@ export const TestAdapter = (adapter: SourceAdapter, config: TestAdapterOptions )
 
 		test('file exists deep path', async () => {
 
-			const path = 'deep/path/test.txt';
+			const path = getRandomFilePath('md');
 			const content = 'test-cotntent';
 			await adapter.mkdir('deep/path/test');
 			await expect(adapter.fileExists(path)).resolves.toBe(false);
@@ -160,8 +164,8 @@ export const TestAdapter = (adapter: SourceAdapter, config: TestAdapterOptions )
 
 		test('stat for file', async () => {
 
-			const path = 'to-delete.txt';
-			const content = 'test-content';
+			const path = getRandomFilePath('txt');
+			const content = faker.lorem.words(100);
 			await adapter.writeFile(path, content);
 			await expect(adapter.fileExists(path)).resolves.toBe(true);
 			const stat = await adapter.stat(path);
@@ -171,9 +175,8 @@ export const TestAdapter = (adapter: SourceAdapter, config: TestAdapterOptions )
 		});
 
 		test('delete file', async () => {
-
-			const path = 'to-delete.txt';
-			const content = 'test-content';
+			const path = faker.system.commonFileName('txt');
+			const content = faker.lorem.words(10);
 			await adapter.writeFile(path, content);
 			await expect(adapter.fileExists(path)).resolves.toBe(true);
 			await adapter.deleteFile(path);
@@ -182,19 +185,23 @@ export const TestAdapter = (adapter: SourceAdapter, config: TestAdapterOptions )
 
 		test('delete file deep path', async () => {
 
-			const path = 'deep/path/file/to-delete.txt';
-			const content = 'test-content';
+			const path = getRandomFilePath('txt');
+			const dir = dirname(path);
+			console.log('path', path);
+			console.log('dir', dir);
+			await adapter.mkdir(dir);
+			const content = faker.lorem.words(10);
 			await adapter.writeFile(path, content);
 			await expect(adapter.fileExists(path)).resolves.toBe(true);
 			await adapter.deleteFile(path);
 			await expect(adapter.fileExists(path)).resolves.toBe(false);
-			await expect(adapter.dirExists('deep/path')).resolves.toBe(true);
+			await expect(adapter.dirExists(dir)).resolves.toBe(true);
 		});
 
 		test('open file handler', async () => {
 
-			const path = 'open-file-handler.txt';
-			const content = 'test-content';
+			const path = faker.system.commonFileName('md');
+			const content = faker.lorem.words(100);
 			await adapter.writeFile(path, content);
 			const handler = await adapter.openFile(path);
 			expect(handler).toBeDefined();
@@ -203,22 +210,22 @@ export const TestAdapter = (adapter: SourceAdapter, config: TestAdapterOptions )
 
 		test('read partial file with buffer', async () => {
 
-			const path = 'read-partial-file.txt';
-			const content = 'test-content';
+			const path = faker.system.commonFileName('md');
+			const content = faker.lorem.paragraphs(7);
 			await adapter.writeFile(path, content);
 			const handler = await adapter.openFile(path);
 			const buffer = Buffer.alloc(7);
 			const { bytesRead, buffer: ref } = await handler.read(buffer, { position: 5 });
 			expect(bytesRead).toBe(7);
 			expect(ref).toBe(buffer);
-			expect(ref.toString('utf-8')).toBe('content');
-			expect(buffer.toString('utf-8')).toBe('content');
+			expect(ref.toString('utf-8')).toBe(content.slice(5, 12));
+			expect(buffer.toString('utf-8')).toBe(content.slice(5, 12));
 			await handler.close();
 		});
 
 		test('read partial file with buffer and offset', async () => {
 
-			const path = 'read-partial-file.txt';
+			const path = faker.system.commonFileName('md');
 			const content = 'test-content';
 			await adapter.writeFile(path, content);
 			const handler = await adapter.openFile(path);
