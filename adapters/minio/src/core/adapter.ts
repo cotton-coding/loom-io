@@ -22,7 +22,7 @@ export class Adapter implements SourceAdapter {
 
 	protected async exists(path: string): Promise<boolean> {
 
-		const bucketStream = this.s3.listObjects(this.bucket, path);
+		const bucketStream = this.s3.listObjectsV2(this.bucket, path);
 		return new Promise((resolve, reject) => {
 
 			bucketStream.on('data', () => {
@@ -54,7 +54,7 @@ export class Adapter implements SourceAdapter {
 	}
 
 	protected async rmdirRecursive(bucket: string, path: string): Promise<void> {
-		const objects = await this.s3.listObjects(bucket, path);
+		const objects = await this.s3.listObjectsV2(bucket, path);
 		for await (const obj of objects) {
 			await this.s3.removeObject(bucket, obj.name);
 		}
@@ -73,7 +73,7 @@ export class Adapter implements SourceAdapter {
 
 	protected async dirHasFiles(path: string): Promise<boolean> {
 		const pathWithTailSlash = path.endsWith('/') ? path : `${path}/`;
-		const bucketStream = await this.s3.listObjects(this.bucket, pathWithTailSlash);
+		const bucketStream = await this.s3.listObjectsV2(this.bucket, pathWithTailSlash);
 		return new Promise((resolve, reject) => {
 			bucketStream.on('data', (data) => {
 				if(data.name?.endsWith('/')) {

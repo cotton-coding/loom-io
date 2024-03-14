@@ -17,25 +17,24 @@ export class LoomIO {
 
 	protected constructor() {}
 
-	static async source(link: string) {
-		const dirOrFile = await Promise.race(this.sourceAdapters.map(adapter => adapter.source(link)));
+	static async source(link: string): Promise<Directory | LoomFile>
+	static async source(link: string, Type: typeof Directory): Promise<Directory>
+	static async source(link: string, Type: typeof LoomFile): Promise<LoomFile>
+	static async source(link: string, Type?: typeof Directory | typeof LoomFile): Promise<Directory | LoomFile> {
+		const dirOrFile = await Promise.any(this.sourceAdapters.map(adapter => adapter.source(link, Type)));
 		if(dirOrFile) {
-			return dirOrFile satisfies Directory | LoomFile;
+			return dirOrFile;
 		}
 		throw new Error('No source adapter is matching the given link');
 	}
 
-	// static root() {
-	// 	return new Directory();
-	// }
+	static dir(link: string) {
+		return LoomIO.source(link, Directory);
+	}
 
-	// static dir(...path: string[]) {
-	// 	return new Directory(...path);
-	// }
-
-	// static file(path: string) {
-	// 	return LoomFile.from(path);
-	// }
+	static file(path: string) {
+		return LoomIO.source(path, LoomFile);
+	}
 
 	static register(plugin: LoomPlugin) {
 		const pluginHash = crypto.createHash('sha1').update(JSON.stringify(plugin)).digest('hex');

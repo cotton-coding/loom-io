@@ -4,13 +4,21 @@ import * as fs from 'node:fs/promises';
 import { dirname, basename } from 'node:path';
 import { PathLike } from 'node:fs';
 
-export const source = (async (path: string, rootdir: PathLike) => {
+export const source = async (path: string, rootdir?: PathLike, Type?: typeof Directory | typeof LoomFile) => {
 	const adapter = new Adapter(rootdir);
-	const stats = await fs.stat(path);
-	if(stats.isFile()) {
+	if(Type === LoomFile) {
 		const dir = new Directory(adapter, dirname(path));
 		return new LoomFile(adapter, dir, basename(path));
-	} else {
+	} else if(Type === Directory || path.endsWith('/')) {
 		return new Directory(adapter, path);
+	} else {
+		const stats = await fs.stat(path);
+
+		if(stats.isFile()) {
+			const dir = new Directory(adapter, dirname(path));
+			return new LoomFile(adapter, dir, basename(path));
+		} else {
+			return new Directory(adapter, path);
+		}
 	}
-});
+};

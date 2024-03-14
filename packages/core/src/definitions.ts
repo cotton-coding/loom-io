@@ -31,7 +31,7 @@ export interface LoomFileConverter extends LoomPluginBase {
 }
 export interface LoomSourceAdapter extends LoomPluginBase{
     $type: PLUGIN_TYPE.SOURCE_ADAPTER,
-    source: (link: string) => MaybePromise<Directory | LoomFile> | void
+    source: (link: string, Type?: typeof Directory | typeof LoomFile) => MaybePromise<Directory | LoomFile> | void
 }
 
 export type LoomPlugin = LoomFileConverter | LoomSourceAdapter;

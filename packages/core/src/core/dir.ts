@@ -1,5 +1,5 @@
 import * as fs from 'node:fs/promises';
-import { join as joinPath, relative as relativePath, resolve as resolvePath} from 'node:path';
+import { join as joinPath, relative as relativePath} from 'node:path';
 import { LoomFile } from './file.js';
 import { List } from './list.js';
 import { isErrnoException } from '../helper/typechecks.js';
@@ -13,10 +13,10 @@ export class Directory {
 
 	constructor(
 		adapter: SourceAdapter,
-		path: string = process.cwd(),
+		path: string,
 		...paths: string[]
 	) {
-		this._path = resolvePath(path, ...(paths || []));
+		this._path = joinPath(path, ...(paths || []));
 		this._adapter = adapter;
 	}
 
