@@ -118,7 +118,7 @@ export const TestAdapter = (adapter: SourceAdapter, config: TestAdapterOptions )
 			const dirPromises = dirs.map(async (dir) => {
 				const first = dir.split('/')[0];
 				firstLevelDirsAndFiles.add(first);
-				await adapter.mkdir(join(basePath, dir);
+				await adapter.mkdir(join(basePath, dir));
 			});
 			const filePromises = files.map(async (file) => {
 				const first = file.split('/')[0];
@@ -183,7 +183,6 @@ export const TestAdapter = (adapter: SourceAdapter, config: TestAdapterOptions )
 		});
 
 		test('stat for file', async () => {
-
 			const path = getRandomFilePath('txt');
 			await adapter.mkdir(dirname(path));
 			const content = faker.lorem.words(100);
