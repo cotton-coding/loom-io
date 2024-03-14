@@ -9,3 +9,9 @@ export class FileConvertException extends Error {
 		super(`Error converting file ${path}: ${message}`);
 	}
 }
+
+export class PathNotExistsException extends Error {
+	constructor(path: string) {
+		super(`Path ${path} does not exist`);
+	}
+}

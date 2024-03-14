@@ -27,22 +27,6 @@ export class LoomFile {
 		return new LoomFile(adapter, dirOrPath, name);
 	}
 
-	static async exists(path: string): Promise<boolean>
-	static async exists(dir: Directory, name: string): Promise<boolean>
-	static async exists(dirOrPath: Directory | string, name: string = ''){
-		const path =
-			typeof dirOrPath === 'string'
-				? dirOrPath
-				: joinPath((dirOrPath as Directory).path, name);
-
-		try {
-			await fs.access(path, fs.constants.F_OK);
-			return true;
-		} catch {
-			return false;
-		}
-	}
-
 	constructor(
 		protected _adapter: SourceAdapter,
 		protected _dir: Directory,
@@ -102,7 +86,8 @@ export class LoomFile {
 	}
 
 	async exists() {
-		return await LoomFile.exists(this.dir, this.name);
+		const fullPath = joinPath(this.dir.path, this.name);
+		this._adapter.fileExists(fullPath);
 	}
 
 	async reader() {

@@ -1,5 +1,5 @@
 {
-	"name": "@loom-io/filesystem-adapter",
+	"name": "@loom-io/node-filesystem-adapter",
 	"main": "dist/exports/lib.js",
 	"types": "dist/exports/lib.d.ts",
 	"author": "Cotton Coding",
@@ -31,6 +31,7 @@
 		"prepublishOnly": "npm run build && publint"
 	},
 	"devDependencies": {
+		"@loom-io/interface-tests": "workspace:^",
 		"@loom-io/test-utils": "workspace:*"
 	},
 	"peerDependencies": {
@@ -51,5 +52,8 @@
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/cotton-coding/loom.git"
+	},
+	"dependencies": {
+		"@faker-js/faker": "^8.4.1"
 	}
 }

@@ -17,10 +17,10 @@ export class LoomIO {
 
 	protected constructor() {}
 
-	static async source(link: string): Promise<Directory> {
-		const dir = await Promise.race(this.sourceAdapters.map(adapter => adapter.source(link)));
-		if(dir) {
-			return dir;
+	static async source(link: string) {
+		const dirOrFile = await Promise.race(this.sourceAdapters.map(adapter => adapter.source(link)));
+		if(dirOrFile) {
+			return dirOrFile satisfies Directory | LoomFile;
 		}
 		throw new Error('No source adapter is matching the given link');
 	}

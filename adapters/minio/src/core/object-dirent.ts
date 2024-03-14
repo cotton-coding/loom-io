@@ -33,7 +33,7 @@ export class ObjectDirent implements ObjectDirentInterface{
 			throw new Error('No path or name found');
 		}
 		const currentObjectName = split.pop()!;
-		return [split.join('/'), currentObjectName];
+		return [`${split.join('/')}/`, currentObjectName];
 	}
 
 	get name() {

@@ -37,12 +37,7 @@ export class Directory {
 	}
 
 	async exists(): Promise<boolean> {
-		try {
-			await fs.access(this.path, fs.constants.R_OK);
-			return true;
-		} catch {
-			return false;
-		}
+		return await this._adapter.dirExists(this.path);
 	}
 
 	async create(): Promise<void> {
