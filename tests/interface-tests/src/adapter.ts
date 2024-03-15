@@ -98,14 +98,26 @@ export const TestAdapter = (adapter: SourceAdapter, config: TestAdapterOptions )
 		});
 
 		test('list dir content', async () => {
-			await adapter.mkdir(getPathWithBase('list-dir-content/list'));
-			await adapter.writeFile(getPathWithBase('list-dir-content/list/file.txt'), 'test');
-			const list = await adapter.readdir(getPathWithBase('list-dir-content/list/'));
+			await adapter.mkdir('list-dir-content/list');
+			await adapter.writeFile('list-dir-content/list/file.txt', 'test');
+			const list = await adapter.readdir('list-dir-content/list/');
 			expect(list.length).toBe(1);
 			expect(list[0].name).toEqual('file.txt');
 			expect(list[0].isFile()).toBe(true);
 			expect(list[0].isDirectory()).toBe(false);
-			expect(list[0].path).toEqual(getPathWithBase('list-dir-content/list/'));
+			expect(list[0].path).toEqual('list-dir-content/list/');
+		});
+
+		test('list dir content with multiple sub directories', async () => {
+			const basePath = getRandomPath('list-dir-content');
+			await adapter.mkdir(basePath);
+			const dirs = ['a/cow', 'b/ape', 'c/human'];
+			const dirPromises = dirs.map(async (dir) => {
+				await adapter.mkdir(join(basePath, dir));
+			});
+			await Promise.all(dirPromises);
+			const list = await adapter.readdir(basePath);
+			expect(list.length).toBe(dirs.length);
 		});
 
 		test('list dir content with multiple sub directories and files', async () => {

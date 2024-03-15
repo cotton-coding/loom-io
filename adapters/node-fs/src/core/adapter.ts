@@ -5,16 +5,16 @@ import { PathNotExistsException } from '@loom-io/core';
 import { PathLike } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { isNodeErrnoExpression } from '../utils/error-handling.js';
+import { ObjectDirent } from './object-dirent.js';
 export class Adapter implements SourceAdapter {
 
-	protected rootdir: string | undefined;
+	protected rootdir: string;
 
 	constructor(
-		rootdir?: PathLike,
+		rootdir: PathLike = process.cwd(),
 	) {
-		if(rootdir !== undefined) {
-			this.rootdir = resolve(rootdir.toString());
-		}
+		const fullPath = resolve(rootdir.toString());
+		this.rootdir = fullPath.endsWith('/') ? fullPath : `${fullPath}/`;
 	}
 
 	get raw() {
@@ -52,7 +52,7 @@ export class Adapter implements SourceAdapter {
 	async readdir(path: PathLike): Promise<ObjectDirentInterface[]> {
 		const fullPath = this.getFullPath(path.toString());
 		const paths =  await fs.readdir(fullPath, {withFileTypes: true});
-		return paths;
+		return paths.map((dirent) => new ObjectDirent(dirent, this.rootdir.toString()));
 	}
 
 	async rmdir(path: string, options: rmdirOptions= {}): Promise<void> {
