@@ -22,9 +22,9 @@ export class NotFoundException extends Error {
 
 export class AlreadyExistsException extends Error {
 
-	protected object: MemoryObject;
+	protected object: MemoryObject | MemoryRoot;
 
-	constructor(path: string, object: MemoryObject) {
+	constructor(path: string, object: MemoryObject | MemoryRoot) {
 		super('Already exists ' + path);
 		this.object = object;
 	}

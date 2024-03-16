@@ -91,6 +91,7 @@ export class Adapter implements SourceAdapter {
 
 	protected createObjectInRoot(name: string, ref: MEMORY_TYPE.FILE): MemoryFile;
 	protected createObjectInRoot(name: string, ref: MEMORY_TYPE.DIRECTORY): MemoryDirectory;
+	protected createObjectInRoot(name: string, ref: MEMORY_TYPE): MemoryObject;
 	protected createObjectInRoot(name: string, ref: MEMORY_TYPE): MemoryObject {
 		if(ref === MEMORY_TYPE.FILE) {
 			const file = this.createFile(name);
@@ -122,7 +123,7 @@ export class Adapter implements SourceAdapter {
 
 				if(ref === MEMORY_TYPE.FILE) {
 					const lastDir = this.createMissingDirectories(last, parts.slice(depth, -1));
-					const file = this.createFile(parts[parts.length-1], '');
+					const file = this.createFile(parts[parts.length-1]);
 					lastDir.content.push(file);
 					return file;
 				} else {
@@ -144,7 +145,7 @@ export class Adapter implements SourceAdapter {
 
 	}
 
-	async fileExists(path: string): boolean {
+	fileExists(path: string): boolean {
 		return this.exists(path, MEMORY_TYPE.FILE);
 	}
 
@@ -227,15 +228,15 @@ export class Adapter implements SourceAdapter {
 		}
 	}
 
-	async deleteFile(path: string): Promise<void> {
+	deleteFile(path: string): void {
 		const [subPath, tail] = splitTailingPath(path);
 		const subElement = this.getLastPartOfPath(subPath, MEMORY_TYPE.DIRECTORY);
 		subElement.content = subElement.content.filter((item) => !this.compareNameAndType(item, tail, MEMORY_TYPE.FILE));
 	}
 
-	async openFile(path: string, mode: 'r' | 'w' = 'r'): Promise<FileHandler> {
+	openFile(path: string, mode: 'r' | 'w' = 'r'): FileHandler {
 		const file = this.getLastPartOfPath(path, MEMORY_TYPE.FILE);
-		return new FileHandler(file);
+		return new FileHandler(file, mode);
 	}
 
 }

@@ -5,7 +5,8 @@ import { MemoryFile } from '../definitions';
 export class FileHandler implements FileHandlerInterface{
 
 	constructor(
-		protected file: MemoryFile
+		protected file: MemoryFile,
+		protected mode: 'r' | 'w' = 'r'
 	) {}
 
 	read(options: FileHandlerReadOptions): Promise<ReadBuffer>
