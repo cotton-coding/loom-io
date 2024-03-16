@@ -36,6 +36,22 @@ importers:
         specifier: ^1.3.1
         version: 1.3.1(@types/node@20.11.26)
 
+  adapters/in-memory:
+    dependencies:
+      '@loom-io/core':
+        specifier: workspace:*
+        version: link:../../packages/core
+    devDependencies:
+      '@faker-js/faker':
+        specifier: ^8.4.1
+        version: 8.4.1
+      '@loom-io/interface-tests':
+        specifier: workspace:^
+        version: link:../../tests/interface-tests
+      '@loom-io/test-utils':
+        specifier: workspace:*
+        version: link:../../tests/test-utils
+
   adapters/minio:
     dependencies:
       '@loom-io/core':

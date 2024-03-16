@@ -1,0 +1,57 @@
+{
+	"name": "@loom-io/in-memory-adapter",
+	"main": "dist/exports/lib.js",
+	"types": "dist/exports/lib.d.ts",
+	"author": "Cotton Coding",
+	"license": "MIT",
+	"version": "0.6.0",
+	"description": "A file system wrapper for Node.js and Bun",
+	"keywords": [
+		"fs",
+		"directory",
+		"dir",
+		"file",
+		"file system",
+		"filesystem",
+		"node",
+		"nodejs",
+		"wrapper",
+		"@loom-io"
+	],
+	"files": [
+		"dist"
+	],
+	"type": "module",
+	"scripts": {
+		"test": "vitest --typecheck.enabled --test-timeout=500",
+		"test:ci": "npm run test -- --run --coverage",
+		"lint": "eslint --ext .ts .",
+		"lint:fix": "eslint --ext .ts . --fix",
+		"build": "tsc --project tsconfig.json",
+		"prepublishOnly": "npm run build && publint"
+	},
+	"devDependencies": {
+		"@faker-js/faker": "^8.4.1",
+		"@loom-io/interface-tests": "workspace:^",
+		"@loom-io/test-utils": "workspace:*"
+	},
+	"peerDependencies": {
+		"@loom-io/core": "workspace:*"
+	},
+	"exports": {
+		".": {
+			"types": "./dist/exports/lib.d.ts",
+			"import": "./dist/exports/lib.js"
+		}
+	},
+	"maintainers": [
+		{
+			"name": "Wolfgang Rathgeb",
+			"email": "ghost+npm@dropanote.de"
+		}
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/cotton-coding/loom.git"
+	}
+}

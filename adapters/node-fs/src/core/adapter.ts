@@ -21,7 +21,7 @@ export class Adapter implements SourceAdapter {
 		return fs;
 	}
 
-	getFullPath(path: string): string {
+	protected getFullPath(path: string): string {
 		return join(this.rootdir || '', path);
 	}
 
