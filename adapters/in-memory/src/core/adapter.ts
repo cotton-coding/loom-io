@@ -4,7 +4,7 @@ import { AlreadyExistsException, NotFoundException } from '../exceptions';
 import { ObjectDirent } from './object-dirent.js';
 import { MEMORY_TYPE, MemoryDirectory, MemoryFile, MemoryObject, MemoryRoot } from '../definitions';
 import { isMemoryDirectoryAndMatchNamePrepared } from '../utils/validations';
-import { removePresentedAndTrailingSlash, splitTailingPath } from '../utils/path.js';
+import { removePresentedAndTrailingSlash, splitTailingPath } from '@loom-io/common';
 export class Adapter implements SourceAdapter {
 
 	protected storage: MemoryRoot;

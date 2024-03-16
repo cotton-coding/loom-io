@@ -79,9 +79,9 @@ class UnwrappedAdapter extends Adapter {
 		return super.createObjectInRoot(name, ref);
 	}
 
-	protected createObject(path: string, ref: MEMORY_TYPE.FILE): MemoryFile;
-	protected createObject(path: string, ref: MEMORY_TYPE.DIRECTORY): MemoryDirectory;
-	protected createObject(path: string, ref: MEMORY_TYPE): MemoryObject {
+	createObject(path: string, ref: MEMORY_TYPE.FILE): MemoryFile;
+	createObject(path: string, ref: MEMORY_TYPE.DIRECTORY): MemoryDirectory;
+	createObject(path: string, ref: MEMORY_TYPE): MemoryObject {
 		if( ref === MEMORY_TYPE.FILE) {
 			return super.createObject(path, MEMORY_TYPE.FILE);
 		} else {

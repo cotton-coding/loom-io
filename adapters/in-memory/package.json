@@ -38,10 +38,17 @@
 	"peerDependencies": {
 		"@loom-io/core": "workspace:*"
 	},
+	"dependencies": {
+		"@loom-io/common": "workspace:*"
+	},
 	"exports": {
 		".": {
 			"types": "./dist/exports/lib.d.ts",
 			"import": "./dist/exports/lib.js"
+		},
+		"./internal": {
+			"types": "./dist/exports/internal.d.ts",
+			"import": "./dist/exports/internal.js"
 		}
 	},
 	"maintainers": [

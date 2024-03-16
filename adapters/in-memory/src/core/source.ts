@@ -1,7 +1,7 @@
 import { Directory, LoomFile } from '@loom-io/core/internal';
 import { Adapter } from './adapter';
 import { dirname, basename } from 'node:path';
-import { splitTailingPath } from '../utils/path';
+import { splitTailingPath } from '@loom-io/common';
 
 export const source = async (path: string,  Type?: typeof Directory | typeof LoomFile) => {
 	const adapter = new Adapter();
