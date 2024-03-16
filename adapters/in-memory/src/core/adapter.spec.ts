@@ -20,6 +20,7 @@ class UnwrappedAdapter extends Adapter {
 					$type: MEMORY_TYPE.FILE,
 					name: 'file',
 					ext: 'txt',
+					mtime: new Date(),
 					content: Buffer.from('test')
 				}]
 			}, {
@@ -32,6 +33,7 @@ class UnwrappedAdapter extends Adapter {
 						$type: MEMORY_TYPE.FILE,
 						name: 'file2',
 						ext: 'txt',
+						mtime: new Date(),
 						content: Buffer.from('test')
 					}]
 				}, {
@@ -43,6 +45,7 @@ class UnwrappedAdapter extends Adapter {
 				$type: MEMORY_TYPE.FILE,
 				name: 'file2',
 				ext: 'txt',
+				mtime: new Date(),
 				content: Buffer.from('test')
 			}, {
 				$type: MEMORY_TYPE.DIRECTORY,
@@ -51,6 +54,7 @@ class UnwrappedAdapter extends Adapter {
 					$type: MEMORY_TYPE.FILE,
 					name: 'file3',
 					ext: 'txt',
+					mtime: new Date(),
 					content: Buffer.from('test')
 				}]
 			}]
