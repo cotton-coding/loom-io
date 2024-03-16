@@ -1,4 +1,4 @@
-import { MemoryDirectory, MEMORY_TYPE, MemoryRoot } from '../definitions';
+import { MemoryDirectory, MEMORY_TYPE, MemoryRoot, MemoryObject, MemoryFile } from '../definitions';
 import { AlreadyExistsException, NotFoundException } from '../exceptions';
 import { Adapter } from './adapter';
 import { describe, test, expect, beforeEach } from 'vitest';
@@ -69,10 +69,32 @@ class UnwrappedAdapter extends Adapter {
 		return super.createFile(name, content);
 	}
 
-	compareNameAndType = super.compareNameAndType.bind(this);
-	createObjectInRoot = super.createObjectInRoot.bind(this);
-	createObject = super.createObject.bind(this);
-	getLastPartOfPath = super.getLastPartOfPath.bind(this);
+	compareNameAndType<T extends MemoryObject>(item: T, name: string, type?: MEMORY_TYPE): item is T {
+		return super.compareNameAndType(item, name, type);
+	}
+	createObjectInRoot(name: string, ref: MEMORY_TYPE.FILE): MemoryFile;
+	createObjectInRoot(name: string, ref: MEMORY_TYPE.DIRECTORY): MemoryDirectory;
+	createObjectInRoot(name: string, ref: MEMORY_TYPE): MemoryObject;
+	createObjectInRoot(name: string, ref: MEMORY_TYPE): MemoryObject {
+		return super.createObjectInRoot(name, ref);
+	}
+
+	protected createObject(path: string, ref: MEMORY_TYPE.FILE): MemoryFile;
+	protected createObject(path: string, ref: MEMORY_TYPE.DIRECTORY): MemoryDirectory;
+	protected createObject(path: string, ref: MEMORY_TYPE): MemoryObject {
+		if( ref === MEMORY_TYPE.FILE) {
+			return super.createObject(path, MEMORY_TYPE.FILE);
+		} else {
+			return super.createObject(path, MEMORY_TYPE.DIRECTORY);
+		}
+	}
+
+	getLastPartOfPath(path: string | undefined, ref: MEMORY_TYPE.FILE): MemoryFile;
+	getLastPartOfPath(path: string | undefined, ref: MEMORY_TYPE.DIRECTORY): MemoryRoot | MemoryDirectory;
+	getLastPartOfPath(path: string | undefined, ref?: MEMORY_TYPE): MemoryRoot | MemoryObject;
+	getLastPartOfPath(path: string | undefined, ref?: MEMORY_TYPE): MemoryRoot | MemoryObject {
+		return super.getLastPartOfPath(path, ref);
+	}
 }
 
 
