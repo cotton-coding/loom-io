@@ -30,6 +30,13 @@
 		"build": "tsc --project tsconfig.json",
 		"prepublishOnly": "npm run build && publint"
 	},
+	"devDependencies": {
+		"@loom-io/test-utils": "workspace:*",
+		"@loom-io/in-memory-adapter": "workspace:*"
+	},
+	"dependencies": {
+		"@loom-io/common": "workspace:*"
+	},
 	"exports": {
 		".": {
 			"types": "./dist/exports/lib.d.ts",
