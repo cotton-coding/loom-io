@@ -21,7 +21,7 @@ async function createAdapter(): Promise<Adapter> {
 
 
 TestAdapter(await createAdapter(), {
-	beforeAll: createDir.bind(null),
-	afterAll: cleanDir.bind(null),
+	beforeEach: createDir.bind(null),
+	afterEach: cleanDir.bind(null),
 	basePath: ROOT_DIR
 });

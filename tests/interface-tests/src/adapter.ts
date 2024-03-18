@@ -28,9 +28,14 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 		return join(base, faker.string.uuid(), faker.system.directoryPath().slice(1), faker.system.commonFileName(ext));
 	}
 
-	function getPathWithBase(subpath: string): string {
-		const base = config?.basePath || '';
-		return join(base, subpath);
+	async function getPathWithBase(subpath: string): Promise<string> {
+		if(config?.basePath) {
+			const base = config?.basePath || '';
+			await adapter.mkdir(base);
+			return join(base, subpath);
+		} else {
+			return subpath;
+		}
 	}
 
 	describe('Adapter', async () => {
@@ -45,12 +50,11 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 			afterAll(config.afterAll);
 		}
 
-		if (config?.beforeEach) {
-			beforeEach(config.beforeEach);
-		}
-
 		beforeEach(async () => {
 			path = getRandomPath('test');
+			if(config?.beforeEach) {
+				await config.beforeEach();
+			}
 		});
 
 		if (config?.afterEach) {
@@ -81,7 +85,7 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 		});
 
 		test('exists', async () => {
-			const path = getPathWithBase('test/exists');
+			const path = await getPathWithBase('test/exists');
 			await adapter.mkdir(path);
 			expect( await adapter.dirExists(path)).toBe(true);
 		});
@@ -94,7 +98,14 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 		});
 
 		test('not exists', async () => {
-			expect( await adapter.dirExists(getPathWithBase('does-not-exits-in-folder'))).toBe(false);
+			expect( await adapter.dirExists(await getPathWithBase('does-not-exits-in-folder'))).toBe(false);
+		});
+
+		test('should handle slashes', async () => {
+			const path = '/';
+			await adapter.mkdir(path);
+			expect(await adapter.dirExists(path)).toBe(true);
+			expect(await adapter.readdir(path)).toHaveLength(0);
 		});
 
 		test('list dir content', async () => {
@@ -175,14 +186,14 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 		});
 
 		test('file exists', async () => {
-			const path = getPathWithBase(faker.system.commonFileName('js'));
+			const path = await getPathWithBase(faker.system.commonFileName('js'));
 			const content = 'export const exists = true';
 			await adapter.writeFile(path, content);
 			expect( await adapter.fileExists(path)).toBe(true);
 		});
 
 		test('file not exists', async () => {
-			expect( await adapter.fileExists(getPathWithBase('file-not-exists.js'))).toBe(false);
+			expect( await adapter.fileExists(await getPathWithBase('file-not-exists.js'))).toBe(false);
 		});
 
 		test('file exists deep path', async () => {
@@ -207,7 +218,7 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 		});
 
 		test('delete file', async () => {
-			const path = getPathWithBase(faker.system.commonFileName('txt'));
+			const path = await getPathWithBase(faker.system.commonFileName('txt'));
 			const content = faker.lorem.words(10);
 			await adapter.writeFile(path, content);
 			expect( await adapter.fileExists(path)).toBe(true);
@@ -228,7 +239,7 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 		});
 
 		test('open file handler', async () => {
-			const path = getPathWithBase(faker.system.commonFileName('md'));
+			const path = await getPathWithBase(faker.system.commonFileName('md'));
 			const content = faker.lorem.words(100);
 			await adapter.writeFile(path, content);
 			const handler = await adapter.openFile(path);
@@ -237,7 +248,7 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 		});
 
 		test('read partial file with buffer', async () => {
-			const path = getPathWithBase(faker.system.commonFileName('md'));
+			const path = await getPathWithBase(faker.system.commonFileName('md'));
 			const content = faker.lorem.paragraphs(7);
 			await adapter.writeFile(path, content);
 			const handler = await adapter.openFile(path);
@@ -251,7 +262,7 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 		});
 
 		test('read partial file with buffer and offset', async () => {
-			const path = getPathWithBase(faker.system.commonFileName('md'));
+			const path = await getPathWithBase(faker.system.commonFileName('md'));
 			const content = 'test-content';
 			await adapter.writeFile(path, content);
 			const handler = await adapter.openFile(path);

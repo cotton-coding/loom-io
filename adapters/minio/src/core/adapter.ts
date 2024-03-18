@@ -44,12 +44,18 @@ export class Adapter implements SourceAdapter {
 
 	async dirExists(path: string): Promise<boolean> {
 		const pathWithTailSlash = path.endsWith('/') ? path : path + '/';
+		if(path === '/') {
+			return true;
+		}
 		return this.exists(pathWithTailSlash);
 	}
 
 
 	async mkdir(path: string): Promise<void> {
-		const pathWithTailSlash = path.endsWith('/') ? '' : `${path}/`;
+		const pathWithTailSlash = path.endsWith('/') ? path : `${path}/`;
+		if(pathWithTailSlash === '/') {
+			return;
+		}
 		await this.s3.putObject(this.bucket, pathWithTailSlash, Buffer.alloc(0));
 	}
 
@@ -110,7 +116,7 @@ export class Adapter implements SourceAdapter {
 
 	async readdir(path: string): Promise<ObjectDirentInterface[]> {
 		const pathWithTailSlash = path.endsWith('/') ? path : `${path}/`;
-		const bucketStream = await this.s3.listObjects(this.bucket, pathWithTailSlash);
+		const bucketStream = await this.s3.listObjectsV2(this.bucket, pathWithTailSlash === '/' ? '' : pathWithTailSlash);
 		return new Promise((resolve, reject) => {
 			const pathObjects: ObjectDirent[] = [];
 			bucketStream.on('data', (data) => {
@@ -130,7 +136,6 @@ export class Adapter implements SourceAdapter {
 	}
 
 	async rmdir(path: string, options: rmdirOptions= {}): Promise<void> {
-		// TODO: Check if directory is empty and throw error if not and force is not set
 		if(options.force) {
 			await this.rmdirForce(path);
 			return;

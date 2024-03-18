@@ -4,7 +4,7 @@ import { AlreadyExistsException, NotFoundException } from '../exceptions';
 import { ObjectDirent } from './object-dirent.js';
 import { MEMORY_TYPE, MemoryDirectory, MemoryFile, MemoryObject, MemoryRoot } from '../definitions';
 import { isMemoryDirectoryAndMatchNamePrepared } from '../utils/validations';
-import { removePresentedAndTrailingSlash, splitTailingPath } from '@loom-io/common';
+import { removePrecedingAndTrailingSlash, splitTailingPath } from '@loom-io/common';
 export class Adapter implements SourceAdapter {
 
 	protected storage: MemoryRoot;
@@ -34,7 +34,7 @@ export class Adapter implements SourceAdapter {
 		if(path === undefined) {
 			return this.storage;
 		}
-		const parts = removePresentedAndTrailingSlash(path).split('/');
+		const parts = removePrecedingAndTrailingSlash(path).split('/');
 		const lastPart = parts.pop();
 		if(lastPart === undefined) {
 			return this.storage;
@@ -109,7 +109,7 @@ export class Adapter implements SourceAdapter {
 	protected createObject(path: string, ref: MEMORY_TYPE.DIRECTORY): MemoryDirectory;
 	protected createObject(path: string, ref: MEMORY_TYPE): MemoryObject {
 
-		const parts = removePresentedAndTrailingSlash(path).split('/');
+		const parts = removePrecedingAndTrailingSlash(path).split('/');
 		if(parts.length === 1) {
 			return this.createObjectInRoot(parts[0], ref);
 		}
@@ -216,7 +216,7 @@ export class Adapter implements SourceAdapter {
 			file.mtime = new Date();
 		} catch (err) {
 			if(err instanceof NotFoundException) {
-				if(removePresentedAndTrailingSlash(path).split('/').length === err.depth + 1) {
+				if(removePrecedingAndTrailingSlash(path).split('/').length === err.depth + 1) {
 					const [,tail] = splitTailingPath(path);
 					const file = this.createFile(tail, Buffer.isBuffer(content) ? content : Buffer.from(content, encoding));
 					err.last.content.push(file);
