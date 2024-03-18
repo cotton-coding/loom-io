@@ -167,6 +167,9 @@ importers:
       '@faker-js/faker':
         specifier: ^8.4.1
         version: 8.4.1
+      '@loom-io/common':
+        specifier: workspace:*
+        version: link:../../packages/common
 
   tests/test-utils:
     dependencies:
