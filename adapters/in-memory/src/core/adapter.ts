@@ -31,14 +31,15 @@ export class Adapter implements SourceAdapter {
 	protected getLastPartOfPath(path: string | undefined, ref: MEMORY_TYPE.DIRECTORY): MemoryDirectory | MemoryRoot;
 	protected getLastPartOfPath(path: string | undefined, ref?: MEMORY_TYPE): MemoryObject | MemoryRoot;
 	protected getLastPartOfPath(path: string | undefined, ref?: MEMORY_TYPE): MemoryObject | MemoryRoot {
+		path = path?.trim();
 		if(path === undefined || path === '' || path === '/') {
 			return this.storage;
 		}
 		const parts = removePrecedingAndTrailingSlash(path).split('/');
-		if(parts.length === 0) {
+		const lastPart = parts.pop();
+		if(lastPart === undefined) {
 			return this.storage;
 		}
-		const lastPart = parts.pop();
 		let currentStack = this.storage.content;
 		let lastObject: MemoryDirectory | MemoryRoot = this.storage;
 		for(let x = 0; x < parts.length; x++) {
@@ -138,7 +139,7 @@ export class Adapter implements SourceAdapter {
 	protected exists(path: string, ref: MEMORY_TYPE): boolean {
 		try {
 			const lastPart = this.getLastPartOfPath(path);
-			return lastPart.$type === ref;
+			return lastPart.$type === ref || (ref === MEMORY_TYPE.DIRECTORY && lastPart.$type === MEMORY_TYPE.ROOT);
 		} catch {
 			return false;
 		}
@@ -172,8 +173,17 @@ export class Adapter implements SourceAdapter {
 
 	rmdir(path: string, options: rmdirOptions= {}): void {
 		try {
-			const [subPath, tail] = splitTailingPath(path);
+			const [subPath, tail] = splitTailingPath(removePrecedingAndTrailingSlash(path));
 			const subElement = this.getLastPartOfPath(subPath, MEMORY_TYPE.DIRECTORY);
+
+			if(!tail) {
+				if(subElement.content.length > 0 && (!options.recursive && !options.force)) {
+					throw new Error('Directory is not empty');
+				}
+				subElement.content = [];
+				return;
+			}
+
 
 			if((!options.recursive || !options.force)) {
 				const element = subElement.content.find(isMemoryDirectoryAndMatchNamePrepared(tail));
@@ -218,6 +228,9 @@ export class Adapter implements SourceAdapter {
 			if(err instanceof NotFoundException) {
 				if(removePrecedingAndTrailingSlash(path).split('/').length === err.depth + 1) {
 					const [,tail] = splitTailingPath(path);
+					if(tail === undefined) {
+						throw new Error('Invalid path'); // TODO: Create a custom exception
+					}
 					const file = this.createFile(tail, Buffer.isBuffer(content) ? content : Buffer.from(content, encoding));
 					err.last.content.push(file);
 					return;
@@ -230,6 +243,9 @@ export class Adapter implements SourceAdapter {
 
 	deleteFile(path: string): void {
 		const [subPath, tail] = splitTailingPath(path);
+		if(tail === undefined) {
+			throw new Error('Invalid path'); // TODO: Create a custom exception
+		}
 		const subElement = this.getLastPartOfPath(subPath, MEMORY_TYPE.DIRECTORY);
 		subElement.content = subElement.content.filter((item) => !this.compareNameAndType(item, tail, MEMORY_TYPE.FILE));
 	}

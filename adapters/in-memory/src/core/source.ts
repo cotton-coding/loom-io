@@ -14,7 +14,7 @@ export const source = async (path: string,  Type?: typeof Directory | typeof Loo
 		if(await adapter.fileExists(path)) {
 			const [subPath, tail] = splitTailingPath(path);
 			const dir = new Directory(adapter, subPath || '/');
-			return new LoomFile(adapter, dir, tail);
+			return new LoomFile(adapter, dir, tail!); // tail need to be defined here otherwise it is not an existing file
 		} else {
 			return new Directory(adapter, path);
 		}

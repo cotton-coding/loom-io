@@ -101,22 +101,36 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 			expect( await adapter.dirExists(await getPathWithBase('does-not-exits-in-folder'))).toBe(false);
 		});
 
-		test('should handle slashes', async () => {
+		test('should handle root slash', async () => {
+			await adapter.rmdir('/', { recursive: true });
 			const path = '/';
 			await adapter.mkdir(path);
 			expect(await adapter.dirExists(path)).toBe(true);
-			expect(await adapter.readdir(path)).toHaveLength(0);
+			expect(await adapter.readdir(path)).toHaveLength(1);
 		});
 
 		test('list dir content', async () => {
 			await adapter.mkdir('list-dir-content/list');
 			await adapter.writeFile('list-dir-content/list/file.txt', 'test');
 			const list = await adapter.readdir('list-dir-content/list/');
-			expect(list.length).toBe(1);
+			expect(list).toHaveLength(1);
 			expect(list[0].name).toEqual('file.txt');
 			expect(list[0].isFile()).toBe(true);
 			expect(list[0].isDirectory()).toBe(false);
 			expect(list[0].path).toEqual('list-dir-content/list/');
+		});
+
+		test('list dir content with multiple objects in sub directory', async () => {
+			await adapter.rmdir('/', { recursive: true });
+			await adapter.mkdir('list-dir-content/list');
+			await adapter.writeFile('list-dir-content/list/file.txt', 'test');
+
+			const list = await adapter.readdir('/');
+			expect(list).toHaveLength(1);
+			expect(list[0].name).toEqual('list-dir-content');
+			expect(list[0].isFile()).toBe(false);
+			expect(list[0].isDirectory()).toBe(true);
+			expect(list[0].path).toEqual('/');
 		});
 
 		test('list dir content with multiple sub directories', async () => {

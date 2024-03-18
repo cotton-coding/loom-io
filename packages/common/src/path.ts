@@ -1,7 +1,7 @@
 
 
 
-export function removePresentedSlash(path: string): string {
+export function removePrecedingSlash(path: string): string {
 	if (path.startsWith('/')) {
 		return path.slice(1);
 	}
@@ -14,14 +14,17 @@ export function removeTailingSlash(path: string): string {
 	}
 	return path;
 }
-export function removePresentedAndTrailingSlash(path: string): string {
-	return removeTailingSlash(removePresentedSlash(path));
+export function removePrecedingAndTrailingSlash(path: string): string {
+	return removeTailingSlash(removePrecedingSlash(path.trim()));
 }
 
-export function splitTailingPath(path: string): [string | undefined, string] {
+export function splitTailingPath(path: string): [string, string] | [string, undefined] | [string, string]{
+	if(path === '' || path === '/') {
+		return ['/', undefined];
+	}
 	const index = removeTailingSlash(path).lastIndexOf('/');
 	if (index === -1) {
-		return [undefined, path];
+		return ['/', path];
 	}
-	return [path.slice(0, index), path.slice(index + 1)];
+	return [path.slice(0, index + 1), path.slice(index + 1)];
 }
