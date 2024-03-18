@@ -31,14 +31,14 @@ export class Adapter implements SourceAdapter {
 	protected getLastPartOfPath(path: string | undefined, ref: MEMORY_TYPE.DIRECTORY): MemoryDirectory | MemoryRoot;
 	protected getLastPartOfPath(path: string | undefined, ref?: MEMORY_TYPE): MemoryObject | MemoryRoot;
 	protected getLastPartOfPath(path: string | undefined, ref?: MEMORY_TYPE): MemoryObject | MemoryRoot {
-		if(path === undefined) {
+		if(path === undefined || path === '' || path === '/') {
 			return this.storage;
 		}
 		const parts = removePrecedingAndTrailingSlash(path).split('/');
-		const lastPart = parts.pop();
-		if(lastPart === undefined) {
+		if(parts.length === 0) {
 			return this.storage;
 		}
+		const lastPart = parts.pop();
 		let currentStack = this.storage.content;
 		let lastObject: MemoryDirectory | MemoryRoot = this.storage;
 		for(let x = 0; x < parts.length; x++) {
