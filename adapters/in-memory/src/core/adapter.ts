@@ -156,6 +156,10 @@ export class Adapter implements SourceAdapter {
 
 
 	mkdir(path: string): void {
+		path = path.trim();
+		if(path === '/' || path === '') {
+			return;
+		}
 		try {
 			this.createObject(path, MEMORY_TYPE.DIRECTORY);
 		} catch (err) {

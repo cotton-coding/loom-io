@@ -106,7 +106,7 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 			const path = '/';
 			await adapter.mkdir(path);
 			expect(await adapter.dirExists(path)).toBe(true);
-			expect(await adapter.readdir(path)).toHaveLength(1);
+			expect(await adapter.readdir(path)).toHaveLength(0);
 		});
 
 		test('list dir content', async () => {

@@ -21,7 +21,8 @@ export class ObjectDirent implements ObjectDirentInterface{
 	}
 
 	get path() {
-		return this._dirent.path.slice(this._rootPath.length);
+		const pathFromRelativeRoot = this._dirent.path.slice(this._rootPath.length);
+		return pathFromRelativeRoot.endsWith('/') ? pathFromRelativeRoot : `${pathFromRelativeRoot}/`;
 	}
 
 }
