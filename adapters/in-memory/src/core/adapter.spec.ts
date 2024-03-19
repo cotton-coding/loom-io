@@ -72,12 +72,6 @@ class UnwrappedAdapter extends Adapter {
 	compareNameAndType<T extends MemoryObject>(item: T, name: string, type?: MEMORY_TYPE): item is T {
 		return super.compareNameAndType(item, name, type);
 	}
-	createObjectInRoot(name: string, ref: MEMORY_TYPE.FILE): MemoryFile;
-	createObjectInRoot(name: string, ref: MEMORY_TYPE.DIRECTORY): MemoryDirectory;
-	createObjectInRoot(name: string, ref: MEMORY_TYPE): MemoryObject;
-	createObjectInRoot(name: string, ref: MEMORY_TYPE): MemoryObject {
-		return super.createObjectInRoot(name, ref);
-	}
 
 	createObject(path: string, ref: MEMORY_TYPE.FILE): MemoryFile;
 	createObject(path: string, ref: MEMORY_TYPE.DIRECTORY): MemoryDirectory;
@@ -138,19 +132,19 @@ describe('Memory Adapter internal functions', async () => {
 	});
 
 	test('create directory in root', async () => {
-		const dir = adapter.createObjectInRoot('test', MEMORY_TYPE.DIRECTORY);
+		const dir = adapter.createObject('test', MEMORY_TYPE.DIRECTORY);
 		expect(adapter._storage.content).toEqual([dir]);
 	});
 
 	test('create file in root', async () => {
-		const file = adapter.createObjectInRoot('file.txt', MEMORY_TYPE.FILE);
+		const file = adapter.createObject('file.txt', MEMORY_TYPE.FILE);
 		expect(adapter._storage.content).toEqual([file]);
 	});
 
 	test('create multiple objects in root', async () => {
-		const file = adapter.createObjectInRoot('file.txt', MEMORY_TYPE.FILE);
-		const dir = adapter.createObjectInRoot('test', MEMORY_TYPE.DIRECTORY);
-		const dir2 = adapter.createObjectInRoot('test2', MEMORY_TYPE.DIRECTORY);
+		const file = adapter.createObject('file.txt', MEMORY_TYPE.FILE);
+		const dir = adapter.createObject('test', MEMORY_TYPE.DIRECTORY);
+		const dir2 = adapter.createObject('test2', MEMORY_TYPE.DIRECTORY);
 		expect(adapter._storage.content).toEqual([file, dir, dir2]);
 	});
 

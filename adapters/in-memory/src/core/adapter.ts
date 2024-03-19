@@ -90,38 +90,17 @@ export class Adapter implements SourceAdapter {
 		};
 	}
 
-	protected createObjectInRoot(name: string, ref: MEMORY_TYPE.FILE): MemoryFile;
-	protected createObjectInRoot(name: string, ref: MEMORY_TYPE.DIRECTORY): MemoryDirectory;
-	protected createObjectInRoot(name: string, ref: MEMORY_TYPE): MemoryObject;
-	protected createObjectInRoot(name: string, ref: MEMORY_TYPE): MemoryObject {
-		if(ref === MEMORY_TYPE.FILE) {
-			const file = this.createFile(name);
-			this.storage.content.push(file);
-			return file;
-		} else {
-			const dir = this.createDirectory(name);
-			this.storage.content.push(dir);
-			return dir;
-		}
-	}
-
-
 	protected createObject(path: string, ref: MEMORY_TYPE.FILE): MemoryFile;
 	protected createObject(path: string, ref: MEMORY_TYPE.DIRECTORY): MemoryDirectory;
 	protected createObject(path: string, ref: MEMORY_TYPE): MemoryObject {
 
 		const parts = removePrecedingAndTrailingSlash(path).split('/');
-		if(parts.length === 1) {
-			return this.createObjectInRoot(parts[0], ref);
-		}
-
 		try {
 			const lastPart = this.getLastPartOfPath(path);
 			throw new AlreadyExistsException(path, lastPart);
 		} catch (err) {
 			if(err instanceof NotFoundException) {
 				const {last, depth} = err;
-
 				if(ref === MEMORY_TYPE.FILE) {
 					const lastDir = this.createMissingDirectories(last, parts.slice(depth, -1));
 					const file = this.createFile(parts[parts.length-1]);
@@ -138,8 +117,8 @@ export class Adapter implements SourceAdapter {
 
 	protected exists(path: string, ref: MEMORY_TYPE): boolean {
 		try {
-			const lastPart = this.getLastPartOfPath(path);
-			return lastPart.$type === ref || (ref === MEMORY_TYPE.DIRECTORY && lastPart.$type === MEMORY_TYPE.ROOT);
+			this.getLastPartOfPath(path, ref);
+			return true;//lastPart.$type === ref || (ref === MEMORY_TYPE.DIRECTORY && lastPart.$type === MEMORY_TYPE.ROOT);
 		} catch {
 			return false;
 		}
@@ -153,7 +132,6 @@ export class Adapter implements SourceAdapter {
 	dirExists(path: string): boolean {
 		return this.exists(path, MEMORY_TYPE.DIRECTORY);
 	}
-
 
 	mkdir(path: string): void {
 		path = path.trim();
