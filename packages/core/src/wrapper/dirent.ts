@@ -1,12 +1,12 @@
-import { Dirent } from 'fs';
 import { Directory } from '../core/dir.js';
-import { join } from 'path';	
+import { join } from 'path';
+import { ObjectDirentInterface } from '../definitions.js';
 
 export class DirentWrapper {
 
 	constructor(
-		protected _dir: Directory,  
-		protected _dirent: Dirent) {
+		protected _dir: Directory,
+		protected _dirent: ObjectDirentInterface) {
 	}
 
 	isDirectory() {

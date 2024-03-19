@@ -1,20 +1,25 @@
 import { describe, test, expect, beforeAll } from 'vitest';
-import * as fs from 'fs/promises';
-import type { Dirent } from 'fs';
 import { DirentWrapper } from './dirent.js';
 import { Directory } from '../core/dir.js';
-import { TestFilesystemHelper } from '../../test/helpers/testFilesystemHelper.js';
+import { InMemoryAdapterHelper } from '@loom-io/test-utils';
+import { ObjectDirentInterface } from '../definitions.js';
 
 describe('Test Dirent Service', () => {
 
 	let dir: Directory;
-	let dirent: Dirent;
+	let dirent: ObjectDirentInterface;
 
 	beforeAll(async () => {
-		const testHelper = TestFilesystemHelper.init();
-		(await testHelper).createDir('test');
-		dir = new Directory((await testHelper).getBasePath());
-		dirent = (await fs.readdir(dir.path, { withFileTypes: true }))[0];
+		const testHelper = InMemoryAdapterHelper.init();
+		testHelper.createDirectory('test');
+		const { adapter } = testHelper;
+		dir = new Directory(adapter, '/');
+		dirent = {
+			name: 'test',
+			path: '/',
+			isDirectory: () => true,
+			isFile: () => false
+		};
 	});
 
 	test('Create Instance and set path', async () => {
@@ -54,7 +59,7 @@ describe('Test Dirent Service', () => {
 
 	test('path', async () => {
 		const direntWrapper = new DirentWrapper(dir, dirent);
-		expect(direntWrapper.path).toBe(`${dir.path}/test`);
+		expect(direntWrapper.path).toBe(`${dir.path}test`);
 	});
 
 });
