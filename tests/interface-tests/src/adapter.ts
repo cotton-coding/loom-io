@@ -1,8 +1,9 @@
-import { test, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
+import { describe, test, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
 import type { SourceAdapter } from '@loom-io/core';
-import { describe } from 'node:test';
 import { faker } from '@faker-js/faker';
 import { dirname, join } from 'node:path';
+import { getUniqSegmentsOfPath, splitTailingPath } from '@loom-io/common';
+import { nanoid } from 'nanoid';
 
 
 export interface TestAdapterOptions {
@@ -11,6 +12,33 @@ export interface TestAdapterOptions {
 	beforeEach?: () => Promise<void>;
 	afterEach?: () => Promise<void>;
 	basePath?: string;
+	debug?: boolean;
+}
+
+async function createMultipleDirectories(adapter: SourceAdapter, amount: number = faker.number.int({min: 1, max: 20}), base: string = '') {
+	const paths: string[] = [];
+	for(let i = 0; i < amount; i++) {
+		paths.push(await createDirectory(adapter, undefined, base));
+	}
+
+	return paths;
+}
+
+async function createDirectory(adapter: SourceAdapter, path: string = faker.system.directoryPath(), base: string = '') {
+	path = join(base, path);
+	await adapter.mkdir(path);
+	return path;
+}
+
+
+const allIds = new Set<string>();
+function getUniqId() {
+	const id = nanoid();
+	if(allIds.has(id)) {
+		return getUniqId();
+	}
+	allIds.add(id);
+	return id;
 }
 
 
@@ -18,14 +46,14 @@ export interface TestAdapterOptions {
 // eslint-disable-next-line @typescript-eslint/ban-types
 export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions ) => {
 
-	function getRandomPath(subpath: string): string {
+	function getRandomPath(subpath: string = ''): string {
 		const base = config?.basePath || '';
-		return join(base, faker.string.uuid(), faker.system.directoryPath().slice(1), subpath);
+		return join(base, getUniqId(), faker.system.directoryPath(), subpath);
 	}
 
 	function getRandomFilePath(ext: string): string {
 		const base = config?.basePath || '';
-		return join(base, faker.string.uuid(), faker.system.directoryPath().slice(1), faker.system.commonFileName(ext));
+		return join(base, getUniqId(), faker.system.directoryPath(), faker.system.commonFileName(ext));
 	}
 
 	async function getPathWithBase(subpath: string): Promise<string> {
@@ -38,7 +66,26 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 		}
 	}
 
-	describe('Adapter', async () => {
+	function debug(...args: unknown[]) {
+		if(config?.debug) {
+			console.debug(...args);
+		}
+	}
+
+	function beginTest(name: string) {
+		const start = new Date();
+		debug('###########################################################');
+		debug(`Starting test: ${name} at ${start.toISOString()}`);
+		return () => {
+			const finish = new Date();
+			debug(`Finish test: ${name} at ${finish.toISOString()}, duration: ${finish.getTime() - start.getTime()}ms`);
+			debug('###########################################################');
+		};
+	}
+
+
+
+	describe.concurrent('Adapter', async () => {
 
 		let path: string;
 
@@ -51,7 +98,7 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 		}
 
 		beforeEach(async () => {
-			path = getRandomPath('test');
+			path = getRandomPath();
 			if(config?.beforeEach) {
 				await config.beforeEach();
 			}
@@ -68,7 +115,8 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 		});
 
 		test('rmdir', async () => {
-			const subPath = path.split('/').slice(0,-1).join('/');
+			const path = getRandomPath('test/long/mkdir');
+			const [subPath] = splitTailingPath(path);
 			await adapter.mkdir(subPath);
 			await adapter.mkdir(path);
 			await adapter.rmdir(path);
@@ -101,14 +149,6 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 			expect( await adapter.dirExists(await getPathWithBase('does-not-exits-in-folder'))).toBe(false);
 		});
 
-		test('should handle root slash', async () => {
-			await adapter.rmdir('/', { recursive: true });
-			const path = '/';
-			await adapter.mkdir(path);
-			expect(await adapter.dirExists(path)).toBe(true);
-			expect(await adapter.readdir(path)).toHaveLength(0);
-		});
-
 		test('list dir content', async () => {
 			await adapter.mkdir('list-dir-content/list');
 			await adapter.writeFile('list-dir-content/list/file.txt', 'test');
@@ -118,19 +158,6 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 			expect(list[0].isFile()).toBe(true);
 			expect(list[0].isDirectory()).toBe(false);
 			expect(list[0].path).toEqual('list-dir-content/list/');
-		});
-
-		test('list dir content with multiple objects in sub directory', async () => {
-			await adapter.rmdir('/', { recursive: true });
-			await adapter.mkdir('list-dir-content/list');
-			await adapter.writeFile('list-dir-content/list/file.txt', 'test');
-
-			const list = await adapter.readdir('/');
-			expect(list).toHaveLength(1);
-			expect(list[0].name).toEqual('list-dir-content');
-			expect(list[0].isFile()).toBe(false);
-			expect(list[0].isDirectory()).toBe(true);
-			expect(list[0].path).toEqual('/');
 		});
 
 		test('list dir content with multiple sub directories', async () => {
@@ -292,6 +319,45 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 			await handler.read(buffer, { length: 4, offset: bytesRead + 1 });
 			expect(buffer.toString('utf-8')).toBe('content-test');
 			await handler.close();
+		});
+
+		describe.sequential('root directory tests', () => {
+
+			beforeEach(async () => {
+				await adapter.rmdir('/', { recursive: true });
+			});
+
+			test.sequential('creating lots of directories and count them', async () => {
+				const finish = beginTest('creating lots of directories and count them');
+				const paths = await createMultipleDirectories(adapter, 100);
+				const amount = getUniqSegmentsOfPath(paths, 1).length;
+				const read = await adapter.readdir('/');
+				expect(read.length).toBe(amount);
+				finish();
+			});
+
+
+			test.sequential('should handle root slash', async () => {
+				const path = '/';
+				await adapter.mkdir(path);
+				expect(await adapter.dirExists(path)).toBe(true);
+				expect(await adapter.readdir(path)).toHaveLength(0);
+			});
+
+
+			test.sequential('list dir content with multiple objects in sub directory', async () => {
+				const finish = beginTest('list dir content with multiple objects in sub directory');
+				await adapter.mkdir('list-dir-content/list');
+				await adapter.writeFile('list-dir-content/list/file.txt', 'test');
+
+				const list = await adapter.readdir('/');
+				expect(list).toHaveLength(1);
+				expect(list[0].name).toEqual('list-dir-content');
+				expect(list[0].isFile()).toBe(false);
+				expect(list[0].isDirectory()).toBe(true);
+				expect(list[0].path).toEqual('/');
+				finish();
+			});
 		});
 
 	});

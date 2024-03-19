@@ -56,11 +56,17 @@ export class Adapter implements SourceAdapter {
 	}
 
 	async rmdir(path: string, options: rmdirOptions= {}): Promise<void> {
+		path = path.trim();
 		const fullPath = this.getFullPath(path);
 		if(!options.recursive || !options.force) {
-			await fs.rmdir(fullPath);
+			if(path !== '/' && path !== '') {
+				await fs.rmdir(fullPath);
+			}
 		} else {
 			await fs.rm(fullPath, options);
+			if(path === '/' || path === '') {
+				await fs.mkdir(this.rootdir);
+			}
 		}
 	}
 
