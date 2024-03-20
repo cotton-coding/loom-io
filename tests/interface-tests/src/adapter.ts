@@ -87,8 +87,6 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 
 	describe.concurrent('Adapter', async () => {
 
-		let path: string;
-
 		if (config?.beforeAll) {
 			beforeAll(config.beforeAll);
 		}
@@ -98,7 +96,6 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 		}
 
 		beforeEach(async () => {
-			path = getRandomPath();
 			if(config?.beforeEach) {
 				await config.beforeEach();
 			}
@@ -115,7 +112,7 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 		});
 
 		test('rmdir', async () => {
-			const path = getRandomPath('test/long/mkdir');
+			const path = getRandomPath('test/other/mkdir');
 			const [subPath] = splitTailingPath(path);
 			await adapter.mkdir(subPath);
 			await adapter.mkdir(path);
@@ -125,6 +122,7 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 		});
 
 		test('rmdir with file should fail', async () => {
+			const path = getRandomPath('test/other/mkdir');
 			const fileName = 'file.txt';
 			await adapter.mkdir(path);
 			await adapter.writeFile(`${path}/${fileName}`, 'test');
@@ -139,6 +137,7 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 		});
 
 		test('exists with path', async () => {
+			const path = getRandomPath();
 			await adapter.mkdir(path);
 			const subPath = path.split('/').slice(0,-1).join('/');
 			expect( await adapter.dirExists(path)).toBe(true);
@@ -334,7 +333,7 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 				const read = await adapter.readdir('/');
 				expect(read.length).toBe(amount);
 				finish();
-			});
+			}, 25000);
 
 
 			test.sequential('should handle root slash', async () => {

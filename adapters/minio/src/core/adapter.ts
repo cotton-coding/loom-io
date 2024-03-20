@@ -2,6 +2,12 @@ import type { BucketItem, Client }	from 'minio';
 import { ObjectDirent } from './object-dirent.js';
 import { FileHandler } from './file-handler.js';
 import type { SourceAdapter, rmdirOptions, ObjectDirentInterface } from '@loom-io/core';
+import { removePrecedingSlash } from '@loom-io/common';
+
+function addTailSlash(path: string): string {
+	return path.endsWith('/') ? path : `${path}/`;
+}
+
 export class Adapter implements SourceAdapter {
 	constructor(
 		protected s3: Client,
@@ -43,7 +49,7 @@ export class Adapter implements SourceAdapter {
 	}
 
 	async dirExists(path: string): Promise<boolean> {
-		const pathWithTailSlash = path.endsWith('/') ? path : path + '/';
+		const pathWithTailSlash = addTailSlash(path);
 		if(path === '/') {
 			return true;
 		}
@@ -52,29 +58,28 @@ export class Adapter implements SourceAdapter {
 
 
 	async mkdir(path: string): Promise<void> {
-		const pathWithTailSlash = path.endsWith('/') ? path : `${path}/`;
-		if(pathWithTailSlash === '/') {
+		const pathWithTailSlash = removePrecedingSlash(addTailSlash(path));
+		if(pathWithTailSlash === '') {
 			return;
 		}
 		await this.s3.putObject(this.bucket, pathWithTailSlash, Buffer.alloc(0));
 	}
 
 	protected async rmdirRecursive(bucket: string, path: string): Promise<void> {
-		const objects = await this.s3.listObjectsV2(bucket, path);
+		path = removePrecedingSlash(addTailSlash(path));
+		const objects = await this.s3.listObjectsV2(bucket, path, true);
 		for await (const obj of objects) {
 			await this.s3.removeObject(bucket, obj.name);
 		}
 	}
 
 	protected async rmdirForce(path: string): Promise<void> {
-		const pathWithTailSlash = path.endsWith('/') ? path : `${path}/`;
+		const pathWithTailSlash = removePrecedingSlash(addTailSlash(path));
+		if(pathWithTailSlash === '') {
+			await this.rmdirRecursive(this.bucket, pathWithTailSlash);
+			return;
+		}
 		await this.s3.removeObject(this.bucket, pathWithTailSlash, { forceDelete: true });
-	}
-
-	protected async rmDirRecursive(bucket: string, path: string): Promise<void> {
-		const objects = await this.filesInDir(path);
-		const names = objects.map((obj) => obj.name).filter((name): name is string => typeof name === 'string');
-		await this.s3.removeObjects(bucket, names);
 	}
 
 	protected async dirHasFiles(path: string): Promise<boolean> {
@@ -115,8 +120,8 @@ export class Adapter implements SourceAdapter {
 	}
 
 	async readdir(path: string): Promise<ObjectDirentInterface[]> {
-		const pathWithTailSlash = path.endsWith('/') ? path : `${path}/`;
-		const bucketStream = await this.s3.listObjectsV2(this.bucket, pathWithTailSlash === '/' ? '' : pathWithTailSlash);
+		const pathWithTailSlash = removePrecedingSlash(addTailSlash(path));
+		const bucketStream = await this.s3.listObjectsV2(this.bucket, pathWithTailSlash, false);
 		return new Promise((resolve, reject) => {
 			const pathObjects: ObjectDirent[] = [];
 			bucketStream.on('data', (data) => {
