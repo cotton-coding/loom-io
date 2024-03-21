@@ -6,8 +6,9 @@
 	"scripts": {
 		"build:common": "pnpm run --filter @loom-io/common build",
 		"build:core": "pnpm run --filter @loom-io/core build",
-		"build": "pnpm run build:common && pnpm run build:core && pnpm run --recursive build",
-		"prepublishOnly": "pnpm run --recursive prepublishOnly",
+		"build:pre": "pnpm run build:common && pnpm run build:core",
+		"build": "pnpm run build:pre && pnpm run --recursive build",
+		"prepublishOnly": "pnpm run build:pre && pnpm run --recursive prepublishOnly",
 		"test": "vitest",
 		"test:ci": "vitest --run --coverage",
 		"lint": "pnpm run --recursive lint",

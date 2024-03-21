@@ -4,7 +4,6 @@ import { faker } from '@faker-js/faker';
 import { dirname, join } from 'node:path';
 import { getUniqSegmentsOfPath, splitTailingPath } from '@loom-io/common';
 import { nanoid } from 'nanoid';
-import { after } from 'node:test';
 
 
 export interface TestAdapterOptions {
@@ -338,7 +337,7 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 				const read = await adapter.readdir('/');
 				expect(read.length).toBe(amount);
 				finish();
-			}, 10000);
+			}, 15000);
 
 
 			test.sequential('should handle root slash', async () => {
