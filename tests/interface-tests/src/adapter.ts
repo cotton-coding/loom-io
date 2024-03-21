@@ -4,6 +4,7 @@ import { faker } from '@faker-js/faker';
 import { dirname, join } from 'node:path';
 import { getUniqSegmentsOfPath, splitTailingPath } from '@loom-io/common';
 import { nanoid } from 'nanoid';
+import { after } from 'node:test';
 
 
 export interface TestAdapterOptions {
@@ -323,6 +324,10 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 		describe.sequential('root directory tests', () => {
 
 			beforeEach(async () => {
+				await adapter.rmdir('/', { recursive: true });
+			});
+
+			afterAll(async () => {
 				await adapter.rmdir('/', { recursive: true });
 			});
 
