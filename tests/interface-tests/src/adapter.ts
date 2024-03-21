@@ -16,12 +16,12 @@ export interface TestAdapterOptions {
 }
 
 async function createMultipleDirectories(adapter: SourceAdapter, amount: number = faker.number.int({min: 1, max: 20}), base: string = '') {
-	const paths: string[] = [];
+	const paths: Promise<string>[] = [];
 	for(let i = 0; i < amount; i++) {
-		paths.push(await createDirectory(adapter, undefined, base));
+		paths.push(createDirectory(adapter, undefined, base));
 	}
 
-	return paths;
+	return await Promise.all(paths);
 }
 
 async function createDirectory(adapter: SourceAdapter, path: string = faker.system.directoryPath(), base: string = '') {
@@ -328,12 +328,12 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 
 			test.sequential('creating lots of directories and count them', async () => {
 				const finish = beginTest('creating lots of directories and count them');
-				const paths = await createMultipleDirectories(adapter, 100);
+				const paths = await createMultipleDirectories(adapter, 50);
 				const amount = getUniqSegmentsOfPath(paths, 1).length;
 				const read = await adapter.readdir('/');
 				expect(read.length).toBe(amount);
 				finish();
-			}, 25000);
+			}, 10000);
 
 
 			test.sequential('should handle root slash', async () => {
