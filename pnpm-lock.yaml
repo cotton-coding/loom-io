@@ -167,14 +167,13 @@ importers:
         version: 5.0.6
 
   tests/test-utils:
-    dependencies:
-      '@loom-io/in-memory-adapter':
-        specifier: workspace:*
-        version: link:../../adapters/in-memory
     devDependencies:
       '@loom-io/common':
         specifier: workspace:*
         version: link:../../packages/common
+      '@loom-io/in-memory-adapter':
+        specifier: workspace:*
+        version: link:../../adapters/in-memory
 
 packages:
 
