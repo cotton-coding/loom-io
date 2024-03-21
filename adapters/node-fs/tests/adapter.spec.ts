@@ -16,6 +16,7 @@ async function cleanDir() {
 
 
 async function createAdapter(): Promise<Adapter> {
+	await createDir();
 	return new Adapter(ROOT_DIR);
 }
 
