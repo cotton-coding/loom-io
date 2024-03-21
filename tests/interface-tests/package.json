@@ -11,8 +11,8 @@
 		"@loom-io/core": "workspace:*"
 	},
 	"dependencies": {
-		"@faker-js/faker": "^8.4.1",
 		"@loom-io/common": "workspace:*",
+		"@faker-js/faker": "^8.4.1",
 		"nanoid": "^5.0.6"
 	},
 	"exports": {
