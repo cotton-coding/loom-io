@@ -9,11 +9,8 @@
 		"prepublishOnly": "pnpm build && publint"
 	},
 	"devDependencies": {
-		"@loom-io/common": "workspace:*"
-	},
-	"peerDependencies": {
-		"@loom-io/in-memory-adapter": "workspace:*",
-		"vitest": "^0.1.3"
+		"@loom-io/common": "workspace:*",
+		"@loom-io/in-memory-adapter": "workspace:*"
 	},
 	"exports": {
 		".": {
