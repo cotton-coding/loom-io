@@ -73,13 +73,16 @@ importers:
 
   adapters/node-fs:
     dependencies:
-      '@faker-js/faker':
-        specifier: ^8.4.1
-        version: 8.4.1
+      '@loom-io/common':
+        specifier: workspace:*
+        version: link:../../packages/common
       '@loom-io/core':
         specifier: workspace:*
         version: link:../../packages/core
     devDependencies:
+      '@faker-js/faker':
+        specifier: ^8.4.1
+        version: 8.4.1
       '@loom-io/interface-tests':
         specifier: workspace:^
         version: link:../../tests/interface-tests

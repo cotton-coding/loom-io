@@ -1,5 +1,6 @@
 import { ObjectDirentInterface } from '@loom-io/core';
 import { Dirent } from 'node:fs';
+import { addPrecedingAndTailingSlash } from '@loom-io/common';
 
 export class ObjectDirent implements ObjectDirentInterface{
 
@@ -22,7 +23,7 @@ export class ObjectDirent implements ObjectDirentInterface{
 
 	get path() {
 		const pathFromRelativeRoot = this._dirent.path.slice(this._rootPath.length);
-		return pathFromRelativeRoot.endsWith('/') ? pathFromRelativeRoot : `${pathFromRelativeRoot}/`;
+		return addPrecedingAndTailingSlash(pathFromRelativeRoot);
 	}
 
 }

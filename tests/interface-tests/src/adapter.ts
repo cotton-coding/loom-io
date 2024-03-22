@@ -1,7 +1,7 @@
 import { describe, test, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
 import type { SourceAdapter } from '@loom-io/core';
-import { faker } from '@faker-js/faker';
-import { dirname, join } from 'node:path';
+import { base, faker } from '@faker-js/faker';
+import { basename, dirname, join } from 'node:path';
 import { getUniqSegmentsOfPath, splitTailingPath } from '@loom-io/common';
 import { nanoid } from 'nanoid';
 
@@ -156,7 +156,7 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 			expect(list[0].name).toEqual('file.txt');
 			expect(list[0].isFile()).toBe(true);
 			expect(list[0].isDirectory()).toBe(false);
-			expect(list[0].path).toEqual('list-dir-content/list/');
+			expect(list[0].path).toEqual('/list-dir-content/list/');
 		});
 
 		test('list dir content with multiple sub directories', async () => {
@@ -224,6 +224,15 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 			await adapter.writeFile(path, content);
 			expect( await adapter.readFile(path, 'utf-8')).toEqual(content);
 		});
+
+		test('write and read without file extension', async () => {
+			const path = join(getRandomPath(), 'file');
+			const content = faker.lorem.words(1000);
+			await adapter.mkdir(dirname(path));
+			await adapter.writeFile(path, content);
+			expect( await adapter.readFile(path)).toEqual(Buffer.from(content));
+		});
+
 
 		test('file exists', async () => {
 			const path = await getPathWithBase(faker.system.commonFileName('js'));
@@ -318,6 +327,22 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 			await handler.read(buffer, { length: 4, offset: bytesRead + 1 });
 			expect(buffer.toString('utf-8')).toBe('content-test');
 			await handler.close();
+		});
+
+		test('Validate DirentObject of file', async () => {
+			const file = await getRandomPath(faker.system.commonFileName('md'));
+			const path = `${dirname(file)}/`;
+			const fileName = basename(file);
+			const content = faker.lorem.words(100);
+			await adapter.mkdir(path);
+			await adapter.writeFile(file, content);
+			const dirents = await adapter.readdir(path);
+			expect(dirents).toHaveLength(1);
+			const dirent = dirents[0];
+			expect(dirent.isFile()).toBe(true);
+			expect(dirent.isDirectory()).toBe(false);
+			expect(dirent.name).toBe(fileName);
+			expect(dirent.path).toBe(path.startsWith('/') ? path : `/${path}`);
 		});
 
 		describe.sequential('root directory tests', () => {

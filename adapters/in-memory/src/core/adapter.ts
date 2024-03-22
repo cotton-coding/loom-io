@@ -16,7 +16,7 @@ export class Adapter implements SourceAdapter {
 	}
 
 	protected compareNameAndType<T extends MemoryObject>(item: T, name: string, type?: MEMORY_TYPE): item is T{
-		const isFile = (item: MemoryObject) => item.$type === MEMORY_TYPE.FILE && `${item.name}.${item.ext}` === name;
+		const isFile = (item: MemoryObject) => item.$type === MEMORY_TYPE.FILE && item.name === name;
 		const isDir = (item: MemoryObject) => item.$type === MEMORY_TYPE.DIRECTORY && item.name === name;
 		if(type === MEMORY_TYPE.FILE) {
 			return isFile(item);
@@ -81,10 +81,11 @@ export class Adapter implements SourceAdapter {
 
 	protected createFile(name: string, content: Buffer = Buffer.alloc(0)): MemoryFile {
 		const parts = name.split('.');
+		const ext = parts.length > 1 ? parts[parts.length-1] : undefined;
 		return {
 			$type: MEMORY_TYPE.FILE,
-			ext: parts.pop(),
-			name: parts.join('.'),
+			ext,
+			name,
 			mtime: new Date(),
 			content
 		};

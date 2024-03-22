@@ -1,5 +1,6 @@
 import { ObjectDirentInterface } from '@loom-io/core';
 import { MEMORY_TYPE, MemoryObject } from '../definitions';
+import { addPrecedingAndTailingSlash } from '@loom-io/common';
 
 export class ObjectDirent implements ObjectDirentInterface{
 
@@ -18,13 +19,13 @@ export class ObjectDirent implements ObjectDirentInterface{
 
 	get name() {
 		if(this._object.$type === MEMORY_TYPE.FILE) {
-			return `${this._object.name}.${this._object.ext}`;
+			return this._object.name;
 		}
 		return this._object.name;
 	}
 
 	get path() {
-		return this._basePath;
+		return addPrecedingAndTailingSlash(this._basePath);
 	}
 
 }

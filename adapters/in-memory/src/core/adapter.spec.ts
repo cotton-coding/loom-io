@@ -18,7 +18,7 @@ class UnwrappedAdapter extends Adapter {
 				name: 'test',
 				content: [{
 					$type: MEMORY_TYPE.FILE,
-					name: 'file',
+					name: 'file.txt',
 					ext: 'txt',
 					mtime: new Date(),
 					content: Buffer.from('test')
@@ -31,7 +31,7 @@ class UnwrappedAdapter extends Adapter {
 					name: 'sub-dir',
 					content: [{
 						$type: MEMORY_TYPE.FILE,
-						name: 'file2',
+						name: 'file2.txt',
 						ext: 'txt',
 						mtime: new Date(),
 						content: Buffer.from('test')
@@ -43,7 +43,7 @@ class UnwrappedAdapter extends Adapter {
 				}]
 			}, {
 				$type: MEMORY_TYPE.FILE,
-				name: 'file2',
+				name: 'file2.txt',
 				ext: 'txt',
 				mtime: new Date(),
 				content: Buffer.from('test')
@@ -52,7 +52,7 @@ class UnwrappedAdapter extends Adapter {
 				name: 'test2',
 				content: [{
 					$type: MEMORY_TYPE.FILE,
-					name: 'file3',
+					name: 'file3.txt',
 					ext: 'txt',
 					mtime: new Date(),
 					content: Buffer.from('test')
@@ -109,7 +109,7 @@ describe('Memory Adapter internal functions', async () => {
 	test('create file object', async () => {
 		const file = adapter.createFile('file.txt', Buffer.from('test'));
 		expect(file.$type).toBe(MEMORY_TYPE.FILE);
-		expect(file.name).toBe('file');
+		expect(file.name).toBe('file.txt');
 		expect(file.ext).toBe('txt');
 		expect(file.content).toEqual(Buffer.from('test'));
 	});
@@ -117,7 +117,7 @@ describe('Memory Adapter internal functions', async () => {
 	test('create empty file object', async () => {
 		const file = adapter.createFile('file.txt');
 		expect(file.$type).toBe(MEMORY_TYPE.FILE);
-		expect(file.name).toBe('file');
+		expect(file.name).toBe('file.txt');
 		expect(file.ext).toBe('txt');
 		expect(file.content.toString('utf-8')).toEqual('');
 	});
@@ -170,8 +170,8 @@ describe('Memory Adapter internal functions', async () => {
 
 		expect(ref.content.length).toBe(1);
 		expect(ref.content[0]).toBe(file);
-		const [name, ext] = fileName!.split('.');
-		expect(file.name).toBe(name);
+		const [, ext] = fileName!.split('.');
+		expect(file.name).toBe(fileName);
 		expect(file.ext).toBe(ext);
 	});
 
