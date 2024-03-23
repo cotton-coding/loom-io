@@ -175,4 +175,8 @@ dist
 .DS_Store
 
 # Test directory
-test/tmp/
+**/test/tmp/
+
+tests/integration/test-tmp/
+
+test-tmp/

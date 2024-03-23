@@ -1,66 +1,41 @@
 {
-  "name": "@loom-io/fs",
-  "module": "dist/exports/lib.js",
-  "main": "dist/exports/lib.js",
-  "types": "dist/exports/lib.d.ts",
-  "author": "Cotton Coding",
-  "license": "MIT",
-  "version": "0.6.0",
-  "description": "A file system wrapper for Node.js and Bun",
-  "keywords": [
-    "bun",
-    "fs",
-    "directory",
-    "dir",
-    "file",
-    "file system",
-    "filesystem",
-    "node",
-    "nodejs",
-    "wrapper"
-  ],
-  "files": [
-    "dist"
-  ],
-  "type": "module",
-  "scripts": {
-    "test": "vitest --typecheck.enabled --test-timeout=500",
-    "test:ci": "npm run test -- --run --coverage",
-    "lint": "eslint --ext .ts .",
-    "lint:fix": "eslint --ext .ts . --fix",
-    "build": "tsc --project tsconfig.json",
-    "prepublishOnly": "npm run build && publint"
-  },
-  "devDependencies": {
-    "@faker-js/faker": "^8.4.0",
-    "@types/node": "^20.11.0",
-    "@typescript-eslint/eslint-plugin": "latest",
-    "@typescript-eslint/parser": "latest",
-    "@vitest/coverage-v8": "^1.2.2",
-    "eslint": "^8.56.0",
-    "publint": "^0.2.7",
-    "vitest": "^1.2.2"
-  },
-  "peerDependencies": {
-    "typescript": "^5.0.0"
-  },
-  "dependencies": {
-    "yaml": "^2.3.4"
-  },
-  "exports": {
-    ".": {
-      "types": "./dist/exports/lib.d.ts",
-      "import": "./dist/exports/lib.js"
-    }
-  },
-  "maintainers": [
-    {
-      "name": "Wolfgang Rathgeb",
-      "email": "ghost+npm@dropanote.de"
-    }
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/cotton-coding/loom.git"
-  }
+	"name": "loom-io",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"build:common": "pnpm run --filter @loom-io/common build",
+		"build:core": "pnpm run --filter @loom-io/core build",
+		"build:pre": "pnpm run build:common && pnpm run build:core",
+		"build": "pnpm run build:pre && pnpm run --recursive build",
+		"prepublishOnly": "pnpm run build:pre && pnpm run --recursive prepublishOnly",
+		"test": "vitest",
+		"test:ci": "vitest --run --coverage",
+		"lint": "pnpm run --recursive lint",
+		"lint:fix": "pnpm run --recursive lint:fix"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "MIT",
+	"maintainers": [
+		{
+			"name": "Wolfgang Rathgeb",
+			"email": "ghost+npm@dropanote.de"
+		}
+	],
+	"devDependencies": {
+		"@faker-js/faker": "^8.4.1",
+		"@types/node": "^20.11.28",
+		"@typescript-eslint/eslint-plugin": "latest",
+		"@typescript-eslint/parser": "latest",
+		"@vitest/coverage-v8": "^1.4.0",
+		"eslint": "^8.57.0",
+		"publint": "^0.2.7",
+		"typescript": "^5.4.2",
+		"vitest": "^1.4.0"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/cotton-coding/loom-io.git"
+	}
 }

@@ -12,18 +12,28 @@ jobs:
   test:
     name: lint & test
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [18, 20]
     steps:
       - uses: actions/checkout@v4
-      - name: Setup NodeJs
+      - name: pnpm-setup
+        uses: pnpm/action-setup@v3
+        with:
+          version: latest
+      - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: latest
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
       - name: Install
-        run: npm ci
+        run: pnpm install
+      - name: Run build to resolve dependencies
+        run: pnpm build
       - name: Lint & Fix
-        run: npm run lint:fix
+        run: pnpm lint:fix
       - name: Test
-        run: npm run test:ci
+        run: pnpm test:ci
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         env:
@@ -39,16 +49,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: pnpm-setup
+        uses: pnpm/action-setup@v3
+        with:
+          version: latest
       - name: Setup NodeJs
         uses: actions/setup-node@v4
         with:
           node-version: latest
           registry-url: https://registry.npmjs.org/
+          cache: "pnpm"
       - name: Install
-        run: npm ci
+        run: pnpm install
       - name: Build && publint
-        run: npm run prepublishOnly
+        run: pnpm run prepublishOnly
       - name: Publish Dry Run
-        run: npm publish --dry-run
+        run: pnpm publish --dry-run --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
