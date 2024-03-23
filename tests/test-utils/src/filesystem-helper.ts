@@ -80,7 +80,7 @@ export class FilesystemHelper {
 export class FileObject {
 
 	private _includeBasePath = false;
-    
+
 	constructor(
             private basePath: string,
             private path: string,
@@ -91,15 +91,15 @@ export class FileObject {
 		this._includeBasePath = setTo;
 		return this;
 	}
-    
+
 	getPath() {
 		return this._includeBasePath ? joinPath(this.basePath, this.path) : this.path;
 	}
-    
+
 	getContent() {
 		return this.content;
 	}
-    
+
 }
 
 export class PathObject {
@@ -133,14 +133,14 @@ export class PathObject {
 				return parts.slice(0, dept).join('/');
 			});
 		}
-		
+
 		if(this._includeBasePath) {
 			const p = paths.map((path) => joinPath(this.basePath, path));
 			return Array.from(new Set(p));
 		}
 		return Array.from(new Set(paths));
 	}
-    
+
 	[Symbol.iterator]() {
 		let index = 0;
 		const paths = this.paths;

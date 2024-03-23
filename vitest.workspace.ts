@@ -5,7 +5,7 @@ export default defineWorkspace([
 	'adapters/*',
 	{
 		test: {
-			include: ['tests/test-utils/**/*'],
+			include: ['tests/test-utils/**/*.spec.ts'],
 			name: 'test-helper',
 			environment: 'node'
 		}
