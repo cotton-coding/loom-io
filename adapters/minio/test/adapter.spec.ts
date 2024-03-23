@@ -2,7 +2,7 @@ import { TestAdapter } from '@loom-io/interface-tests';
 import { Adapter } from '../src/core/adapter';
 import { Client } from 'minio';
 
-const DEFAULT_BUCKET: string = 'cotton-coding';
+const DEFAULT_BUCKET: string = `cotton-coding-${Math.random().toString(36).substring(7)}`;
 
 
 const s3Client = new Client({
@@ -29,6 +29,11 @@ async function cleanBucketForce(client: Client, bucket: string) {
 	}
 }
 
+async function deleteBucket(client: Client, bucket: string) {
+	await cleanBucketForce(client, bucket);
+	await client.removeBucket(bucket);
+}
+
 
 
 async function createAdapter(client, bucket): Promise<Adapter> {
@@ -41,4 +46,4 @@ async function createAdapter(client, bucket): Promise<Adapter> {
 }
 
 
-TestAdapter(await createAdapter(s3Client, DEFAULT_BUCKET));
+TestAdapter(await createAdapter(s3Client, DEFAULT_BUCKET), { afterAll: deleteBucket.bind(null, s3Client, DEFAULT_BUCKET)});

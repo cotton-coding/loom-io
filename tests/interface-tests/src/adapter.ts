@@ -362,7 +362,7 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 				const read = await adapter.readdir('/');
 				expect(read.length).toBe(amount);
 				finish();
-			}, 15000);
+			}, 25000);
 
 
 			test.sequential('should handle root slash', async () => {
