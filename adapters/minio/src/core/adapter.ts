@@ -1,7 +1,7 @@
 import type { BucketItem, Client }	from 'minio';
 import { ObjectDirent } from './object-dirent.js';
 import { FileHandler } from './file-handler.js';
-import type { SourceAdapter, rmdirOptions, ObjectDirentInterface } from '@loom-io/core';
+import { type SourceAdapter, type rmdirOptions, type ObjectDirentInterface, DirectoryNotEmptyException } from '@loom-io/core';
 import { removePrecedingSlash } from '@loom-io/common';
 
 function addTailSlash(path: string): string {
@@ -149,7 +149,7 @@ export class Adapter implements SourceAdapter {
 			return;
 		} else {
 			if(await this.dirHasFiles(path)) {
-				throw new Error('Directory is not empty');
+				throw new DirectoryNotEmptyException(path);
 			}
 			const pathWithTailSlash = path.endsWith('/') ? path : `${path}/`;
 			await this.s3.removeObject(this.bucket, pathWithTailSlash);

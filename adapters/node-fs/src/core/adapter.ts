@@ -1,7 +1,7 @@
 import { FileHandler } from './file-handler.js';
 import * as fs from 'node:fs/promises';
 import type { SourceAdapter, rmdirOptions, ObjectDirentInterface } from '@loom-io/core';
-import { PathNotExistsException } from '@loom-io/core';
+import { DirectoryNotEmptyException, PathNotExistsException } from '@loom-io/core';
 import { PathLike } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { isNodeErrnoExpression } from '../utils/error-handling.js';
@@ -56,17 +56,29 @@ export class Adapter implements SourceAdapter {
 	}
 
 	async rmdir(path: string, options: rmdirOptions= {}): Promise<void> {
-		path = path.trim();
-		const fullPath = this.getFullPath(path);
-		if(options.recursive || options.force) {
-			await fs.rm(fullPath, options);
-			if(path === '/' || path === '') {
-				await fs.mkdir(this.rootdir);
+		try {
+			path = path.trim();
+			const fullPath = this.getFullPath(path);
+			if(options.recursive || options.force) {
+				await fs.rm(fullPath, options);
+				if(path === '/' || path === '') {
+					await fs.mkdir(this.rootdir);
+				}
+			} else {
+				if(path !== '/' && path !== '') {
+					await fs.rmdir(fullPath);
+				}
 			}
-		} else {
-			if(path !== '/' && path !== '') {
-				await fs.rmdir(fullPath);
+		} catch (err) {
+			if(isNodeErrnoExpression(err)) {
+				switch(err.code) {
+				case 'ENOTEMPTY':
+					throw new DirectoryNotEmptyException(path);
+				case 'ENOENT':
+					throw new PathNotExistsException(path);
+				}
 			}
+			throw err;
 		}
 	}
 

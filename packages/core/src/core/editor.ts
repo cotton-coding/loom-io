@@ -1,7 +1,7 @@
 import { LoomFile } from './file.js';
-import * as fs from 'fs/promises';
 import { LineResult, SearchResult } from '../helper/result.js';
 import { TextItemList } from '../helper/textItemList.js';
+import { FileHandler, SourceAdapter } from '../definitions.js';
 
 interface ReadWrite {
 	getSizeInBytes(): Promise<number>;
@@ -33,16 +33,15 @@ export class Editor implements Reader, Writer, ReaderInternal{
 	protected newLineCharacter: Buffer = Buffer.from('\n'); //0x0a = \n
 	protected currentLine: number = 0;
 	protected EOF: boolean = false;
-	//protected watcher: IterableIterator<fs.FileChangeInfo<string>>;
 
-	static async from(file: LoomFile): Promise<Editor> {
-		const handler = await fs.open(file.path);
+	static async from(adapter: SourceAdapter, file: LoomFile): Promise<Editor> {
+		const handler = await adapter.openFile(file.path);
 		return new Editor(file, handler);
 	}
 
 	constructor(
 		protected ref: LoomFile,
-		protected file: fs.FileHandle
+		protected file: FileHandler
 	) {
 
 		// TODO: watch file for changes
@@ -202,7 +201,7 @@ export class Editor implements Reader, Writer, ReaderInternal{
 	 */
 	async read(start: number, length: number): Promise<Buffer> {
 		const buffer = Buffer.alloc(length);
-		const data = await this.file.read({position: start, buffer});
+		const data = await this.file.read(buffer, {position: start});
 		return data.buffer;
 	}
 

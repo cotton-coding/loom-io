@@ -2,10 +2,11 @@ import { expect, describe, test, beforeEach, afterEach } from 'vitest';
 import { List } from './list';
 import { Directory } from './dir';
 import { LoomFile } from './file';
-import { TestFilesystemHelper } from '../../test/helpers/testFilesystemHelper';
+import { InMemoryAdapterHelper } from '@loom-io/test-utils';
+import { getUniqSegmentsOfPath, removePrecedingSlash } from '@loom-io/common';
 
 class RevealedList extends List {
-	
+
 	constructor(list?: List) {
 		super();
 		if(list){
@@ -14,7 +15,7 @@ class RevealedList extends List {
 	}
 
 	getWraps() {
-		return this.dirWrap;
+		return this._dirent;
 	}
 
 	revealedAdd(...params: unknown[]) {
@@ -26,14 +27,18 @@ class RevealedList extends List {
 describe('Test List', () => {
 
 
-	let testHelper: TestFilesystemHelper;
+	let adapterHelper: InMemoryAdapterHelper;
+	let adapter: InMemoryAdapterHelper['adapter'];
 
 	beforeEach(async () => {
-		testHelper = await TestFilesystemHelper.init();
+		adapterHelper = InMemoryAdapterHelper.init();
+		adapterHelper.createDirectory('test/data');
+
+		adapter = adapterHelper.adapter;
 	});
 
 	afterEach(async () => {
-		await testHelper.destroy();
+		await adapterHelper.destroy();
 	});
 
 
@@ -45,7 +50,7 @@ describe('Test List', () => {
 		});
 
 		test('Create Instance with DirentWrapper', async () => {
-			const dir = new Directory('./test/data');
+			const dir = new Directory(adapter, './test/data');
 			const list = await dir.list();
 			const revealedList = new RevealedList(list);
 			expect(list).toBeInstanceOf(List);
@@ -55,7 +60,7 @@ describe('Test List', () => {
 		});
 
 		test('Create Instance with Directory', async () => {
-			const dir = new Directory('./test/data');
+			const dir = new Directory(adapter, './test/data');
 			const list = await dir.list();
 			const revealedList = new RevealedList(list);
 			expect(list).toBeInstanceOf(List);
@@ -68,41 +73,54 @@ describe('Test List', () => {
 
 		test('Concat Lists', async () => {
 
-			await testHelper.createFile('testDir/testFile.txt');
-			const testSub1 = await testHelper.createSubDir('testDir1');
-			const testSub2 = await testHelper.createSubDir('testDir2');
+			await adapterHelper.createFile('testDir/testFile.txt');
+			const base1 = 'cotton';
+			const base2 = 'wool';
 
-			const testPaths1 = (await testSub1.createDirs(7)).getPaths(1);
-			const testPaths2 = (await testSub2.createDirs(13)).getPaths(1);
+			const testPaths1 = adapterHelper.createMultipleDirectories(7, base1);
+			const testPaths2 = adapterHelper.createMultipleDirectories(13, base2);
 
-			const dir1 = new Directory(testSub1.getBasePath());
-			const dir2 = new Directory(testSub2.getBasePath());
+			const basePaths1 = Array.from(new Set(testPaths1.map((path) => removePrecedingSlash(path).split('/').splice(1, 1)).flat()));
+			const basePaths2 = Array.from(new Set(testPaths2.map((path) => removePrecedingSlash(path).split('/').splice(1, 1)).flat()));
+
+			const dir1 = new Directory(adapter, base1);
+			const dir2 = new Directory(adapter, base2);
 			const list1 = await dir1.list();
 
 			expect(list1).toBeInstanceOf(List);
-			expect(list1).toHaveLength(testPaths1.length);
+			expect(list1).toHaveLength(basePaths1.length);
 
 			const list2 = await dir2.list();
 
 			expect(list2).toBeInstanceOf(List);
-			expect(list2).toHaveLength(testPaths2.length);
+			expect(list2).toHaveLength(basePaths2.length);
 
 			const list = list1.concat(list2);
 
 			expect(list).toBeInstanceOf(List);
-			expect(list).toHaveLength(testPaths1.length + testPaths2.length);
+			expect(list).toHaveLength(basePaths1.length + basePaths2.length);
 		});
 
 	});
 
 	describe('Filter', () => {
 
-		test('Filter function', async () => {
-			await testHelper.createDir('testDir');
-			await testHelper.createDirs();
-			await testHelper.createFile('testFile.txt');
+		beforeEach(async () => {
+			adapterHelper = InMemoryAdapterHelper.init();
+			adapter = adapterHelper.adapter;
+		});
 
-			const dir = new Directory(testHelper.getBasePath());
+		afterEach(async () => {
+			await adapterHelper.destroy();
+		});
+
+		test('Filter function', async () => {
+			await adapterHelper.createDirectory('testDir');
+			await adapterHelper.createMultipleDirectories();
+			await adapterHelper.createFile('testFile.txt');
+
+			// TODO: Handle '/' and './' and '.'
+			const dir = new Directory(adapter, '/');
 			const list = await dir.list();
 			const filtered = list.filter((wrap) => wrap.name === 'testDir');
 			expect(filtered).toBeInstanceOf(List);
@@ -112,12 +130,12 @@ describe('Test List', () => {
 
 		test('filter function with subDir', async () => {
 			const subDirName = 'testDir';
-			const testSub = await testHelper.createSubDir(subDirName);
-			await testSub.createFile('lorem', {path: 'some.log'});
-			await testHelper.createDirs();
-			await testHelper.createFile('testFile.txt');
+			adapterHelper.createDirectory(subDirName);
+			adapterHelper.createFile(`${subDirName}/some.log`, 'lorem');
+			adapterHelper.createMultipleDirectories();
+			adapterHelper.createFile('testFile.txt');
 
-			const dir = new Directory(testHelper.getBasePath());
+			const dir = new Directory(adapter, '/');
 			const list = await dir.list();
 			const filtered = list.filter((wrap) => wrap.name === subDirName);
 			expect(filtered).toBeInstanceOf(List);
@@ -125,21 +143,21 @@ describe('Test List', () => {
 
 			expect(filtered.first()).toBeInstanceOf(Directory);
 			const file = (await filtered.first<Directory>().list()).first();
-			
+
 			expect(file).toBeInstanceOf(LoomFile);
 
 		});
 
 		test('filterByDirent directory', async () => {
-			await testHelper.createDir('testDir');
-			await testHelper.createDirs();
-			await testHelper.createFile('testFile.txt');
+			await adapterHelper.createDirectory('testDir');
+			await adapterHelper.createMultipleDirectories();
+			await adapterHelper.createFile('testFile.txt');
 
-			const dir = new Directory(testHelper.getBasePath());
+			const dir = new Directory(adapter, '/');
 			const list = await dir.list();
 			const filtered = list.filterByType('isDirectory');
 			expect(filtered).toBeInstanceOf(List);
-			
+
 			for(const dir of filtered) {
 				expect(dir).toBeInstanceOf(Directory);
 			}
@@ -147,19 +165,19 @@ describe('Test List', () => {
 		});
 
 		test('filterByDirent file', async () => {
-			await testHelper.createDir('testDir');
-			await testHelper.createDirs();
-			await testHelper.createFile('lorem', {path: 'some.log'});
-			await testHelper.createFile('lorems', {path: 'some.ltest'});
-			await testHelper.createFile();
-			await testHelper.createFile();
+			await adapterHelper.createDirectory('testDir');
+			await adapterHelper.createMultipleDirectories();
+			await adapterHelper.createFile('some.log', 'lorem');
+			await adapterHelper.createFile('some.ltest', 'lorems');
+			await adapterHelper.createFile();
+			await adapterHelper.createFile();
 
 
-			const dir = new Directory(testHelper.getBasePath());
+			const dir = new Directory(adapter, '/');
 			const list = await dir.list();
 			const filtered = list.filterByType('isFile');
 			expect(filtered).toBeInstanceOf(List);
-			
+
 			for(const file of filtered) {
 				expect(file).toBeInstanceOf(LoomFile);
 			}
@@ -169,15 +187,26 @@ describe('Test List', () => {
 	});
 
 	describe('Iterator', () => {
-		
+
+		beforeEach(async () => {
+			adapterHelper = InMemoryAdapterHelper.init();
+			adapter = adapterHelper.adapter;
+		});
+
+		afterEach(async () => {
+			await adapterHelper.destroy();
+		});
+
 		test('Iterate over list', async () => {
-			await testHelper.createDir('testDir');
-			const amount = (await testHelper.createDirs()).getPaths(1).length;
-			await testHelper.createFile('lorem', {path: 'some.log'});
+			await adapterHelper.createDirectory('testDir');
+			const paths = adapterHelper.createMultipleDirectories();
+
+			const amount = getUniqSegmentsOfPath(paths, 1).length;
+			await adapterHelper.createFile('some.log', 'lorem');
 
 			const total = amount + 2;
 
-			const dir = new Directory(testHelper.getBasePath());
+			const dir = new Directory(adapter, '/');
 			const list = await dir.list();
 			expect(list).toHaveLength(total);
 
@@ -195,26 +224,38 @@ describe('Test List', () => {
 	});
 
 	describe('Getters', () => {
+
+		beforeEach(async () => {
+			adapterHelper = InMemoryAdapterHelper.init();
+			adapter = adapterHelper.adapter;
+		});
+
+		afterEach(async () => {
+			await adapterHelper.destroy();
+		});
+
 		test('Get length', async () => {
-			await testHelper.createDir('testDir');
-			const amount = (await testHelper.createDirs()).getPaths(1).length;
-			await testHelper.createFile('lorem', {path: 'some.log'});
+			await adapterHelper.createDirectory('testDir');
+			const paths = await adapterHelper.createMultipleDirectories();
+			const amount = getUniqSegmentsOfPath(paths, 1).length;
+			await adapterHelper.createFile('some.log', 'lorem');
 
 			const total = amount + 2;
 
-			const dir = new Directory(testHelper.getBasePath());
+			const dir = new Directory(adapter, '/');
 			const list = await dir.list();
 			expect(list).toHaveLength(total);
 		});
 
 		test('Get first', async () => {
-			await testHelper.createDir('testDir');
-			const amount = (await testHelper.createDirs()).getPaths(1).length;
-			await testHelper.createFile('lorem', {path: 'some.log'});
+			await adapterHelper.createDirectory('testDir');
+			const paths = await adapterHelper.createMultipleDirectories();
+			const amount = getUniqSegmentsOfPath(paths, 1).length;
+			await adapterHelper.createFile('some.log', 'lorem');
 
 			const total = amount + 2;
 
-			const dir = new Directory(testHelper.getBasePath());
+			const dir = new Directory(adapter, '/');
 			const list = await dir.list();
 			expect(list).toHaveLength(total);
 
@@ -226,13 +267,14 @@ describe('Test List', () => {
 		});
 
 		test('Get last', async () => {
-			await testHelper.createDir('testDir');
-			const amount = (await testHelper.createDirs()).getPaths(1).length;
-			await testHelper.createFile('lorem', {path: 'some.log'});
+			await adapterHelper.createDirectory('testDir');
+			const paths = await adapterHelper.createMultipleDirectories();
+			const amount = getUniqSegmentsOfPath(paths, 1).length;
+			await adapterHelper.createFile('some.log', 'lorem');
 
 			const total = amount + 2;
 
-			const dir = new Directory(testHelper.getBasePath());
+			const dir = new Directory(adapter, '/');
 			const list = await dir.list();
 			expect(list).toHaveLength(total);
 
@@ -247,7 +289,7 @@ describe('Test List', () => {
 	describe('protected functions', () => {
 
 		test('Add DirentWrapper', async () => {
-			const dir = new Directory('./test/data');
+			const dir = new Directory(adapter, './test/data');
 			const list = await dir.list();
 			const revealedList = new RevealedList(list);
 			const paths = revealedList.getWraps();
@@ -257,7 +299,7 @@ describe('Test List', () => {
 		});
 
 		test('Add List', async () => {
-			const dir = new Directory('./test/data');
+			const dir = new Directory(adapter, './test/data');
 			const list = await dir.list();
 			const revealedList = new RevealedList(list);
 			const newList = new RevealedList();

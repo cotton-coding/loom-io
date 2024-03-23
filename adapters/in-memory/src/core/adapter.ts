@@ -1,5 +1,5 @@
 import { FileHandler } from './file-handler.js';
-import { type SourceAdapter, type rmdirOptions, type ObjectDirentInterface, PathNotExistsException } from '@loom-io/core';
+import { type SourceAdapter, type rmdirOptions, type ObjectDirentInterface, PathNotExistsException, DirectoryNotEmptyException } from '@loom-io/core';
 import { AlreadyExistsException, NotFoundException } from '../exceptions';
 import { ObjectDirent } from './object-dirent.js';
 import { MEMORY_TYPE, MemoryDirectory, MemoryFile, MemoryObject, MemoryRoot } from '../definitions';
@@ -159,19 +159,21 @@ export class Adapter implements SourceAdapter {
 			const [subPath, tail] = splitTailingPath(removePrecedingAndTrailingSlash(path));
 			const subElement = this.getLastPartOfPath(subPath, MEMORY_TYPE.DIRECTORY);
 
-			if(!tail) {
+			if(!tail) { // Handle root directory
 				if(subElement.content.length > 0 && (!options.recursive && !options.force)) {
-					throw new Error('Directory is not empty');
+					throw new DirectoryNotEmptyException(path);
 				}
 				subElement.content = [];
 				return;
 			}
 
 
-			if((!options.recursive || !options.force)) {
+			if((!options.recursive && !options.force)) {
 				const element = subElement.content.find(isMemoryDirectoryAndMatchNamePrepared(tail));
-				if(element !== undefined && element.content.length > 0) {
-					throw new Error('Directory is not empty');
+				if(element == null) {
+					throw new PathNotExistsException(path);
+				}else if(element.content.length > 0) {
+					throw new DirectoryNotEmptyException(path);
 				}
 			}
 

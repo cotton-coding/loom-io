@@ -1,82 +1,87 @@
 import { describe, test, expect, beforeEach, afterEach } from 'vitest';
 import { Directory } from './dir.js';
-
-import { TestFilesystemHelper } from '../../test/helpers/testFilesystemHelper.js';
+import { join as joinPath } from 'node:path';
+import { InMemoryAdapterHelper } from '@loom-io/test-utils';
 import { LoomFile } from './file.js';
+import { DirectoryNotEmptyException } from '../exceptions.js';
+import { addPrecedingSlash, getUniqSegmentsOfPath } from '@loom-io/common';
 
 describe('Test Directory Service', () => {
-	test('Create Instance and set path', () => {
-		const path = 'test/data';
-		const dir = new Directory(path);
-		expect(dir).toBeInstanceOf(Directory);
-		expect(dir.path).toBe(`${process.cwd()}/${path}`);
+
+	let adapter: InMemoryAdapterHelper['adapter'];
+
+	beforeEach(() => {
+		const helper = InMemoryAdapterHelper.init();
+		adapter = helper.adapter;
+	});
+
+	test('path', () => {
+		const dir = new Directory(adapter, './test/data');
+		expect(dir.path).toBe('test/data');
 	});
 
 	test('relativePath', () => {
-		const dir = new Directory('./test/');
-		const dir2 = new Directory('./test/data');
+		const dir = new Directory(adapter, './test/');
+		const dir2 = new Directory(adapter, './test/data');
 		expect(dir.relativePath(dir2)).toBe('data');
 	});
 
 	test('exists', async () => {
-		const dir = new Directory('./test/data/');
+		adapter.mkdir('test/data');
+		const dir = new Directory(adapter, './test/data/');
 		const exists = await dir.exists();
 		expect(exists).toBeTruthy();
 	});
 
 	test('not exists', async () => {
-		const dir = new Directory('./test/data-not-exists');
+		const dir = new Directory(adapter, './test/data-not-exists');
 		const exists = await dir.exists();
 		expect(exists).toBeFalsy();
 	});
 
-	test('path', () => {
-		const testPath = 'test/data';
-		const dir = new Directory(`./${testPath}`);
-		expect(dir.path).toBe(`${process.cwd()}/${testPath}`);
-	});
-
 	test('parent', () => {
-		const dir = new Directory('./test/data');
+		const dir = new Directory(adapter, './test/data');
 		expect(dir.parent).toBeInstanceOf(Directory);
-		expect(dir.parent!.path).toBe(`${process.cwd()}/test`);
+		expect(dir.parent!.path).toBe('/test');
 	});
 
 	test('parent of root', () => {
-		const root = new Directory('/');
+		const root = new Directory(adapter, '/');
 		expect(root.parent).toBe(undefined);
 	});
 
 	test('parent of first level after root', () => {
-		const dir = new Directory('/etc');
+		const dir = new Directory(adapter, '/etc');
 		expect(dir.parent).toBeDefined();
 		expect(dir.parent!.path).toBe('/');
 	});
 
 	describe('with generated file', () => {
 
-		let testHelper: TestFilesystemHelper;
+		let adapterHelper: InMemoryAdapterHelper;
+		let adapter: InMemoryAdapterHelper['adapter'];
 
 		beforeEach(async () => {
-    
-			testHelper = await TestFilesystemHelper.init();
+			adapterHelper = await InMemoryAdapterHelper.init();
+			adapterHelper.createDirectory();
+			adapter = adapterHelper.adapter;
 		});
 
 		afterEach(() => {
-			testHelper.destroy();
+			adapterHelper.destroy();
 		});
 
 		test('create', async () => {
-			const dir = new Directory(testHelper.getBasePath(), 'to_delete');
+
+			const dir = new Directory(adapter, adapterHelper.last!, 'to_delete');
 			await dir.create();
-			const exists = await dir.exists();
-			expect(exists).toBeTruthy();
+			await expect(dir.exists()).resolves.toBeTruthy();
 		});
 
 		describe('delete', () => {
 
 			test('create and delete a file non recursive', async () => {
-				const dir = new Directory(testHelper.getBasePath(), 'to_delete');
+				const dir = new Directory(adapter, adapterHelper.last!, 'to_delete');
 				await dir.create();
 				expect(await dir.exists()).toBeTruthy();
 				await dir.delete();
@@ -84,65 +89,66 @@ describe('Test Directory Service', () => {
 			});
 
 			test('delete a non existing file', async () => {
-				const dir = new Directory(testHelper.getBasePath(), 'to_delete');
+				const dir = new Directory(adapter, adapterHelper.last!, 'to_delete');
 				await dir.delete();
 				expect(await dir.exists()).toBeFalsy();
 			});
 
-			test('try to delete a non existing file with strict mode', async () => {
-				const dir = new Directory(testHelper.getBasePath(), 'to_delete');
+			test('try to delete a non existing dir in strict mode', async () => {
+				const dir = new Directory(adapter, adapterHelper.last!, 'to_delete');
 				dir.strict();
 				await expect(dir.delete()).rejects.toThrow();
 			});
 
 			test('delete a non empty directory', async () => {
-				const dir = new Directory(testHelper.getBasePath(), 'to_delete');
+				const dir = new Directory(adapter, adapterHelper.last!, 'to_delete');
 				await dir.create();
-				await testHelper.createFile('some content', {path: 'to_delete/test.txt'});
-				await expect(dir.delete()).rejects.toThrow();
+				await expect(dir.exists()).resolves.toBeTruthy();
+				await adapterHelper.createFile(joinPath(adapterHelper.last!, 'to_delete/cotton.txt'));
+				await expect(dir.delete()).rejects.toThrow(DirectoryNotEmptyException);
 				await expect(dir.exists()).resolves.toBeTruthy();
 			});
 
 			test('delete a non empty directory recursive', async () => {
-				const dir = new Directory(testHelper.getBasePath(), 'to_delete');
+				const dir = new Directory(adapter, adapterHelper.last!, 'to_delete');
 				await dir.create();
-				await testHelper.createFile('some content', {path: 'to_delete/test_some_other'});
+				await adapterHelper.createFile(joinPath(adapterHelper.last!, 'to_delete/test_some_other'));
 				await dir.delete(true);
-				expect(await dir.exists()).toBeFalsy();
+				await expect(dir.exists()).resolves.toBeFalsy();
 			});
 
 		});
 		describe('list method', () => {
 
 			test('list directory amount', async () => {
-				await testHelper.createDir('testDir');
-				await testHelper.createDir('testDir2/testDir3');
-				await testHelper.createFile('testDir23/testFile.txt');
+				const base = adapterHelper.last!;
+				await adapterHelper.createDirectory(joinPath(base, 'testDir1'));
+				await adapterHelper.createDirectory(joinPath(base, 'testDir2/testDir3'));
+				await adapterHelper.createFile(joinPath(base, 'testDir23/testFile.txt'));
 
-				const dir = new Directory(testHelper.getBasePath());
+				const dir = new Directory(adapter, base);
 				const files = await dir.list();
 				expect(files).toHaveLength(3);
 
 			});
 
 			test('list directory' , async () => {
-				const testDir = (await testHelper.createDirs()).includeBasePath().getPaths(1);
-
-				const dir = new Directory(testHelper.getBasePath());
+				const testDir = adapterHelper.createMultipleDirectories(100);
+				const listOfUniques = getUniqSegmentsOfPath(testDir, 1);
+				const dir = new Directory(adapter, '/');
 				const paths = await dir.list();
 				for(const t of paths) {
-					expect(testDir).toContain((t as Directory).path);
+					expect(listOfUniques).toContain((t as Directory).path);
 				}
 			});
 
 			test('list with subDirectory', async () => {
 				const subPath = 'someRandomTestDir';
-				const testSubHelper = testHelper.createSubDir(subPath);
-				const testDir = (await testSubHelper.createDirs(30)).includeBasePath().getPaths(1);
-				await testHelper.createDirs(7);
+				const testPaths = await adapterHelper.createMultipleDirectories(7, subPath);
+				const testDir = getUniqSegmentsOfPath(testPaths, 2).map(p => addPrecedingSlash(p));
 
 
-				const dir = new Directory(testHelper.getBasePath());
+				const dir = new Directory(adapter, '/');
 				const paths = await dir.subDir(subPath).list();
 				for(const t of paths) {
 					expect(testDir).toContain((t as Directory).path);
@@ -154,7 +160,7 @@ describe('Test Directory Service', () => {
 			// 	await testHelper.createDirs(30);
 			// 	await testHelper.createDirs(2);
 
-			// 	const dir = new Directory(testHelper.getBasePath());
+			// 	const dir = new Directory(adapter, testHelper.getBasePath());
 			// 	const paths = await dir.list(undefined, 'isDirectory');
 			// 	expect(paths[0]).toHaveLength(2);
 			// 	expect(paths[0][0]).toBeTypeOf('string');
@@ -164,7 +170,7 @@ describe('Test Directory Service', () => {
 			// test('list with additional multiple params', async () => {
 			// 	await testHelper.createFile('testFile', {path: 'testFile.txt'});
 
-			// 	const dir = new Directory(testHelper.getBasePath());
+			// 	const dir = new Directory(adapter, testHelper.getBasePath());
 			// 	const paths = await dir.list(undefined, 'isDirectory', 'isFile');
 			// 	expect(paths[0]).toHaveLength(3);
 			// 	expect(paths[0][0]).toBeTypeOf('string');
@@ -174,17 +180,17 @@ describe('Test Directory Service', () => {
 		});
 
 		describe('files method', () => {
-                
-			test('files test returned amount', async () => {
-				await testHelper.createDirs();
-				await testHelper.createFile('lorem-dorem', {path: 'dorem/tt.txt'});
-				await testHelper.createFile('lorem', {path: 'tt2.txt'});
 
-				const dir = new Directory(testHelper.getBasePath());
+			test('files test returned amount', async () => {
+				await adapterHelper.createMultipleDirectories();
+				await adapterHelper.createFile('dorem/tt.txt', 'lorem-dorem');
+				await adapterHelper.createFile('tt2.txt', 'lorem');
+
+				const dir = new Directory(adapter, '/');
 
 				const files = await dir.files();
 				expect(files).toHaveLength(1);
-                
+
 				for(const f of files) {
 					expect(f).toBeInstanceOf;
 					expect(await (f as LoomFile).text()).toBe('lorem');
@@ -194,16 +200,16 @@ describe('Test Directory Service', () => {
 			});
 
 			test('get files recursive', async () => {
-				await testHelper.createDirs();
-				await testHelper.createFile('lorem', {path: 'dorem/tt.txt'});
-				await testHelper.createFile('lorem');
-				await testHelper.createFile('lorem');
+				await adapterHelper.createMultipleDirectories();
+				await adapterHelper.createFile('dorem/tt.txt', 'lorem');
+				await adapterHelper.createFile('random/path/to/cotton/coding/lorem.txt', 'lorem');
+				await adapterHelper.createFile('more/lorem.txt', 'lorem');
 
-				const dir = new Directory(testHelper.getBasePath());
+				const dir = new Directory(adapter, '/');
 
 				const files = await dir.files(true);
 				expect(files).toHaveLength(3);
-								
+
 				for(const f of files) {
 					expect(f).toBeInstanceOf;
 					expect(await (f as LoomFile).text()).toBe('lorem');
@@ -211,7 +217,7 @@ describe('Test Directory Service', () => {
 			});
 
 		});
-        
+
 
 	});
 });

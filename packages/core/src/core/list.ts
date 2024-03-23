@@ -1,7 +1,7 @@
-import type { Dirent } from 'fs';
 import { Directory } from './dir.js';
 import { DirentWrapper } from '../wrapper/dirent.js';
 import type { LoomFile } from './file.js';
+import { ObjectDirentInterface } from '../definitions.js';
 
 
 export type ListTypes = LoomFile | Directory;
@@ -15,7 +15,7 @@ type DirentMethodsName = keyof PickMatching<DirentWrapper, () => unknown>;
 
 export class List<T extends ListTypes = ListTypes> {
 
-	protected dirWrap: DirentWrapper[];
+	protected _dirent: DirentWrapper[];
 
 	static from<T extends ListTypes>(list: List<T>): List<T>
 	static from<T extends ListTypes>(direntWraps: DirentWrapper[]): List<T>
@@ -26,15 +26,15 @@ export class List<T extends ListTypes = ListTypes> {
 	}
 
 	constructor()
-	constructor(dir: Directory, paths: Dirent[])
+	constructor(dir: Directory, paths: ObjectDirentInterface[])
 	constructor(
 		dir?: Directory,
-		_paths?: Dirent[])
+		_dirent?: ObjectDirentInterface[])
 	{
-		if(dir && _paths) {
-			this.dirWrap = _paths.map((p)  => new DirentWrapper(dir, p));
+		if(dir && _dirent) {
+			this._dirent = _dirent.map((p)  => new DirentWrapper(dir, p));
 		} else {
-			this.dirWrap = [];
+			this._dirent = [];
 		}
 	}
 
@@ -44,9 +44,9 @@ export class List<T extends ListTypes = ListTypes> {
 	protected add(listOrDirentWrapper: DirentWrapper[] | List<T>) {
 
 		if(listOrDirentWrapper instanceof List) {
-			this.dirWrap.push(...listOrDirentWrapper.dirWrap);
+			this._dirent.push(...listOrDirentWrapper._dirent);
 		} else {
-			this.dirWrap.push(...listOrDirentWrapper);
+			this._dirent.push(...listOrDirentWrapper);
 		}
 	}
 
@@ -60,7 +60,7 @@ export class List<T extends ListTypes = ListTypes> {
 	}
 
 	get length() {
-		return this.dirWrap.length;
+		return this._dirent.length;
 	}
 
 	protected convert(wrap: DirentWrapper) {
@@ -72,7 +72,7 @@ export class List<T extends ListTypes = ListTypes> {
 	}
 
 	at(index: number) {
-		const wrap = this.dirWrap[index];
+		const wrap = this._dirent[index];
 		return this.convert(wrap);
 	}
 
@@ -89,7 +89,7 @@ export class List<T extends ListTypes = ListTypes> {
 	}
 
 	filter<T extends ListTypes>(fn: (wrap: DirentWrapper) => boolean): List<T> {
-		const filtered = this.dirWrap.filter(fn);
+		const filtered = this._dirent.filter(fn);
 		return List.from(filtered);
 	}
 
@@ -127,12 +127,12 @@ export class List<T extends ListTypes = ListTypes> {
 	// 				return wrap[param];
 	// 			}
 	// 		});
-	// 	}) as U; 
+	// 	}) as U;
 	// }
 
 
 	*[Symbol.iterator](): IterableIterator<T> {
-		for(const wrap of this.dirWrap) {
+		for(const wrap of this._dirent) {
 			if(wrap.isDirectory()) {
 				yield wrap.dir.subDir(wrap.name) as T;
 			} else {

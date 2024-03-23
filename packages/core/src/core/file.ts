@@ -1,4 +1,3 @@
-import * as fs from 'node:fs/promises';
 import { PLUGIN_TYPE, type LoomFileConverter, FILE_SIZE_UNIT, SourceAdapter } from '../definitions.js';
 import { FileConvertException, PluginNotFoundException } from '../exceptions.js';
 import { Directory } from './dir.js';
@@ -58,7 +57,7 @@ export class LoomFile {
 	}
 
 	async getSizeInBytes() {
-		const stats = await fs.stat(this.path);
+		const stats = await this._adapter.stat(this.path);
 		return stats.size;
 	}
 
@@ -87,19 +86,19 @@ export class LoomFile {
 
 	async exists() {
 		const fullPath = joinPath(this.dir.path, this.name);
-		this._adapter.fileExists(fullPath);
+		return this._adapter.fileExists(fullPath);
 	}
 
 	async reader() {
-		return await Editor.from(this);
+		return await Editor.from(this._adapter, this);
 	}
 
 	async plain() {
-		return await fs.readFile(this.path);
+		return await this._adapter.readFile(this.path);
 	}
 
 	async text(encoding: BufferEncoding = 'utf8') {
-		return await fs.readFile(this.path, encoding);
+		return await this._adapter.readFile(this.path, encoding);
 	}
 
 	static register(plugin: LoomFileConverter) {

@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
-import type { SourceAdapter } from '@loom-io/core';
-import { base, faker } from '@faker-js/faker';
+import { DirectoryNotEmptyException, type SourceAdapter } from '@loom-io/core';
+import { faker } from '@faker-js/faker';
 import { basename, dirname, join } from 'node:path';
 import { getUniqSegmentsOfPath, splitTailingPath } from '@loom-io/common';
 import { nanoid } from 'nanoid';
@@ -123,10 +123,10 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 
 		test('rmdir with file should fail', async () => {
 			const path = getRandomPath('test/other/mkdir');
-			const fileName = 'file.txt';
+			const fileName = faker.system.commonFileName('txt');
 			await adapter.mkdir(path);
 			await adapter.writeFile(`${path}/${fileName}`, 'test');
-			expect(async () => await adapter.rmdir(path)).rejects.toThrow();
+			expect(async () => await adapter.rmdir(path)).rejects.toThrow(DirectoryNotEmptyException);
 			expect( await adapter.dirExists(path)).toBe(true);
 		});
 

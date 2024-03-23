@@ -1,26 +1,31 @@
 import { describe, expect, test } from 'vitest';
 import { Editor, Reader } from './editor';
-import { TestFilesystemHelper } from '../../test/helpers/testFilesystemHelper';
 import { dirname, basename } from 'node:path';
 import { Directory } from './dir';
 import { LoomFile } from './file';
-import * as fs from 'node:fs/promises';
 
 import { faker } from '@faker-js/faker';
-import { TextItemList } from './helper/textItemList';
+import { TextItemList } from '../helper/textItemList';
+import { beforeAll } from 'vitest';
+import { InMemoryAdapterHelper } from '@loom-io/test-utils';
+import { SourceAdapter } from '../definitions';
 
-function createEditor(testFile: string) {
-	const dir = new Directory(dirname(testFile));
-	const file = new LoomFile(dir, basename(testFile));
-	return Editor.from(file);
+function createEditor(adapter, testFile: string) {
+	const dir = new Directory(adapter, dirname(testFile));
+	const file = new LoomFile(adapter, dir, basename(testFile));
+	return Editor.from(adapter, file);
 }
+
+const TEST_FILE_PATH = '/test/data/editor.md';
+const TEST_TXT_FILE_PATH = '/test/data/test.txt';
+const TEST_EMPTY_FILE_PATH = '/test/data/empty.txt';
 
 class TestEditor extends Editor {
 
-	static async fromPath(path: string): Promise<TestEditor> {
-		const dir = new Directory(dirname(path));
-		const file = new LoomFile(dir, basename(path));
-		const handler = await fs.open(file.path);
+	static async fromPath(adapter: SourceAdapter, path: string): Promise<TestEditor> {
+		const dir = new Directory(adapter, dirname(path));
+		const file = new LoomFile(adapter, dir, basename(path));
+		const handler = await adapter.openFile(file.path);
 		return new TestEditor(file, handler);
 
 	}
@@ -55,27 +60,50 @@ class TestEditor extends Editor {
 }
 
 describe('Editor', () => {
+
+	let testHelper: InMemoryAdapterHelper;
+	let adapter: InMemoryAdapterHelper['adapter'];
+
+	beforeAll(async () => {
+		testHelper = InMemoryAdapterHelper.init();
+		adapter = testHelper.adapter;
+		const testFileContent =
+`---
+createdAt: 2020-12-17
+metaDescription: As an experienced Software engineer Wolfgang Rathgeb wants to deliver a  balanced project witch fits user needs. To fulfill, this Wolfgang Rathgeb is also taking a look behind the horizon and do all that is required.
+---
+### About me
+
+A Computer is a good tool to get ideas easy and cheap to live. But this also increases the number of ideas that are already implemented. Finally, there is mostly something, that isn't implemented or could be done in a better way.
+
+I already started to implement some ideas, but only two had the ability to get something big before they failed because of complications or time problems. Maybe failed is the wrong word, because the project itself failed, but I got a lot of experience and learned to find the gap between theory and practice. Both projects are already some years ago and I was able to increase my knowledge in other projects. Currently, I am working at the HPI-Schul-Cloud project, which gives me the opportunity to learn about processes in companies: How they change and what could go wrong (besides the programming stuff).
+
+I also have some ideas in my mind, but not sure if they are worth to invest time. I am open to good ideas, co-founders, or only a good Open-Source project.
+### EOF`;
+		await testHelper.createFile(TEST_FILE_PATH, testFileContent);
+		await testHelper.createFile('/test/data/test.txt', 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.');
+		await testHelper.createFile(TEST_EMPTY_FILE_PATH, '');
+	});
+
 	test('constructor', async () => {
-		const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-		const dir = new Directory(dirname(testFile));
-		const file = new LoomFile(dir, 'test.txt');
-		const reader: Reader = await Editor.from(file);
+		const dir = new Directory(adapter, dirname(TEST_TXT_FILE_PATH));
+		const file = new LoomFile(adapter, dir, basename(TEST_TXT_FILE_PATH));
+		const reader: Reader = await Editor.from(adapter, file);
 		expect(reader).toBeInstanceOf(Editor);
 		reader.close();
 	});
 
 	test('from', async () => {
-		const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-		const dir = new Directory(dirname(testFile));
-		const file = new LoomFile(dir, basename(testFile));
-		const reader: Reader = await Editor.from(file);
+		const dir = new Directory(adapter, dirname(TEST_FILE_PATH));
+		const file = new LoomFile(adapter, dir, basename(TEST_FILE_PATH));
+		const reader: Reader = await Editor.from(adapter, file);
 		expect(reader).toBeInstanceOf(Editor);
 		reader.close();
 	});
 
 	test('raw', async () => {
-		const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-		const reader = await createEditor(testFile);
+
+		const reader = await createEditor(adapter, TEST_FILE_PATH);
 		expect(reader.raw).toBeDefined();
 		reader.close();
 	});
@@ -83,16 +111,14 @@ describe('Editor', () => {
 
 	describe('search', () => {
 		test('find first value', async () => {
-			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-			const reader = await createEditor(testFile);
+			const reader = await createEditor(adapter, TEST_FILE_PATH);
 			const result = await reader.searchFirst('sure');
 			expect(result).toBeDefined();
 			reader.close();
 		});
 
 		test('has next value', async () => {
-			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-			const reader = await createEditor(testFile);
+			const reader = await createEditor(adapter, TEST_FILE_PATH);
 			const result = await reader.searchFirst('some');
 			expect(result).toBeDefined();
 			const hasNext = await result?.hasNext();
@@ -101,8 +127,7 @@ describe('Editor', () => {
 		});
 
 		test('has no next value', async () => {
-			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-			const reader = await createEditor(testFile);
+			const reader = await createEditor(adapter, TEST_FILE_PATH);
 			const result = await reader.searchFirst('opportunity');
 			expect(result).toBeDefined();
 			expect(await result?.hasNext()).toBe(false);
@@ -110,8 +135,7 @@ describe('Editor', () => {
 		});
 
 		test('find next value', async () => {
-			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-			const reader = await createEditor(testFile);
+			const reader = await createEditor(adapter, TEST_FILE_PATH);
 			const result = await reader.searchFirst('some');
 			expect(result).toBeDefined();
 			const resultValue = result!.meta;
@@ -123,13 +147,12 @@ describe('Editor', () => {
 		});
 
 		test('find all values forward', async () => {
-			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-			const reader = await createEditor(testFile);
+			const reader = await createEditor(adapter, TEST_FILE_PATH);
 			const result = await reader.searchFirst('co');
 			expect(result).toBeDefined();
 			let count = 1;
 			while(await result!.hasNext()) {
-				
+
 				await result!.next();
 				expect(result).toBeDefined();
 				count++;
@@ -141,8 +164,7 @@ describe('Editor', () => {
 		});
 
 		test('find no value', async () => {
-			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-			const reader = await createEditor(testFile);
+			const reader = await createEditor(adapter, TEST_FILE_PATH);
 			const searchValue = 'surely not';
 			const result = await reader.searchFirst(searchValue);
 			expect(result).toBeUndefined();
@@ -152,8 +174,7 @@ describe('Editor', () => {
 		});
 
 		test('has prev value', async () => {
-			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-			const reader = await createEditor(testFile);
+			const reader = await createEditor(adapter, TEST_FILE_PATH);
 			const result = await reader.searchLast('it');
 			expect(result).toBeDefined();
 			const hasPrev = await result?.hasPrev();
@@ -162,8 +183,7 @@ describe('Editor', () => {
 		});
 
 		test('has no prev value', async () => {
-			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-			const reader = await createEditor(testFile);
+			const reader = await createEditor(adapter, TEST_FILE_PATH);
 			const result = await reader.searchLast('itself');
 			expect(result).toBeDefined();
 			const hasPrev = await result?.hasPrev();
@@ -172,8 +192,7 @@ describe('Editor', () => {
 		});
 
 		test('find last value', async () => {
-			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-			const reader = await createEditor(testFile);
+			const reader = await createEditor(adapter, TEST_FILE_PATH);
 			const result = await reader.searchLast('some');
 			expect(result).toBeDefined();
 			expect(result?.meta.start).toBeGreaterThan(1000);
@@ -181,8 +200,7 @@ describe('Editor', () => {
 		});
 
 		test('find previous value', async () => {
-			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-			const reader = await createEditor(testFile);
+			const reader = await createEditor(adapter, TEST_FILE_PATH);
 			const result = await reader.searchLast('some');
 			expect(result).toBeDefined();
 			const resultValue = result!.meta;
@@ -194,11 +212,10 @@ describe('Editor', () => {
 		});
 
 		test('find all values reverse', async () => {
-			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-			const reader = await createEditor(testFile);
+			const reader = await createEditor(adapter, TEST_FILE_PATH);
 			const result = await reader.searchLast('in');
 			expect(result).toBeDefined();
-			
+
 			let count = 1;
 			while(await result?.hasPrev()) {
 				await result!.prev();
@@ -216,8 +233,7 @@ describe('Editor', () => {
 		describe('test loop and background function', () => {
 
 			test('searchInChunk', async () => {
-				const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-				const editor = await TestEditor.fromPath(testFile);
+				const editor = await TestEditor.fromPath(adapter, TEST_FILE_PATH);
 				const chunk = Buffer.from('This is a test with ab in it.');
 				const value = Buffer.from('ab');
 				const result = await editor.unwrappedSearchInChunk(value, chunk);
@@ -228,8 +244,7 @@ describe('Editor', () => {
 			});
 
 			test('calcChunkSize', async () => {
-				const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-				const editor = await TestEditor.fromPath(testFile);
+				const editor = await TestEditor.fromPath(adapter, TEST_FILE_PATH);
 				const valueLength = 10;
 				const chunkSize = editor.unwrappedCalcChunkSize(valueLength);
 				expect(chunkSize).toBeDefined();
@@ -242,8 +257,7 @@ describe('Editor', () => {
 			});
 
 			test('searchInChunk random strings', async () => {
-				const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-				const editor = await TestEditor.fromPath(testFile);
+				const editor = await TestEditor.fromPath(adapter, TEST_FILE_PATH);
 				const chunk = Buffer.from(faker.lorem.paragraphs({min: 1000, max: 40000}));
 				const value = Buffer.from(faker.date.birthdate().toString());
 				const result = await editor.unwrappedSearchInChunk(value, chunk);
@@ -252,7 +266,7 @@ describe('Editor', () => {
 				expect(result).toBeInstanceOf(Array);
 				expect(result).toHaveLength(0);
 
-				
+
 				const amount = faker.number.int({min: 1, max: 7});
 				const positions: number[] = [];
 				const quoterSize = Math.floor(chunk.length/amount);
@@ -275,8 +289,7 @@ describe('Editor', () => {
 
 
 			test('convertChungMatchesToItems', async () => {
-				const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-				const editor = await TestEditor.fromPath(testFile);
+				const editor = await TestEditor.fromPath(adapter, TEST_FILE_PATH);
 				const matches = [7, 13, 18, 19, 21, 58, 150, 278, 589];
 				const start = faker.number.int({min: 0, max: 1000});
 				const valueLength = 1;
@@ -284,7 +297,7 @@ describe('Editor', () => {
 
 				expect(item).toBeDefined();
 				expect(item).toBeInstanceOf(TextItemList);
-				
+
 				expect(item?.isFirstItem()).toBe(true);
 
 				if(item === undefined) {
@@ -303,8 +316,7 @@ describe('Editor', () => {
 			});
 
 			test('loopReverseCalcPositionAndLength', async () => {
-				const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-				const editor = await TestEditor.fromPath(testFile);
+				const editor = await TestEditor.fromPath(adapter, TEST_FILE_PATH);
 				const cur = faker.number.int({min: 7000, max: 8000});
 				const min = faker.number.int({min: 0, max: 3000});
 				const valueLength = faker.number.int({min: 10, max: 20});
@@ -316,8 +328,7 @@ describe('Editor', () => {
 			});
 
 			test('loopReverseCalcPositionAndLength close to min', async () => {
-				const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-				const editor = await TestEditor.fromPath(testFile);
+				const editor = await TestEditor.fromPath(adapter, TEST_FILE_PATH);
 				const cur = 1000;
 				const min = 500;
 				const valueLength = faker.number.int({min: 10, max: 20});
@@ -336,8 +347,7 @@ describe('Editor', () => {
 	describe('line read', () => {
 
 		test('read first line as string', async () => {
-			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-			const reader = await createEditor(testFile);
+			const reader = await createEditor(adapter, TEST_FILE_PATH);
 			const result = await reader.firstLine();
 			expect(result).toBeDefined();
 			const line = await result?.read('utf8');
@@ -348,8 +358,7 @@ describe('Editor', () => {
 		});
 
 		test('read line', async () => {
-			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-			const reader = await createEditor(testFile);
+			const reader = await createEditor(adapter, TEST_FILE_PATH);
 			const result = await reader.firstLine();
 			expect(result).toBeDefined();
 			const line = await result?.read();
@@ -359,8 +368,7 @@ describe('Editor', () => {
 		});
 
 		test('get next line', async () => {
-			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-			const reader = await createEditor(testFile);
+			const reader = await createEditor(adapter, TEST_FILE_PATH);
 			const result = await reader.firstLine();
 			expect(result).toBeDefined();
 			await result.next();
@@ -370,8 +378,7 @@ describe('Editor', () => {
 		});
 
 		test('read till last lines', async () => {
-			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-			const reader = await createEditor(testFile);
+			const reader = await createEditor(adapter, TEST_FILE_PATH);
 			const result = await reader.firstLine();
 			expect(result).toBeDefined();
 			let count = 0;
@@ -389,8 +396,7 @@ describe('Editor', () => {
 		});
 
 		test('read last line', async () => {
-			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-			const reader = await createEditor(testFile);
+			const reader = await createEditor(adapter, TEST_FILE_PATH);
 			const result = await reader.lastLine();
 			expect(result).toBeDefined();
 			const line = await result.read();
@@ -400,8 +406,7 @@ describe('Editor', () => {
 		});
 
 		test('read last line as string', async () => {
-			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-			const reader = await createEditor(testFile);
+			const reader = await createEditor(adapter, TEST_FILE_PATH);
 			const result = await reader.lastLine();
 			expect(result).toBeDefined();
 			const line = await result.read('utf8');
@@ -412,8 +417,7 @@ describe('Editor', () => {
 		});
 
 		test('get prev line', async () => {
-			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-			const reader = await createEditor(testFile);
+			const reader = await createEditor(adapter, TEST_FILE_PATH);
 			const result = await reader.lastLine();
 			expect(result).toBeDefined();
 			await result.prev();
@@ -423,8 +427,7 @@ describe('Editor', () => {
 		});
 
 		test('read till first lines', async () => {
-			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/editor.md`;
-			const reader = await createEditor(testFile);
+			const reader = await createEditor(adapter, TEST_FILE_PATH);
 			const result = await reader.lastLine();
 			expect(result).toBeDefined();
 
@@ -443,8 +446,7 @@ describe('Editor', () => {
 		});
 
 		test('read empty file', async () => {
-			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/empty.txt`;
-			const reader = await createEditor(testFile);
+			const reader = await createEditor(adapter, TEST_EMPTY_FILE_PATH);
 			const resultForward = await reader.firstLine();
 			expect(resultForward).toBeDefined();
 			const line = await resultForward?.read('utf8');
@@ -457,18 +459,19 @@ describe('Editor', () => {
 		});
 
 		test('read file with only one line', async () => {
-			const fileContentLength = 591;
-			const testFile = `${TestFilesystemHelper.STATIC_TEST_DIR}/line.txt`;
-			const reader = await createEditor(testFile);
+			const longText = faker.lorem.words(10000);
+			testHelper.createFile('/test/data/test_large.txt', longText);
+			const fileContentLength = longText.length;
+			const reader = await createEditor(adapter, '/test/data/test_large.txt');
 			const resultForward = await reader.firstLine();
 			expect(resultForward).toBeDefined();
 			const line = await resultForward?.read('utf8');
 			expect(line.length).toBe(fileContentLength);
-			expect(line).toContain('Lorem ipsum');
+			expect(line).toBe(longText);
 			const resultBackward = await reader.lastLine();
 			expect(resultBackward).toBeDefined();
 			const line2 = await resultBackward?.read('utf8');
-			expect(line2).toContain('Lorem ipsum');
+			expect(line2).toBe(longText);
 			expect(line2.length).toBe(fileContentLength);
 			reader.close();
 		});

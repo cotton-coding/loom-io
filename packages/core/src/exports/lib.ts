@@ -5,6 +5,7 @@ import { List } from '../core/list.js';
 import { PLUGIN_TYPE, FILE_SIZE_UNIT } from '../definitions.js';
 import { LoomPlugin, LoomSourceAdapter } from '../definitions.js';
 import crypto from 'node:crypto';
+import { NoSourceAdapterException } from '../exceptions.js';
 
 export { PLUGIN_TYPE, FILE_SIZE_UNIT };
 export * from '../exceptions.js';
@@ -21,11 +22,17 @@ export class LoomIO {
 	static async source(link: string, Type: typeof Directory): Promise<Directory>
 	static async source(link: string, Type: typeof LoomFile): Promise<LoomFile>
 	static async source(link: string, Type?: typeof Directory | typeof LoomFile): Promise<Directory | LoomFile> {
-		const dirOrFile = await Promise.any(this.sourceAdapters.map(adapter => adapter.source(link, Type)));
-		if(dirOrFile) {
-			return dirOrFile;
+		try {
+			const dirOrFile = await Promise.any(this.sourceAdapters.map(adapter => adapter.source(link, Type)));
+			if(dirOrFile) {
+				return dirOrFile;
+			}
+		} catch(e) {
+			console.warn('Probably no source adapter registered');
+			console.warn(e);
 		}
-		throw new Error('No source adapter is matching the given link');
+
+		throw new NoSourceAdapterException(link);
 	}
 
 	static dir(link: string) {

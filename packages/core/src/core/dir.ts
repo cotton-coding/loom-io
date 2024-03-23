@@ -1,15 +1,15 @@
-import * as fs from 'node:fs/promises';
 import { join as joinPath, relative as relativePath} from 'node:path';
 import { LoomFile } from './file.js';
 import { List } from './list.js';
-import { isErrnoException } from '../helper/typechecks.js';
 import { SourceAdapter } from '../definitions.js';
+import { DirectoryNotEmptyException, EXCEPTION_REF, isInstanceOfLoomException } from '../exceptions.js';
 
 export class Directory {
 
 	protected readonly _path: string;
 	protected readonly _adapter: SourceAdapter;
 	protected _strict: boolean = false;
+	protected isRoot: boolean;
 
 	constructor(
 		adapter: SourceAdapter,
@@ -18,6 +18,7 @@ export class Directory {
 	) {
 		this._path = joinPath(path, ...(paths || []));
 		this._adapter = adapter;
+		this.isRoot = this._path === '' || this._path === '/';
 	}
 
 	strict(strictMode: boolean = true) {
@@ -30,8 +31,8 @@ export class Directory {
 	}
 
 	get parent(): Directory | undefined {
-		if(this._path === '/') return undefined;
-		const split = this.path.slice(1).split('/');
+		if(this.isRoot) return undefined;
+		const split = this.path.split('/');
 		split.pop();
 		return new Directory(this._adapter, `/${split.join('/')}`);
 	}
@@ -41,32 +42,28 @@ export class Directory {
 	}
 
 	async create(): Promise<void> {
-		await fs.mkdir(this.path, {recursive: true});
+		await this._adapter.mkdir(this.path);
 	}
 
 	async delete(recursive: boolean = false): Promise<void> {
 		try {
-			await fs.rmdir(this.path, {recursive});
+			await this._adapter.rmdir(this.path, {recursive});
 		} catch (err) {
-			if(this._strict){
+			if(isInstanceOfLoomException(err, EXCEPTION_REF.DIRECTORY_NOT_EMPTY)) {
+				throw new DirectoryNotEmptyException(this.path);
+			} else if(this._strict) {
 				throw err;
-			}
-			if(isErrnoException(err)) {
-				// File not found
-				if((err as NodeJS.ErrnoException).code !== 'ENOENT' && (err as NodeJS.ErrnoException).errno !== -2) {
-					throw err;
-				}
 			}
 		}
 	}
 
 	subDir(name: string) {
-		return new Directory(this._adapter, joinPath(this.path, name));
+		return new Directory(this._adapter, this.path, name);
 	}
 
 	async list(): Promise<List> {
 
-		const paths =  await fs.readdir(this.path, {withFileTypes: true});
+		const paths =  await this._adapter.readdir(this.path);
 
 		return new List(this, paths);
 	}
