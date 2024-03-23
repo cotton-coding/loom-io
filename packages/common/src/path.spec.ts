@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { getFirstElementsOfPath, getPathDepth, removePrecedingAndTrailingSlash, splitTailingPath } from './path';
+import { addPrecedingAndTailingSlash, getSegmentsOfPath, getPathDepth, removePrecedingAndTrailingSlash, splitTailingPath } from './path';
 
 
 describe('path utils', async () => {
@@ -11,6 +11,15 @@ describe('path utils', async () => {
 		expect(removePrecedingAndTrailingSlash('/')).toBe('');
 		expect(removePrecedingAndTrailingSlash('')).toBe('');
 		expect(removePrecedingAndTrailingSlash('/test/some/slashing/')).toBe('test/some/slashing');
+	});
+
+	test('addPrecedingAndTailingSlash', async () => {
+		expect(addPrecedingAndTailingSlash('test')).toBe('/test/');
+		expect(addPrecedingAndTailingSlash('/test')).toBe('/test/');
+		expect(addPrecedingAndTailingSlash('test/')).toBe('/test/');
+		expect(addPrecedingAndTailingSlash('/test/')).toBe('/test/');
+		expect(addPrecedingAndTailingSlash('/')).toBe('/');
+		expect(addPrecedingAndTailingSlash('')).toBe('/');
 	});
 
 	test('splitTailingPath', async () => {
@@ -37,18 +46,18 @@ describe('path utils', async () => {
 	});
 
 	test('getFirstElementsOfPath', async () => {
-		expect(getFirstElementsOfPath('/test/some/slashing/', 3)).toBe('/test/some/slashing/');
-		expect(getFirstElementsOfPath('/test/some/slashing', 2)).toBe('/test/some');
-		expect(getFirstElementsOfPath('test/some/slashing/', 2)).toBe('test/some/');
-		expect(getFirstElementsOfPath('test/some/slashing', 3)).toBe('test/some/slashing');
-		expect(getFirstElementsOfPath('/test/some/slashing/', 1)).toBe('/test/');
-		expect(getFirstElementsOfPath('/test/some/slashing', 1)).toBe('/test');
-		expect(getFirstElementsOfPath('test/some/slashing/', 1)).toBe('test/');
-		expect(getFirstElementsOfPath('test/some/slashing', 1)).toBe('test');
-		expect(getFirstElementsOfPath('/test/some/slashing/', 0)).toBe('/');
-		expect(getFirstElementsOfPath('/test/some/slashing', 0)).toBe('/');
-		expect(getFirstElementsOfPath('test/some/slashing/', 0)).toBe('/');
-		expect(getFirstElementsOfPath('test/some/slashing', 0)).toBe('/');
+		expect(getSegmentsOfPath('/test/some/slashing/', 3)).toBe('/test/some/slashing/');
+		expect(getSegmentsOfPath('/test/some/slashing', 2)).toBe('/test/some');
+		expect(getSegmentsOfPath('test/some/slashing/', 2)).toBe('test/some/');
+		expect(getSegmentsOfPath('test/some/slashing', 3)).toBe('test/some/slashing');
+		expect(getSegmentsOfPath('/test/some/slashing/', 1)).toBe('/test/');
+		expect(getSegmentsOfPath('/test/some/slashing', 1)).toBe('/test');
+		expect(getSegmentsOfPath('test/some/slashing/', 1)).toBe('test/');
+		expect(getSegmentsOfPath('test/some/slashing', 1)).toBe('test');
+		expect(getSegmentsOfPath('/test/some/slashing/', 0)).toBe('/');
+		expect(getSegmentsOfPath('/test/some/slashing', 0)).toBe('/');
+		expect(getSegmentsOfPath('test/some/slashing/', 0)).toBe('/');
+		expect(getSegmentsOfPath('test/some/slashing', 0)).toBe('/');
 	});
 
 });

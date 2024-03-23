@@ -18,6 +18,24 @@ export function removePrecedingAndTrailingSlash(path: string): string {
 	return removeTailingSlash(removePrecedingSlash(path.trim()));
 }
 
+export function addPrecedingSlash(path: string): string {
+	if (!path.startsWith('/')) {
+		return `/${path}`;
+	}
+	return path;
+}
+
+export function addTailingSlash(path: string): string {
+	if (!path.endsWith('/')) {
+		return `${path}/`;
+	}
+	return path;
+}
+
+export function addPrecedingAndTailingSlash(path: string): string {
+	return addTailingSlash(addPrecedingSlash(path.trim()));
+}
+
 export function splitTailingPath(path: string): [string, string] | [string, undefined] | [string, string]{
 	if(path === '' || path === '/') {
 		return ['/', undefined];
