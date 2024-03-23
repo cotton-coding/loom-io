@@ -8,7 +8,7 @@
 		"build": "tsc -p tsconfig.json",
 		"prepublishOnly": "pnpm build && publint"
 	},
-	"peerDependencies": {
+	"devDependencies": {
 		"@loom-io/common": "workspace:*",
 		"@loom-io/in-memory-adapter": "workspace:*"
 	},

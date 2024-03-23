@@ -167,7 +167,7 @@ importers:
         version: 5.0.6
 
   tests/test-utils:
-    dependencies:
+    devDependencies:
       '@loom-io/common':
         specifier: workspace:*
         version: link:../../packages/common
