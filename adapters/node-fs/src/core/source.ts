@@ -12,12 +12,16 @@ export const source = async (path: string, rootdir?: PathLike, Type?: typeof Dir
 	} else if(Type === Directory || path.endsWith('/')) {
 		return new Directory(adapter, path);
 	} else {
-		const stats = await fs.stat(path);
+		try {
+			const stats = await fs.stat(path);
 
-		if(stats.isFile()) {
-			const dir = new Directory(adapter, dirname(path));
-			return new LoomFile(adapter, dir, basename(path));
-		} else {
+			if(stats.isFile()) {
+				const dir = new Directory(adapter, dirname(path));
+				return new LoomFile(adapter, dir, basename(path));
+			} else {
+				return new Directory(adapter, path);
+			}
+		} catch {
 			return new Directory(adapter, path);
 		}
 	}

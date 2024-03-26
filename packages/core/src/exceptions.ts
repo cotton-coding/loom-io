@@ -44,8 +44,9 @@ export class NoSourceAdapterException extends Error implements LoomException {
 }
 
 export class DirectoryNotEmptyException extends Error implements LoomException {
+
 	__loomExceptionRef = EXCEPTION_REF.DIRECTORY_NOT_EMPTY;
-	protected _path: string;
+	_path: string;
 	constructor(path: string) {
 		super(`Directory ${path} is not empty`);
 		this._path = path;
