@@ -60,4 +60,19 @@ describe('path utils', async () => {
 		expect(getSegmentsOfPath('test/some/slashing', 0)).toBe('/');
 	});
 
+	test('getUniqSegmentsOfPath', async () => {
+		expect(getSegmentsOfPath('/test/some/slashing/', 3)).toBe('/test/some/slashing/');
+		expect(getSegmentsOfPath('/test/some/slashing', 2)).toBe('/test/some');
+		expect(getSegmentsOfPath('test/some/slashing/', 2)).toBe('test/some/');
+		expect(getSegmentsOfPath('test/some/slashing', 3)).toBe('test/some/slashing');
+		expect(getSegmentsOfPath('/test/some/slashing/', 1)).toBe('/test/');
+		expect(getSegmentsOfPath('/test/some/slashing', 1)).toBe('/test');
+		expect(getSegmentsOfPath('test/some/slashing/', 1)).toBe('test/');
+		expect(getSegmentsOfPath('test/some/slashing', 1)).toBe('test');
+		expect(getSegmentsOfPath('/test/some/slashing/', 0)).toBe('/');
+		expect(getSegmentsOfPath('/test/some/slashing', 0)).toBe('/');
+		expect(getSegmentsOfPath('test/some/slashing/', 0)).toBe('/');
+		expect(getSegmentsOfPath('test/some/slashing', 0)).toBe('/');
+	});
+
 });
