@@ -9,9 +9,9 @@
 		"build": "tsc -p tsconfig.json"
 	},
 	"dependencies": {
-		"@loom-io/core": "workspace:^0.6.0",
-		"@loom-io/yamlConverter": "workspace:^0.6.0",
-		"@loom-io/jsonConverter": "workspace:^0.6.0"
+		"@loom-io/core": "workspace:^",
+		"@loom-io/jsonConverter": "workspace:^",
+		"@loom-io/yamlConverter": "workspace:^"
 	},
 	"exports": {
 		".": {

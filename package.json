@@ -25,13 +25,13 @@
 	],
 	"devDependencies": {
 		"@faker-js/faker": "^8.4.1",
-		"@types/node": "^20.11.28",
+		"@types/node": "^20.11.30",
 		"@typescript-eslint/eslint-plugin": "latest",
 		"@typescript-eslint/parser": "latest",
 		"@vitest/coverage-v8": "^1.4.0",
 		"eslint": "^8.57.0",
 		"publint": "^0.2.7",
-		"typescript": "^5.4.2",
+		"typescript": "^5.4.3",
 		"vitest": "^1.4.0"
 	},
 	"repository": {

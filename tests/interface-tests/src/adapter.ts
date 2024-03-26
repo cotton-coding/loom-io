@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
-import { DirectoryNotEmptyException, type SourceAdapter } from '@loom-io/core';
+import { DirectoryNotEmptyException, PathNotExistsException, type SourceAdapter } from '@loom-io/core';
 import { faker } from '@faker-js/faker';
 import { basename, dirname, join } from 'node:path';
 import { getUniqSegmentsOfPath, splitTailingPath } from '@loom-io/common';
@@ -207,6 +207,16 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 			expect(dirCount).toBe(dirs.length);
 			expect(fileCount).toBe(3);
 
+		});
+
+		test('if write fails if path not exists it should fail with PathNotExistsException', async () => {
+			const path = getRandomPath('test/other/mkdir');
+			const fileName = faker.system.commonFileName('txt');
+			try {
+				await adapter.writeFile(`${path}/${fileName}`, 'test');
+			} catch (error) {
+				expect(error).toBeInstanceOf(PathNotExistsException);
+			}
 		});
 
 		test('write and read', async () => {
