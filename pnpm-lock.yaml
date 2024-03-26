@@ -90,7 +90,7 @@ importers:
         specifier: workspace:*
         version: link:../../tests/test-utils
 
-  packages/base:
+  packages/base-fs:
     dependencies:
       '@loom-io/core':
         specifier: workspace:^0.6.0
@@ -98,9 +98,16 @@ importers:
       '@loom-io/jsonConverter':
         specifier: workspace:^0.6.0
         version: link:../../plugins/jsonConverter
+      '@loom-io/node-filesystem-adapter':
+        specifier: workspace:^0.6.0
+        version: link:../../adapters/node-fs
       '@loom-io/yamlConverter':
         specifier: workspace:^0.6.0
         version: link:../../plugins/yamlConverter
+    devDependencies:
+      '@loom-io/test-utils':
+        specifier: workspace:*
+        version: link:../../tests/test-utils
 
   packages/common: {}
 
@@ -1311,8 +1318,8 @@ packages:
     resolution: {integrity: sha512-DCXu6Ifhqcks7TZKY3Hxp3y6qphY5SJZmrWMDrKcERSOXWQdMhU9Ig/PYrzyw/ul9jOIyh0N4M0tbC5hodg8dw==}
     dev: true
 
-  /fast-xml-parser@4.3.5:
-    resolution: {integrity: sha512-sWvP1Pl8H03B8oFJpFR3HE31HUfwtX7Rlf9BNsvdpujD4n7WMhfmu8h9wOV2u+c1k0ZilTADhPqypzx2J690ZQ==}
+  /fast-xml-parser@4.3.6:
+    resolution: {integrity: sha512-M2SovcRxD4+vC493Uc2GZVcZaj66CCJhWurC4viynVSTvrpErCShNcDz1lAho6n9REQKvL/ll4A4/fw6Y9z8nw==}
     hasBin: true
     dependencies:
       strnum: 1.0.5
@@ -1811,7 +1818,7 @@ packages:
       block-stream2: 2.1.0
       browser-or-node: 2.1.1
       buffer-crc32: 0.2.13
-      fast-xml-parser: 4.3.5
+      fast-xml-parser: 4.3.6
       ipaddr.js: 2.1.0
       json-stream: 1.0.0
       lodash: 4.17.21
