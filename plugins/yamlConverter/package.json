@@ -17,7 +17,6 @@
 	},
 	"keywords": [],
 	"author": "Wolfgang Rathgeb",
-	"license": "MIT",
 	"exports": {
 		".": {
 			"types": "./dist/yamlConverter.d.ts",

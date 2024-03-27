@@ -1,19 +1,18 @@
 {
-  "name": "integration",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "vitest --typecheck.enabled --test-timeout=500",
-    "test:ci": "npm run test -- --run"
-  },
-  "devDependencies": {
-    "@loom-io/core": "workspace:*",
-    "@loom-io/jsonConverter": "workspace:*",
-    "@loom-io/yamlConverter": "workspace:*",
-    "@loom-io/test-utils": "workspace:*"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+	"name": "integration",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
+	"scripts": {
+		"test": "vitest --typecheck.enabled --test-timeout=500",
+		"test:ci": "npm run test -- --run"
+	},
+	"devDependencies": {
+		"@loom-io/core": "workspace:*",
+		"@loom-io/jsonConverter": "workspace:*",
+		"@loom-io/yamlConverter": "workspace:*",
+		"@loom-io/test-utils": "workspace:*"
+	},
+	"keywords": [],
+	"author": ""
 }
