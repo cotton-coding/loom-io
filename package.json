@@ -1,8 +1,6 @@
 {
 	"name": "loom-io",
-	"version": "1.0.0",
 	"description": "",
-	"main": "index.js",
 	"scripts": {
 		"build:common": "pnpm run --filter @loom-io/common build",
 		"build:core": "pnpm run --filter @loom-io/core build",

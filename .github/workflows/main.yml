@@ -64,6 +64,6 @@ jobs:
       - name: Build && publint
         run: pnpm run prepublishOnly
       - name: Publish Dry Run
-        run: pnpm publish --dry-run --no-git-checks
+        run: pnpm -r publish --dry-run --no-git-checks
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

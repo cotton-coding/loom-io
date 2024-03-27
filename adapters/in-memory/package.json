@@ -3,7 +3,7 @@
 	"main": "dist/exports/lib.js",
 	"types": "dist/exports/lib.d.ts",
 	"author": "Cotton Coding",
-	"version": "0.6.0",
+	"version": "0.7.0",
 	"description": "A file system wrapper for Node.js and Bun",
 	"keywords": [
 		"fs",
@@ -31,13 +31,13 @@
 	},
 	"devDependencies": {
 		"@faker-js/faker": "^8.4.1",
-		"@loom-io/interface-tests": "workspace:*"
+		"@loom-io/interface-tests": "workspace:^"
 	},
 	"peerDependencies": {
-		"@loom-io/core": "workspace:*"
+		"@loom-io/core": "workspace:^0.7.0"
 	},
 	"dependencies": {
-		"@loom-io/common": "workspace:*"
+		"@loom-io/common": "workspace:^"
 	},
 	"exports": {
 		".": {

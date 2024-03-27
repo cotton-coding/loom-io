@@ -1,6 +1,6 @@
 {
 	"name": "@loom-io/yamlConverter",
-	"version": "0.6.0",
+	"version": "0.7.0",
 	"description": "",
 	"main": "dist/yamlConverter.js",
 	"type": "module",
@@ -10,7 +10,7 @@
 		"prepublishOnly": "npm run build && publint"
 	},
 	"peerDependencies": {
-		"@loom-io/core": "workspace:^0.6.0"
+		"@loom-io/core": "^0.7.0"
 	},
 	"dependencies": {
 		"yaml": "^2.4.1"
