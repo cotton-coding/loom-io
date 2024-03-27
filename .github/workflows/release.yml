@@ -46,6 +46,6 @@ jobs:
       - name: Build & publint
         run: pnpm run prepublishOnly
       - name: Publish
-        run: pnpm -r publish
+        run: pnpm -r publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
