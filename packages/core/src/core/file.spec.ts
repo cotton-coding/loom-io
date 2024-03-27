@@ -139,7 +139,30 @@ describe('Test File Service', () => {
 			expect(content.toString()).toBe(testContent);
 		});
 
+		test('Write file', async () => {
+			const testContent = '1234k2hk3jh1fasdasfc%';
+			const testFile = await testHelper.createFile(undefined, testContent);
 
+			const file = LoomFile.from( adapter, testFile);
+			const newContent = 'new content';
+			await file.write(newContent);
+			const content = await file.text();
+			expect(content).toBe(newContent);
+		});
+
+		test('Create file', async () => {
+			const testFile = await testHelper.createFile(undefined, 'test');
+			const file = LoomFile.from( adapter, testFile);
+			await file.create();
+			expect(await file.exists()).toBeTruthy();
+		});
+
+		test('Delete file', async () => {
+			const testFile = await testHelper.createFile(undefined, 'test');
+			const file = LoomFile.from( adapter, testFile);
+			await file.delete();
+			expect(await file.exists()).toBeFalsy();
+		});
 
 	});
 });
