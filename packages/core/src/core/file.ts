@@ -124,7 +124,7 @@ export class LoomFile {
 			throw new PluginNotFoundException(this.path);
 		}
 
-		return plugin.stringify(content);
+		this.write(plugin.stringify(content));
 	}
 
 	static register(plugin: LoomFileConverter) {
