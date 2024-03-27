@@ -8,7 +8,6 @@ import { Directory } from './dir.js';
 import { FILE_SIZE_UNIT, LoomFileConverter, PLUGIN_TYPE, SourceAdapter } from '../definitions.js';
 import { faker } from '@faker-js/faker';
 import { Editor } from './editor.js';
-import { after } from 'node:test';
 
 class FileTest extends LoomFile {
 
