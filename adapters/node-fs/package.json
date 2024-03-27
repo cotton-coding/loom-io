@@ -31,11 +31,11 @@
 	},
 	"devDependencies": {
 		"@loom-io/interface-tests": "workspace:^",
-		"@loom-io/test-utils": "workspace:*",
+		"@loom-io/test-utils": "workspace:^",
 		"@faker-js/faker": "^8.4.1"
 	},
 	"peerDependencies": {
-		"@loom-io/core": "workspace:*"
+		"@loom-io/core": "^0.7.0"
 	},
 	"exports": {
 		".": {

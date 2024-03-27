@@ -12,10 +12,10 @@
 		"@loom-io/test-utils": "workspace:*"
 	},
 	"dependencies": {
-		"@loom-io/core": "workspace:^0.6.0",
-		"@loom-io/node-filesystem-adapter": "workspace:^0.6.0",
-		"@loom-io/yamlConverter": "workspace:^0.6.0",
-		"@loom-io/jsonConverter": "workspace:^0.6.0"
+		"@loom-io/core": "workspace:^",
+		"@loom-io/node-filesystem-adapter": "workspace:^",
+		"@loom-io/yamlConverter": "workspace:^",
+		"@loom-io/jsonConverter": "workspace:^"
 	},
 	"exports": {
 		".": {
@@ -23,6 +23,5 @@
 			"import": "./dist/exports/lib.js"
 		}
 	},
-	"keywords": [],
-	"author": ""
+	"keywords": []
 }

@@ -30,14 +30,14 @@
 		"prepublishOnly": "npm run build && publint"
 	},
 	"devDependencies": {
-		"@loom-io/interface-tests": "workspace:*",
-		"@loom-io/test-utils": "workspace:*"
+		"@loom-io/interface-tests": "workspace:^",
+		"@loom-io/test-utils": "workspace:^"
 	},
 	"peerDependencies": {
-		"@loom-io/core": "workspace:*"
+		"@loom-io/core": "^0.7.0"
 	},
 	"dependencies": {
-		"@loom-io/common": "workspace:*",
+		"@loom-io/common": "workspace:^",
 		"minio": "^7.1.3"
 	},
 	"exports": {

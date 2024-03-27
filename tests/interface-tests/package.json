@@ -8,10 +8,10 @@
 		"build": "tsc -p tsconfig.json"
 	},
 	"peerDependencies": {
-		"@loom-io/core": "workspace:*"
+		"@loom-io/core": "workspace:^0.7.0"
 	},
 	"dependencies": {
-		"@loom-io/common": "workspace:*",
+		"@loom-io/common": "workspace:^",
 		"@faker-js/faker": "^8.4.1",
 		"nanoid": "^5.0.6"
 	},
