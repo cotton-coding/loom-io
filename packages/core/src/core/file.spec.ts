@@ -5,7 +5,7 @@ import { InMemoryAdapterHelper } from '@loom-io/test-utils';
 
 import { basename, dirname } from 'node:path';
 import { Directory } from './dir.js';
-import { FILE_SIZE_UNIT, SourceAdapter } from '../definitions.js';
+import { FILE_SIZE_UNIT, LoomFileConverter, PLUGIN_TYPE, SourceAdapter } from '../definitions.js';
 import { faker } from '@faker-js/faker';
 import { Editor } from './editor.js';
 
@@ -162,6 +162,55 @@ describe('Test File Service', () => {
 			const file = LoomFile.from( adapter, testFile);
 			await file.delete();
 			expect(await file.exists()).toBeFalsy();
+		});
+
+		test('Register a plugin', async () => {
+			const testContent = '1234k2hk3jh1fasdasfc%';
+			const testFile = await testHelper.createFile(undefined, testContent);
+
+			const file = LoomFile.from( adapter, testFile);
+			const plugin: LoomFileConverter = {
+				$type: PLUGIN_TYPE.FILE_CONVERTER,
+				extensions: ['test'],
+				parse: <T>(text: string) => JSON.parse(text) as T,
+				stringify: (content: unknown) => JSON.stringify(content)
+			};
+			LoomFile.register(plugin);
+			const content = await file.text();
+			expect(content).toBe(testContent);
+		});
+
+		test('Read file with json plugin', async () => {
+			const testContent = {test: true};
+			const testFile = await testHelper.createFile(faker.system.commonFileName('json'), JSON.stringify(testContent));
+
+			const file = LoomFile.from( adapter, testFile);
+			const plugin: LoomFileConverter = {
+				$type: PLUGIN_TYPE.FILE_CONVERTER,
+				extensions: ['json'],
+				parse: <T>(text: string) => JSON.parse(text) as T,
+				stringify: (content: unknown) => JSON.stringify(content)
+			};
+			LoomFile.register(plugin);
+			const content = await file.json();
+			expect(content).toStrictEqual(testContent);
+		});
+
+		test('Write file with json plugin', async () => {
+			const testContent = {test: true};
+			const testFile = await testHelper.createFile(faker.system.commonFileName('json'), JSON.stringify(testContent));
+
+			const file = LoomFile.from( adapter, testFile);
+			const plugin: LoomFileConverter = {
+				$type: PLUGIN_TYPE.FILE_CONVERTER,
+				extensions: ['json'],
+				parse: <T>(text: string) => JSON.parse(text) as T,
+				stringify: (content: unknown) => JSON.stringify(content)
+			};
+			LoomFile.register(plugin);
+			await file.stringify(testContent);
+			const content = await file.text();
+			expect(content).toBe(JSON.stringify(testContent));
 		});
 
 	});
