@@ -118,65 +118,48 @@ describe('Test Directory Service', () => {
 			});
 
 		});
-		describe('list method', () => {
+		describe.concurrent('list method', () => {
 
 			test('list directory amount', async () => {
-				const base = adapterHelper.last!;
-				await adapterHelper.createDirectory(joinPath(base, 'testDir1'));
-				await adapterHelper.createDirectory(joinPath(base, 'testDir2/testDir3'));
-				await adapterHelper.createFile(joinPath(base, 'testDir23/testFile.txt'));
+				const helper = InMemoryAdapterHelper.init();
+				helper.createDirectory();
+				const base = helper.last!;
+				await helper.createDirectory(joinPath(base, 'testDir1'));
+				await helper.createDirectory(joinPath(base, 'testDir2/testDir3'));
+				await helper.createFile(joinPath(base, 'testDir23/testFile.txt'));
 
-				const dir = new Directory(adapter, base);
+				const dir = new Directory(helper.adapter, base);
 				const files = await dir.list();
 				expect(files).toHaveLength(3);
 
 			});
 
 			test('list directory' , async () => {
-				const testDir = adapterHelper.createMultipleDirectories(100);
+				const helper = InMemoryAdapterHelper.init();
+				const testDir = helper.createMultipleDirectories(200);
 				const listOfUniques = getUniqSegmentsOfPath(testDir, 1);
-				const dir = new Directory(adapter, '/');
+				const dir = new Directory(helper.adapter, '/');
 				const paths = await dir.list();
+				expect(paths).toHaveLength(listOfUniques.length);
 				for(const t of paths) {
 					expect(listOfUniques).toContain((t as Directory).path);
 				}
 			});
 
 			test('list with subDirectory', async () => {
+				const helper = InMemoryAdapterHelper.init();
 				const subPath = 'someRandomTestDir';
-				const testPaths = await adapterHelper.createMultipleDirectories(7, subPath);
+				const testPaths = await helper.createMultipleDirectories(7, subPath);
 				const testDir = getUniqSegmentsOfPath(testPaths, 2).map(p => addPrecedingSlash(p));
 
 
-				const dir = new Directory(adapter, '/');
+				const dir = new Directory(helper.adapter, '/');
 				const paths = await dir.subDir(subPath).list();
 				for(const t of paths) {
 					expect(testDir).toContain((t as Directory).path);
 				}
 			});
 
-			// TODO: maybe needed for list.asStringArray();
-			// test('list with additional params', async () => {
-			// 	await testHelper.createDirs(30);
-			// 	await testHelper.createDirs(2);
-
-			// 	const dir = new Directory(adapter, testHelper.getBasePath());
-			// 	const paths = await dir.list(undefined, 'isDirectory');
-			// 	expect(paths[0]).toHaveLength(2);
-			// 	expect(paths[0][0]).toBeTypeOf('string');
-			// 	expect(paths[0][1]).toBe(true);
-			// });
-
-			// test('list with additional multiple params', async () => {
-			// 	await testHelper.createFile('testFile', {path: 'testFile.txt'});
-
-			// 	const dir = new Directory(adapter, testHelper.getBasePath());
-			// 	const paths = await dir.list(undefined, 'isDirectory', 'isFile');
-			// 	expect(paths[0]).toHaveLength(3);
-			// 	expect(paths[0][0]).toBeTypeOf('string');
-			// 	expect(paths[0][1]).toBe(false);
-			// 	expect(paths[0][2]).toBe(true);
-			// });
 		});
 
 		describe('files method', () => {
