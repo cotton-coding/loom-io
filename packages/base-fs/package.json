@@ -8,10 +8,14 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"build": "tsc -p tsconfig.json"
 	},
+	"devDependencies": {
+		"@loom-io/test-utils": "workspace:*"
+	},
 	"dependencies": {
-		"@loom-io/core": "workspace:^",
-		"@loom-io/jsonConverter": "workspace:^",
-		"@loom-io/yamlConverter": "workspace:^"
+		"@loom-io/core": "workspace:^0.6.0",
+		"@loom-io/node-filesystem-adapter": "workspace:^0.6.0",
+		"@loom-io/yamlConverter": "workspace:^0.6.0",
+		"@loom-io/jsonConverter": "workspace:^0.6.0"
 	},
 	"exports": {
 		".": {
