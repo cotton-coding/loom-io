@@ -209,7 +209,7 @@ describe('Test File Service', () => {
 
 		test('Write file with json plugin', async () => {
 			const testContent = {test: true};
-			const testFile = await testHelper.createFile(faker.system.commonFileName('json'), JSON.stringify(testContent));
+			const testFile = await testHelper.createFile(faker.system.commonFileName('json'));
 
 			const file = LoomFile.from( adapter, testFile);
 			const plugin: LoomFileConverter = {
@@ -220,8 +220,7 @@ describe('Test File Service', () => {
 			};
 			LoomFile.register(plugin);
 			await file.stringify(testContent);
-			const content = await file.text();
-			expect(content).toBe(JSON.stringify(testContent));
+			await expect(file.text()).resolves.toBe(JSON.stringify(testContent));
 		});
 
 		test('No plugin for file', async () => {

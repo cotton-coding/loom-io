@@ -90,17 +90,24 @@ importers:
         specifier: workspace:*
         version: link:../../tests/test-utils
 
-  packages/base:
+  packages/base-fs:
     dependencies:
       '@loom-io/core':
-        specifier: workspace:^
+        specifier: workspace:^0.6.0
         version: link:../core
       '@loom-io/jsonConverter':
-        specifier: workspace:^
+        specifier: workspace:^0.6.0
         version: link:../../plugins/jsonConverter
+      '@loom-io/node-filesystem-adapter':
+        specifier: workspace:^0.6.0
+        version: link:../../adapters/node-fs
       '@loom-io/yamlConverter':
-        specifier: workspace:^
+        specifier: workspace:^0.6.0
         version: link:../../plugins/yamlConverter
+    devDependencies:
+      '@loom-io/test-utils':
+        specifier: workspace:*
+        version: link:../../tests/test-utils
 
   packages/common: {}
 
