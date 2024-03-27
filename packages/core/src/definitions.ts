@@ -72,7 +72,7 @@ export interface SourceAdapter {
     readFile(path: string): MaybePromise<Buffer>
     readFile(path: string, encoding: BufferEncoding): MaybePromise<string>
     readFile(path: string, encoding?: BufferEncoding): MaybePromise<Buffer | string>
-    writeFile(path: string, content: string): MaybePromise<void>
+    writeFile(path: string, content: string | Buffer): MaybePromise<void>
     deleteFile(path: string): MaybePromise<void>
     openFile(path: string): MaybePromise<FileHandler>
     stat(path: string): MaybePromise<FileStat>

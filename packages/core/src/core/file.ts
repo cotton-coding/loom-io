@@ -84,6 +84,10 @@ export class LoomFile {
 
 	}
 
+	async delete() {
+		await this._adapter.deleteFile(this.path);
+	}
+
 	async exists() {
 		const fullPath = joinPath(this.dir.path, this.name);
 		return this._adapter.fileExists(fullPath);
@@ -99,6 +103,28 @@ export class LoomFile {
 
 	async text(encoding: BufferEncoding = 'utf8') {
 		return await this._adapter.readFile(this.path, encoding);
+	}
+
+	async write(data: string | Buffer) {
+		await this._adapter.writeFile(this.path, data);
+	}
+
+	async create() {
+		await this._adapter.writeFile(this.path, Buffer.alloc(0));
+	}
+
+	async stringify<T>(content: T) {
+		if(this.extension === undefined) {
+			throw new FileConvertException(this.path, 'File has no extension');
+		}
+
+		const plugin = LoomFile.converterPlugins.get(this.extension);
+
+		if(plugin === undefined) {
+			throw new PluginNotFoundException(this.path);
+		}
+
+		return plugin.stringify(content);
 	}
 
 	static register(plugin: LoomFileConverter) {

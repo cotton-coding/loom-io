@@ -5,7 +5,7 @@ import { InMemoryAdapterHelper } from '@loom-io/test-utils';
 
 import { basename, dirname } from 'node:path';
 import { Directory } from './dir.js';
-import { FILE_SIZE_UNIT, SourceAdapter } from '../definitions.js';
+import { FILE_SIZE_UNIT, LoomFileConverter, PLUGIN_TYPE, SourceAdapter } from '../definitions.js';
 import { faker } from '@faker-js/faker';
 import { Editor } from './editor.js';
 
@@ -139,9 +139,110 @@ describe('Test File Service', () => {
 			expect(content.toString()).toBe(testContent);
 		});
 
+		test('Write file', async () => {
+			const testContent = '1234k2hk3jh1fasdasfc%';
+			const testFile = await testHelper.createFile(undefined, testContent);
+
+			const file = LoomFile.from( adapter, testFile);
+			const newContent = 'new content';
+			await file.write(newContent);
+			const content = await file.text();
+			expect(content).toBe(newContent);
+		});
+
+		test('Create file', async () => {
+			const testFile = await testHelper.createFile(undefined, 'test');
+			const file = LoomFile.from( adapter, testFile);
+			await file.create();
+			expect(await file.exists()).toBeTruthy();
+		});
+
+		test('Delete file', async () => {
+			const testFile = await testHelper.createFile(undefined, 'test');
+			const file = LoomFile.from( adapter, testFile);
+			await file.delete();
+			expect(await file.exists()).toBeFalsy();
+		});
+
 
 
 	});
+
+
+	describe('File Plugin Tests', () => {
+
+		afterEach(() => {
+			FileTest.emptyPlugins();
+		});
+
+		test('Register a plugin', async () => {
+			const testContent = '1234k2hk3jh1fasdasfc%';
+			const testFile = await testHelper.createFile(undefined, testContent);
+
+			const file = LoomFile.from( adapter, testFile);
+			const plugin: LoomFileConverter = {
+				$type: PLUGIN_TYPE.FILE_CONVERTER,
+				extensions: ['test'],
+				parse: <T>(text: string) => JSON.parse(text) as T,
+				stringify: (content: unknown) => JSON.stringify(content)
+			};
+			LoomFile.register(plugin);
+			const content = await file.text();
+			expect(content).toBe(testContent);
+		});
+
+		test('Read file with json plugin', async () => {
+			const testContent = {test: true};
+			const testFile = await testHelper.createFile(faker.system.commonFileName('json'), JSON.stringify(testContent));
+
+			const file = LoomFile.from( adapter, testFile);
+			const plugin: LoomFileConverter = {
+				$type: PLUGIN_TYPE.FILE_CONVERTER,
+				extensions: ['json'],
+				parse: <T>(text: string) => JSON.parse(text) as T,
+				stringify: (content: unknown) => JSON.stringify(content)
+			};
+			LoomFile.register(plugin);
+			const content = await file.json();
+			expect(content).toStrictEqual(testContent);
+		});
+
+		test('Write file with json plugin', async () => {
+			const testContent = {test: true};
+			const testFile = await testHelper.createFile(faker.system.commonFileName('json'), JSON.stringify(testContent));
+
+			const file = LoomFile.from( adapter, testFile);
+			const plugin: LoomFileConverter = {
+				$type: PLUGIN_TYPE.FILE_CONVERTER,
+				extensions: ['json'],
+				parse: <T>(text: string) => JSON.parse(text) as T,
+				stringify: (content: unknown) => JSON.stringify(content)
+			};
+			LoomFile.register(plugin);
+			await file.stringify(testContent);
+			const content = await file.text();
+			expect(content).toBe(JSON.stringify(testContent));
+		});
+
+		test('No plugin for file', async () => {
+			const testContent = {test: true};
+			const testFile = await testHelper.createFile(faker.system.commonFileName('json'), JSON.stringify(testContent));
+
+			const file = LoomFile.from( adapter, testFile);
+			await expect(file.json()).rejects.toThrow(PluginNotFoundException);
+			await expect(file.stringify(testContent)).rejects.toThrow(PluginNotFoundException);
+		});
+
+		test('No extension for file', async () => {
+			const testContent = {test: true};
+			const testFile = await testHelper.createFile(faker.system.directoryPath(), JSON.stringify(testContent));
+
+			const file = LoomFile.from( adapter, testFile);
+			await expect(file.json()).rejects.toThrow(FileConvertException);
+			await expect(file.stringify(testContent)).rejects.toThrow(FileConvertException);
+		});
+	});
+
 });
 
 
