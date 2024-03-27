@@ -8,6 +8,7 @@ import { Directory } from './dir.js';
 import { FILE_SIZE_UNIT, LoomFileConverter, PLUGIN_TYPE, SourceAdapter } from '../definitions.js';
 import { faker } from '@faker-js/faker';
 import { Editor } from './editor.js';
+import { after } from 'node:test';
 
 class FileTest extends LoomFile {
 
@@ -164,6 +165,17 @@ describe('Test File Service', () => {
 			expect(await file.exists()).toBeFalsy();
 		});
 
+
+
+	});
+
+
+	describe('File Plugin Tests', () => {
+
+		afterEach(() => {
+			FileTest.emptyPlugins();
+		});
+
 		test('Register a plugin', async () => {
 			const testContent = '1234k2hk3jh1fasdasfc%';
 			const testFile = await testHelper.createFile(undefined, testContent);
@@ -213,7 +225,25 @@ describe('Test File Service', () => {
 			expect(content).toBe(JSON.stringify(testContent));
 		});
 
+		test('No plugin for file', async () => {
+			const testContent = {test: true};
+			const testFile = await testHelper.createFile(faker.system.commonFileName('json'), JSON.stringify(testContent));
+
+			const file = LoomFile.from( adapter, testFile);
+			await expect(file.json()).rejects.toThrow(PluginNotFoundException);
+			await expect(file.stringify(testContent)).rejects.toThrow(PluginNotFoundException);
+		});
+
+		test('No extension for file', async () => {
+			const testContent = {test: true};
+			const testFile = await testHelper.createFile(faker.system.directoryPath(), JSON.stringify(testContent));
+
+			const file = LoomFile.from( adapter, testFile);
+			await expect(file.json()).rejects.toThrow(FileConvertException);
+			await expect(file.stringify(testContent)).rejects.toThrow(FileConvertException);
+		});
 	});
+
 });
 
 
