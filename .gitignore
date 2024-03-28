@@ -180,3 +180,5 @@ dist
 tests/integration/test-tmp/
 
 test-tmp/
+
+documentation/.vitepress/cache/

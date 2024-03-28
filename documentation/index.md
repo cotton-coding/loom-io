@@ -1,0 +1,22 @@
+---
+# https://vitepress.dev/reference/default-theme-home-page
+layout: home
+
+hero:
+  name: "loom-io"
+  text: handle your files
+  tagline: loom your file handling
+  actions:
+    - theme: brand
+      text: Introduction
+      link: /markdown-examples
+    - theme: alt
+      text: Get started
+      link: /api-examples
+
+features:
+  - title: Sources
+    details: Handle different sources like s3, filesystem or in-memory the same way. Write you own source adapter and plug it
+  - title: Converter
+    details: Read yml or other file types directly as json, build your own converter to handle your own file structure
+---
