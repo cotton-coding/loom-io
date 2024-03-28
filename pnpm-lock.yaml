@@ -101,15 +101,15 @@ importers:
       '@loom-io/core':
         specifier: workspace:^
         version: link:../core
-      '@loom-io/jsonConverter':
+      '@loom-io/json-converter':
         specifier: workspace:^
-        version: link:../../plugins/jsonConverter
+        version: link:../../plugins/json-converter
       '@loom-io/node-filesystem-adapter':
         specifier: workspace:^
         version: link:../../adapters/node-fs
-      '@loom-io/yamlConverter':
+      '@loom-io/yaml-converter':
         specifier: workspace:^
-        version: link:../../plugins/yamlConverter
+        version: link:../../plugins/yaml-converter
     devDependencies:
       '@loom-io/test-utils':
         specifier: workspace:*
@@ -130,13 +130,13 @@ importers:
         specifier: workspace:*
         version: link:../../tests/test-utils
 
-  plugins/jsonConverter:
+  plugins/json-converter:
     dependencies:
       '@loom-io/core':
         specifier: ^0.7.0
         version: link:../../packages/core
 
-  plugins/yamlConverter:
+  plugins/yaml-converter:
     dependencies:
       '@loom-io/core':
         specifier: ^0.7.0
@@ -150,15 +150,9 @@ importers:
       '@loom-io/core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@loom-io/jsonConverter':
-        specifier: workspace:*
-        version: link:../../plugins/jsonConverter
       '@loom-io/test-utils':
         specifier: workspace:*
         version: link:../test-utils
-      '@loom-io/yamlConverter':
-        specifier: workspace:*
-        version: link:../../plugins/yamlConverter
 
   tests/interface-tests:
     dependencies:

@@ -14,8 +14,8 @@
 	"dependencies": {
 		"@loom-io/core": "workspace:^",
 		"@loom-io/node-filesystem-adapter": "workspace:^",
-		"@loom-io/yamlConverter": "workspace:^",
-		"@loom-io/jsonConverter": "workspace:^"
+		"@loom-io/yaml-converter": "workspace:^",
+		"@loom-io/json-converter": "workspace:^"
 	},
 	"exports": {
 		".": {

@@ -1,9 +1,8 @@
 {
-	"name": "@loom-io/jsonConverter",
+	"name": "@loom-io/yaml-converter",
 	"version": "0.7.0",
-	"description": "A plugin for @loom-io to convert json files to JSON",
-	"main": "dist/jsonConverter.js",
-	"module": "dist/jsonConverter.js",
+	"description": "",
+	"main": "dist/yamlConverter.js",
 	"type": "module",
 	"scripts": {
 		"build": "tsc --project tsconfig.json",
@@ -13,12 +12,15 @@
 	"peerDependencies": {
 		"@loom-io/core": "^0.7.0"
 	},
+	"dependencies": {
+		"yaml": "^2.4.1"
+	},
 	"keywords": [],
 	"author": "Wolfgang Rathgeb",
 	"exports": {
 		".": {
-			"types": "./dist/jsonConverter.d.ts",
-			"import": "./dist/jsonConverter.js"
+			"types": "./dist/yamlConverter.d.ts",
+			"import": "./dist/yamlConverter.js"
 		}
 	}
 }

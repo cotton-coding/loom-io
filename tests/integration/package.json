@@ -9,8 +9,6 @@
 	},
 	"devDependencies": {
 		"@loom-io/core": "workspace:*",
-		"@loom-io/jsonConverter": "workspace:*",
-		"@loom-io/yamlConverter": "workspace:*",
 		"@loom-io/test-utils": "workspace:*"
 	},
 	"keywords": [],
