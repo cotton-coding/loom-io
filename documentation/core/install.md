@@ -44,7 +44,7 @@ bun add @loom-io/core
 
 :::
 
-This package will not work out of the box, because it is missing an adapter to connect files. For example to get a similar functionality as in the filesystem bundle you need to install the filesystem adapter and some converter to convert different filetypes to json.
+This package will not work out of the box, because it is missing an adapter to connect a storage system e.g. S3, Filesystem . For example to get a similar functionality as in the filesystem bundle you need to install the filesystem adapter and some converter to convert different filetypes to json.
 
 ::: code-group
 
