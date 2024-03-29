@@ -110,6 +110,7 @@ export class LoomFile {
 	}
 
 	async create() {
+		await this._dir.create();
 		await this._adapter.writeFile(this.path, Buffer.alloc(0));
 	}
 

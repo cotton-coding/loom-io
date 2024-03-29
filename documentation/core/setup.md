@@ -63,3 +63,54 @@ bun add @loom-io/core @loom-io/node-filesystem-adapter @loom-io/yaml-converter @
 :::
 
 You will find installation package in the adapter and converter descriptions.
+
+## Basic Setup (S3)
+
+The default export of loom-io is a global Object you can import at server side without register a plugin or adapter again and again. We will import it as `Loom`, but you can give it any name.
+
+If you are not using a base bundle you need to register an adapter and probably some converters to read files as json.
+To keep the examples more generic we will import `Loom` from the core library. If you are using a bundle replace the import `@loom-io/core` with the bundle name e.g. `@loom-io/base-fs`.
+
+For the setup you need the following packages:
+
+::: code-group
+
+```sh [npm]
+npm add @loom-io/core @loom-io/s3-minio-adapter @loom-io/yaml-converter @loom-io/json-converter
+```
+
+```sh [pnpm]
+pnpm add @loom-io/core @loom-io/ns3-minio-adapter @loom-io/yaml-converter @loom-io/json-converter
+```
+
+```sh [bun]
+bun add @loom-io/core @loom-io/s3-minio-adapter @loom-io/yaml-converter @loom-io/json-converter
+```
+
+:::
+
+Now you can setup a S3 connection. In this example we will use a open minio instance from [minio](https://min.io/)
+
+```ts
+import Loom from "@loom-io/core";
+import s3MinioAdapter from "@loom-io/minio-s3-adapter";
+import jsonConverter from "@loom-io/json-converter";
+import yamlConverter from "@loom-io/yaml-converter";
+
+const minioConfig = {
+	endPoint: "play.min.io",
+	port: 9000,
+	useSSL: true,
+	accessKey: "Q3AM3UQ867SPQQA43P2F",
+	secretKey: "zuf+tfteSlswRu7BJ86wekitnifILbZam1KYY3TG",
+};
+
+const bucketName = "loom-io-test-bucket";
+
+Loom.register(s3MinioAdapter("s3://", bucketName, minioConfig));
+
+Loom.register(jsonConverter);
+Loom.register(yamlConverter);
+```
+
+Now we can dive deeper into loom-io and the storing system to access or create files and directories.

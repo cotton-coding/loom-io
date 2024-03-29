@@ -17,11 +17,8 @@ export default defineConfig({
         text: 'Getting Started',
         items: [
           { text: 'Introduction', link: '/core/intro' },
-          { text: 'Install', link: '/core/install' },
-          { text: 'Overview', link: '/core/overview' },
-          { text: 'Directory', link: '/core/directory' },
-          { text: 'File', link: '/core/file' },
-          { text: 'Editor', link: '/core/editor' }
+          { text: 'Setup', link: '/core/setup' },
+          { text: 'Examples', link: '/core/examples' }
         ]
       },
       {
@@ -32,11 +29,20 @@ export default defineConfig({
           { text: 'S3-Minio', link: '/adapter/minio-s3-adapter' }
         ]
       },
+      // {
+      //   text: 'Converter',
+      //   items: [
+      //     { text: 'JSON', link: '/converter/markdown-converter' },
+      //     { text: 'YAML', link: '/converter/yaml-converter' }
+      //   ]
+      // }
       {
-        text: 'Converter',
+        text: 'Reference',
         items: [
-          { text: 'JSON', link: '/converter/markdown-converter' },
-          { text: 'YAML', link: '/converter/yaml-converter' }
+          { text: 'File', link: '/ref/file' },
+          { text: 'Directory', link: '/ref/directory' },
+          { text: 'List', link: '/ref/list'},
+          { text: 'Editor', link: '/ref/editor' }
         ]
       }
     ],
