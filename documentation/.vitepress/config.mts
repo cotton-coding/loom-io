@@ -3,14 +3,14 @@ import { defineConfig } from 'vitepress'
 // https://vitepress.dev/reference/site-config
 export default defineConfig({
   title: "loom-io",
-  description: "loom your file handling",
+  description: "weave your data access",
   lastUpdated: true,
   themeConfig: {
     logo: "/loom-io.png",
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Documentation', link: '/core/intro' }
+      { text: 'Doc', link: '/core/intro' }
     ],
     sidebar: [
       {
@@ -28,7 +28,7 @@ export default defineConfig({
         text: 'Source Adapter',
         items: [
           { text: 'In-Memory', link: '/adapter/in-memory-adapter' },
-          { text: 'Filesystem (node)', link: '/adapter/node-fs-adapter' },
+          { text: 'Filesystem', link: '/adapter/node-filesystem-adapter' },
           { text: 'S3-Minio', link: '/adapter/minio-s3-adapter' }
         ]
       },

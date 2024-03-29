@@ -5,14 +5,17 @@ layout: home
 hero:
   name: "loom-io"
   text: handle your files
-  tagline: loom your file handling
+  tagline: weave your data access
   actions:
     - theme: brand
       text: Introduction
-      link: /markdown-examples
+      link: /core/intro
     - theme: alt
       text: Get started
-      link: /api-examples
+      link: /core/install
+    - theme: alt
+      text: Github
+      link: https://github.com/cotton-coding/loom-io
 
 features:
   - title: Sources
