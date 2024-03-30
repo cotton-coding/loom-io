@@ -3,3 +3,4 @@ packages:
   - "adapters/*"
   - "plugins/*"
   - "tests/*"
+  - "documentation"

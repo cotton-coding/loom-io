@@ -10,7 +10,4 @@ const s3config = {
 };
 
 
-testSource('s3://', S3MinioSourceAdapter(undefined, {
-	bucket: 'test-bucket',
-	...s3config
-}));
+testSource('s3://', S3MinioSourceAdapter(undefined, 'test-bucket', s3config));
