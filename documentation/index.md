@@ -12,7 +12,7 @@ hero:
       link: /core/intro
     - theme: alt
       text: Get started
-      link: /core/install
+      link: /core/setup
     - theme: alt
       text: Github
       link: https://github.com/cotton-coding/loom-io
