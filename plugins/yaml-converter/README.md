@@ -1,3 +1,11 @@
-# loom-io/core
+# @loom-io/yaml-adapter
 
-Here is the heart of loom-io. It need some extension to work probably, but without it, nothing works. It contains the hole api and abstraction level. Take a look at the [documentation](https://loom-io.cotton-coding.com) to learn how to use it.
+Converts yml and yaml files to JSON and wise versa.
+
+```sh
+npm add @loom-io/yaml-adapter
+```
+
+## Documentation of loom-io
+
+loom-io will help you reading files of any size from different source more easily. See [documentation](https://loom-io.cotton-coding.com) for more details.

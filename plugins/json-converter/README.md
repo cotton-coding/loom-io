@@ -1,5 +1,11 @@
-# loom-io
+# @loom-io/json-adapter
 
-[![codecov](https://codecov.io/gh/cotton-coding/loom/graph/badge.svg?token=HA5N9V34OE)](https://codecov.io/gh/cotton-coding/loom)
+Converts json files to JSON and wise versa.
+
+```sh
+npm add @loom-io/json-adapter
+```
+
+## Documentation of loom-io
 
 loom-io will help you reading files of any size from different source more easily. See [documentation](https://loom-io.cotton-coding.com) for more details.
