@@ -13,6 +13,13 @@
 			"types": "./dist/index.d.ts"
 		}
 	},
-	"keywords": [],
-	"author": ""
+	"keywords": [
+		"loom-io",
+		"common"
+	],
+	"author": "Wolfgang Rathgeb",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/cotton-coding/loom-io.git"
+	}
 }

@@ -19,5 +19,9 @@
 		}
 	},
 	"keywords": [],
-	"author": ""
+	"author": "Wolfgang Rathgeb",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/cotton-coding/loom-io.git"
+	}
 }

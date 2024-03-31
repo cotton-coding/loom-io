@@ -14,12 +14,20 @@
 	"dependencies": {
 		"yaml": "^2.4.1"
 	},
-	"keywords": [],
+	"keywords": [
+		"loom-io",
+		"yaml",
+		"converter"
+	],
 	"author": "Wolfgang Rathgeb",
 	"exports": {
 		".": {
 			"types": "./dist/yamlConverter.d.ts",
 			"import": "./dist/yamlConverter.js"
 		}
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/cotton-coding/loom-io.git"
 	}
 }

@@ -6,14 +6,11 @@
 	"description": "A file system wrapper for Node.js and Bun",
 	"keywords": [
 		"fs",
-		"directory",
-		"dir",
-		"file",
-		"file system",
 		"filesystem",
 		"node",
+		"bun",
 		"nodejs",
-		"wrapper",
+		"adapter",
 		"@loom-io"
 	],
 	"files": [
@@ -50,7 +47,7 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/cotton-coding/loom.git"
+		"url": "https://github.com/cotton-coding/loom-io.git"
 	},
 	"dependencies": {
 		"@loom-io/common": "workspace:*"
