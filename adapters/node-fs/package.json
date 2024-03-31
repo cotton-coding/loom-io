@@ -3,7 +3,6 @@
 	"main": "dist/exports/lib.js",
 	"types": "dist/exports/lib.d.ts",
 	"author": "Cotton Coding",
-	"version": "0.7.0",
 	"description": "A file system wrapper for Node.js and Bun",
 	"keywords": [
 		"fs",

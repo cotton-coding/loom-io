@@ -1,6 +1,5 @@
 {
 	"name": "@loom-io/yaml-converter",
-	"version": "0.7.0",
 	"description": "",
 	"main": "dist/yamlConverter.js",
 	"type": "module",

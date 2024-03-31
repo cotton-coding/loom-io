@@ -1,6 +1,5 @@
 {
 	"name": "@loom-io/base-fs",
-	"version": "0.7.0",
 	"description": "",
 	"main": "dist/exports/lib.js",
 	"type": "module",

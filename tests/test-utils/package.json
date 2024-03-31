@@ -1,6 +1,5 @@
 {
 	"name": "@loom-io/test-utils",
-	"version": "0.7.0",
 	"description": "",
 	"main": "./dist/index.js",
 	"type": "module",
