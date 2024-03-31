@@ -19,12 +19,14 @@ jobs:
         with:
           node-version: 20
           cache: "pnpm"
+      - name: Lint & Fix
+        run: pnpm lint:fix
       - name: Install
         run: pnpm install
-      - name: Lint & Fix
-        run: pnpm run lint:fix
+      - name: Build
+        run: pnpm build
       - name: Test
-        run: pnpm run test:ci
+        run: pnpm test:ci
   publish:
     name: Build & Publish
     needs: test
