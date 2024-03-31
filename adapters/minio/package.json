@@ -3,18 +3,12 @@
 	"main": "dist/exports/lib.js",
 	"types": "dist/exports/lib.d.ts",
 	"author": "Cotton Coding",
-	"version": "0.7.0",
 	"description": "A file system wrapper for Node.js and Bun",
 	"keywords": [
-		"fs",
-		"directory",
-		"dir",
+		"adapter",
+		"minio",
+		"s3",
 		"file",
-		"file system",
-		"filesystem",
-		"node",
-		"nodejs",
-		"wrapper",
 		"@loom-io"
 	],
 	"files": [
@@ -54,6 +48,6 @@
 	],
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/cotton-coding/loom.git"
+		"url": "https://github.com/cotton-coding/loom-io.git"
 	}
 }

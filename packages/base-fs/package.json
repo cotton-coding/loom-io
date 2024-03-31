@@ -1,6 +1,5 @@
 {
-	"name": "@loom-io/base",
-	"version": "0.7.0",
+	"name": "@loom-io/base-fs",
 	"description": "",
 	"main": "dist/exports/lib.js",
 	"type": "module",
@@ -23,5 +22,15 @@
 			"import": "./dist/exports/lib.js"
 		}
 	},
-	"keywords": []
+	"keywords": [
+		"loom-io",
+		"filesystem",
+		"base",
+		"yml",
+		"json"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/cotton-coding/loom-io.git"
+	}
 }

@@ -1,7 +1,6 @@
 {
 	"name": "@loom-io/common",
-	"version": "1.0.0",
-	"description": "",
+	"description": "Common functions for loom-io",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"scripts": {
@@ -14,6 +13,13 @@
 			"types": "./dist/index.d.ts"
 		}
 	},
-	"keywords": [],
-	"author": ""
+	"keywords": [
+		"loom-io",
+		"common"
+	],
+	"author": "Wolfgang Rathgeb",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/cotton-coding/loom-io.git"
+	}
 }

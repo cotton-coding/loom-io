@@ -1,6 +1,5 @@
 {
 	"name": "@loom-io/json-converter",
-	"version": "0.7.0",
 	"description": "A plugin for @loom-io to convert json files to JSON",
 	"main": "dist/jsonConverter.js",
 	"module": "dist/jsonConverter.js",
@@ -13,12 +12,20 @@
 	"peerDependencies": {
 		"@loom-io/core": "^0.7.0"
 	},
-	"keywords": [],
+	"keywords": [
+		"loom-io",
+		"json",
+		"converter"
+	],
 	"author": "Wolfgang Rathgeb",
 	"exports": {
 		".": {
 			"types": "./dist/jsonConverter.d.ts",
 			"import": "./dist/jsonConverter.js"
 		}
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/cotton-coding/loom-io.git"
 	}
 }

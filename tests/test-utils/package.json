@@ -1,7 +1,6 @@
 {
 	"name": "@loom-io/test-utils",
-	"version": "0.7.0",
-	"description": "",
+	"description": "Utils for testing loom-io packages",
 	"main": "./dist/index.js",
 	"type": "module",
 	"scripts": {
@@ -20,5 +19,9 @@
 		}
 	},
 	"keywords": [],
-	"author": ""
+	"author": "Wolfgang Rathgeb",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/cotton-coding/loom-io.git"
+	}
 }
