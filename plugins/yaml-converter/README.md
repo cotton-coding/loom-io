@@ -1,5 +1,3 @@
-# loom-io
+# loom-io/core
 
-[![codecov](https://codecov.io/gh/cotton-coding/loom/graph/badge.svg?token=HA5N9V34OE)](https://codecov.io/gh/cotton-coding/loom)
-
-loom-io will help you reading files of any size from different source more easily. See [documentation](https://loom-io.cotton-coding.com) for more details.
+Here is the heart of loom-io. It need some extension to work probably, but without it, nothing works. It contains the hole api and abstraction level. Take a look at the [documentation](https://loom-io.cotton-coding.com) to learn how to use it.
