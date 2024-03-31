@@ -1,5 +1,6 @@
 {
 	"name": "@loom-io/json-converter",
+	"version": "0.7.1",
 	"description": "A plugin for @loom-io to convert json files to JSON",
 	"main": "dist/jsonConverter.js",
 	"module": "dist/jsonConverter.js",

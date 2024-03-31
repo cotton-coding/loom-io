@@ -1,5 +1,6 @@
 {
 	"name": "@loom-io/common",
+	"version": "1.0.1",
 	"description": "Common functions for loom-io",
 	"main": "dist/index.js",
 	"types": "dist/index.d.ts",

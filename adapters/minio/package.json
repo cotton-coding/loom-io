@@ -1,5 +1,6 @@
 {
 	"name": "@loom-io/minio-s3-adapter",
+	"version": "0.7.1",
 	"main": "dist/exports/lib.js",
 	"types": "dist/exports/lib.d.ts",
 	"author": "Cotton Coding",

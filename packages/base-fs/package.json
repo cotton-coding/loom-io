@@ -1,6 +1,7 @@
 {
 	"name": "@loom-io/base-fs",
-	"description": "",
+	"version": "0.7.1",
+	"description": "Bundle of @loom-io modules for filesystem operations",
 	"main": "dist/exports/lib.js",
 	"type": "module",
 	"scripts": {
