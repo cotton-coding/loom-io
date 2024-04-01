@@ -1,10 +1,9 @@
 import { expect, test, describe, afterEach, vi } from 'vitest';
-import { LoomIO, LoomSourceAdapter, NoSourceAdapterException, PLUGIN_TYPE, SourceAdapter, isFile, isList, isDirectory, isEditor, isReader, ObjectDirentInterface, FileHandler } from './lib.js';
+import { LoomIO, LoomSourceAdapter, NoSourceAdapterException, PLUGIN_TYPE, SourceAdapter, isFile, isList, isDirectory, isEditor, isReader, FileHandler } from './lib.js';
 import { List } from '../core/list.js';
 import { Editor } from '../core/editor.js';
 import { Directory } from '../core/dir.js';
 import { LoomFile } from '../core/file.js';
-import { FileHandle } from 'fs/promises';
 
 
 class LoomFsTest extends LoomIO {
