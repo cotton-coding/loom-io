@@ -29,13 +29,13 @@ export default defineConfig({
           { text: 'S3-Minio', link: '/adapter/minio-s3-adapter' }
         ]
       },
-      // {
-      //   text: 'Converter',
-      //   items: [
-      //     { text: 'JSON', link: '/converter/markdown-converter' },
-      //     { text: 'YAML', link: '/converter/yaml-converter' }
-      //   ]
-      // }
+      {
+        text: 'Converter',
+        items: [
+          { text: 'JSON', link: '/converter/json-converter' },
+          { text: 'YAML', link: '/converter/yaml-converter' }
+        ]
+      },
       {
         text: 'Reference',
         items: [

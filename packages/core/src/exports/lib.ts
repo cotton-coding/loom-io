@@ -4,7 +4,6 @@ import { Editor, Reader } from '../core/editor.js';
 import { List } from '../core/list.js';
 import { PLUGIN_TYPE, FILE_SIZE_UNIT } from '../definitions.js';
 import { LoomPlugin, LoomSourceAdapter } from '../definitions.js';
-import crypto from 'node:crypto';
 import { NoSourceAdapterException } from '../exceptions.js';
 
 export { PLUGIN_TYPE, FILE_SIZE_UNIT };
@@ -13,7 +12,7 @@ export * from '../definitions.js';
 export type { LoomFile, LoomFile as File, Directory, Editor, Reader, List};
 export class LoomIO {
 
-	protected static pluginHashes: string[] = [];
+	protected static pluginNonces: symbol[] = [];
 	protected static sourceAdapters: LoomSourceAdapter[] = [];
 
 	protected constructor() {}
@@ -44,11 +43,11 @@ export class LoomIO {
 	}
 
 	static register(plugin: LoomPlugin) {
-		const pluginHash = crypto.createHash('sha1').update(JSON.stringify(plugin)).digest('hex');
-		if(this.pluginHashes.includes(pluginHash)) {
+		const pluginNonce = plugin.nonce;
+		if(this.pluginNonces.includes(pluginNonce)) {
 			return;
 		}
-		this.pluginHashes.push(pluginHash);
+		this.pluginNonces.push(pluginNonce);
 		if(PLUGIN_TYPE.FILE_CONVERTER === plugin.$type) {
 			LoomFile.register(plugin);
 		} else if(PLUGIN_TYPE.SOURCE_ADAPTER === plugin.$type) {

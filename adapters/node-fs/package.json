@@ -1,6 +1,6 @@
 {
 	"name": "@loom-io/node-filesystem-adapter",
-	"version": "0.7.1",
+	"version": "0.8.0",
 	"main": "dist/exports/lib.js",
 	"types": "dist/exports/lib.d.ts",
 	"author": "Cotton Coding",
@@ -32,7 +32,7 @@
 		"@faker-js/faker": "^8.4.1"
 	},
 	"peerDependencies": {
-		"@loom-io/core": "^0.7.0"
+		"@loom-io/core": "^0.8.0"
 	},
 	"exports": {
 		".": {

@@ -4,8 +4,8 @@ import yamlConverter from '@loom-io/yaml-converter';
 import fileSystemAdapter from '@loom-io/node-filesystem-adapter';
 
 LoomIO.register(fileSystemAdapter('file://'));
-LoomIO.register(jsonConverter);
-LoomIO.register(yamlConverter);
+LoomIO.register(yamlConverter());
+LoomIO.register(jsonConverter());
 
 export * from '@loom-io/core';
 

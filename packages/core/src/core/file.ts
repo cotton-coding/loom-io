@@ -1,5 +1,5 @@
 import { PLUGIN_TYPE, type LoomFileConverter, FILE_SIZE_UNIT, SourceAdapter } from '../definitions.js';
-import { FileConvertException, PluginNotFoundException } from '../exceptions.js';
+import { FileConvertException } from '../exceptions.js';
 import { Directory } from './dir.js';
 import { join as joinPath, extname, dirname, basename } from 'node:path';
 import { Editor } from './editor.js';
@@ -11,8 +11,9 @@ export interface PrefixDefinition {
 
 export class LoomFile {
 
-	protected static converterPlugins: Map<string, LoomFileConverter> = new Map();
+	protected static converterPlugins: Array<LoomFileConverter> = [];
 	protected _extension: string | undefined;
+	protected _converter: LoomFileConverter | undefined;
 
 	static from(adapter: SourceAdapter ,dir: Directory, name: string): LoomFile
 	static from(adapter: SourceAdapter, path: string): LoomFile
@@ -69,19 +70,9 @@ export class LoomFile {
 	}
 
 	async json<T>() {
-		if(this.extension === undefined) {
-			throw new FileConvertException(this.path, 'File has no extension');
-		}
+		const converter = await this.getConverterPlugin();
 
-		const plugin = LoomFile.converterPlugins.get(this.extension);
-
-		if(plugin === undefined) {
-			throw new PluginNotFoundException(this.path);
-		}
-
-		const text = await this.text();
-		return plugin.parse<T>(text);
-
+		return converter.parse<T>(this);
 	}
 
 	async delete() {
@@ -115,24 +106,36 @@ export class LoomFile {
 	}
 
 	async stringify<T>(content: T) {
-		if(this.extension === undefined) {
-			throw new FileConvertException(this.path, 'File has no extension');
+		const converter = await this.getConverterPlugin();
+
+		converter.stringify(this, content);
+	}
+
+	protected async getConverterPlugin(): Promise<LoomFileConverter> {
+		if(this._converter !== undefined) {
+			return this._converter;
 		}
 
-		const plugin = LoomFile.converterPlugins.get(this.extension);
+		try {
+			const plugin = await Promise.any(LoomFile.converterPlugins.map(async (plugin) => {
+				if(await plugin.verify(this)) {
+					return Promise.resolve(plugin);
+				}
+				return Promise.reject();
+			}));
 
-		if(plugin === undefined) {
-			throw new PluginNotFoundException(this.path);
+			this._converter = plugin;
+			return plugin;
+
+		} catch (error) {
+			throw new FileConvertException(this.path, 'No converter found for file');
 		}
 
-		this.write(plugin.stringify(content));
 	}
 
 	static register(plugin: LoomFileConverter) {
 		if(plugin.$type === PLUGIN_TYPE.FILE_CONVERTER) {
-			plugin.extensions.forEach(ext => {
-				LoomFile.converterPlugins.set(ext, plugin);
-			});
+			LoomFile.converterPlugins.push(plugin);
 		}
 	}
 }

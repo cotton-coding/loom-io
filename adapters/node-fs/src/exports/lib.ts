@@ -9,5 +9,6 @@ export default (key: string = 'file://', rootdir?: PathLike) => ({
 			const path = link.slice(key.length);
 			return source(path, rootdir, Type);
 		}
-	}
+	},
+	nonce: Symbol('node-fs-source-adapter')
 }) satisfies LoomSourceAdapter;

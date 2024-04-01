@@ -1,4 +1,4 @@
-import type { BucketItem, Client }	from 'minio';
+import type { Client }	from 'minio';
 import { ObjectDirent } from './object-dirent.js';
 import { FileHandler } from './file-handler.js';
 import { type SourceAdapter, type rmdirOptions, type ObjectDirentInterface, DirectoryNotEmptyException } from '@loom-io/core';
@@ -95,23 +95,6 @@ export class Adapter implements SourceAdapter {
 			});
 			bucketStream.on('end', () => {
 				resolve(false);
-			});
-			bucketStream.on('error', (err) => {
-				reject(err);
-			});
-		});
-	}
-
-	protected async filesInDir(path: string): Promise<BucketItem[]> {
-		const pathWithTailSlash = path.endsWith('/') ? path : `${path}/`;
-		const bucketStream = await this.s3.listObjects(this.bucket, pathWithTailSlash);
-		return new Promise((resolve, reject) => {
-			const files: BucketItem[] = [];
-			bucketStream.on('data', (data) => {
-				files.push(data);
-			});
-			bucketStream.on('end', () => {
-				resolve(files);
 			});
 			bucketStream.on('error', (err) => {
 				reject(err);

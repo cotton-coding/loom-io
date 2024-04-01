@@ -9,7 +9,7 @@ export default defineWorkspace([
 			name: 'test-helper',
 			environment: 'node'
 		}
-	}
-	//'plugins/*',
+	},
+	'plugins/*',
 	//'test/*/vitest.config.ts',
 ]);
