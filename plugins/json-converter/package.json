@@ -2,8 +2,8 @@
 	"name": "@loom-io/json-converter",
 	"version": "0.7.1",
 	"description": "A plugin for @loom-io to convert json files to JSON",
-	"main": "dist/jsonConverter.js",
-	"module": "dist/jsonConverter.js",
+	"main": "dist/json-converter.js",
+	"module": "dist/json-converter.js",
 	"type": "module",
 	"scripts": {
 		"build": "tsc --project tsconfig.json",
@@ -21,8 +21,8 @@
 	"author": "Wolfgang Rathgeb",
 	"exports": {
 		".": {
-			"types": "./dist/jsonConverter.d.ts",
-			"import": "./dist/jsonConverter.js"
+			"types": "./dist/json-converter.d.ts",
+			"import": "./dist/json-converter.js"
 		}
 	},
 	"repository": {
