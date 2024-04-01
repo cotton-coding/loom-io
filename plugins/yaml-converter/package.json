@@ -2,7 +2,7 @@
 	"name": "@loom-io/yaml-converter",
 	"version": "0.7.1",
 	"description": "Convert yaml files to json with loom-io",
-	"main": "dist/yamlConverter.js",
+	"main": "dist/yaml-converter.js",
 	"type": "module",
 	"scripts": {
 		"build": "tsc --project tsconfig.json",
@@ -23,8 +23,8 @@
 	"author": "Wolfgang Rathgeb",
 	"exports": {
 		".": {
-			"types": "./dist/yamlConverter.d.ts",
-			"import": "./dist/yamlConverter.js"
+			"types": "./dist/yaml-converter.d.ts",
+			"import": "./dist/yaml-converter.js"
 		}
 	},
 	"repository": {
