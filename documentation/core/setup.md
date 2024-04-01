@@ -109,8 +109,8 @@ const bucketName = "loom-io-test-bucket";
 
 Loom.register(s3MinioAdapter("s3://", bucketName, minioConfig));
 
-Loom.register(jsonConverter);
-Loom.register(yamlConverter);
+Loom.register(jsonConverter());
+Loom.register(yamlConverter());
 ```
 
 Now we can dive deeper into loom-io and the storing system to access or create files and directories.
