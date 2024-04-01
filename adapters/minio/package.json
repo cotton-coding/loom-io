@@ -1,6 +1,6 @@
 {
 	"name": "@loom-io/minio-s3-adapter",
-	"version": "0.7.1",
+	"version": "0.8.0",
 	"main": "dist/exports/lib.js",
 	"types": "dist/exports/lib.d.ts",
 	"author": "Cotton Coding",
@@ -29,7 +29,7 @@
 		"@loom-io/test-utils": "workspace:^"
 	},
 	"peerDependencies": {
-		"@loom-io/core": "^0.7.0"
+		"@loom-io/core": "^0.8.0"
 	},
 	"dependencies": {
 		"@loom-io/common": "workspace:^",

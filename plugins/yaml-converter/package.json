@@ -1,6 +1,6 @@
 {
 	"name": "@loom-io/yaml-converter",
-	"version": "0.7.1",
+	"version": "0.8.0",
 	"description": "Convert yaml files to json with loom-io",
 	"main": "dist/yaml-converter.js",
 	"type": "module",
@@ -10,7 +10,7 @@
 		"prepublishOnly": "npm run build && publint"
 	},
 	"peerDependencies": {
-		"@loom-io/core": "^0.7.0"
+		"@loom-io/core": "^0.8.0"
 	},
 	"dependencies": {
 		"yaml": "^2.4.1"

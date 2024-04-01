@@ -1,6 +1,6 @@
 {
 	"name": "@loom-io/in-memory-adapter",
-	"version": "0.7.1",
+	"version": "0.8.0",
 	"main": "dist/exports/lib.js",
 	"types": "dist/exports/lib.d.ts",
 	"author": "Cotton Coding",
@@ -27,7 +27,7 @@
 		"@loom-io/interface-tests": "workspace:^"
 	},
 	"peerDependencies": {
-		"@loom-io/core": "workspace:^0.7.0"
+		"@loom-io/core": "workspace:^0.8.0"
 	},
 	"dependencies": {
 		"@loom-io/common": "workspace:^"
