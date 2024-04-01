@@ -14,14 +14,6 @@ interface LoomException {
 	__loomExceptionRef: EXCEPTION_REF;
 }
 
-export class PluginNotFoundException extends Error implements LoomException{
-	__loomExceptionRef = EXCEPTION_REF.PLUGIN_NOT_FOUND;
-	constructor(path: string) {
-		super(`No plugin found for ${path}`);
-	}
-
-}
-
 export class FileConvertException extends Error implements LoomException{
 	__loomExceptionRef = EXCEPTION_REF.FILE_CONVERT;
 	constructor(path: string, message: string, error?: Error) {
