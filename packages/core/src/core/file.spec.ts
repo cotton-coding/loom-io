@@ -25,6 +25,13 @@ class FileTest extends LoomFile {
 	}
 }
 
+const plugin: LoomFileConverter = {
+	$type: PLUGIN_TYPE.FILE_CONVERTER,
+	verify: (file: LoomFile) => file.extension === 'json',
+	parse: async <T>(file: LoomFile) => JSON.parse(await file.text()) as T,
+	stringify: async (file: LoomFile, content: unknown) => await file.write(JSON.stringify(content))
+};
+
 describe('Test File Service', () => {
 
 	let testHelper: InMemoryAdapterHelper;
@@ -180,12 +187,6 @@ describe('Test File Service', () => {
 			const testFile = await testHelper.createFile(undefined, testContent);
 
 			const file = LoomFile.from( adapter, testFile);
-			const plugin: LoomFileConverter = {
-				$type: PLUGIN_TYPE.FILE_CONVERTER,
-				extensions: ['test'],
-				parse: <T>(text: string) => JSON.parse(text) as T,
-				stringify: (content: unknown) => JSON.stringify(content)
-			};
 			LoomFile.register(plugin);
 			const content = await file.text();
 			expect(content).toBe(testContent);
@@ -196,12 +197,6 @@ describe('Test File Service', () => {
 			const testFile = await testHelper.createFile(faker.system.commonFileName('json'), JSON.stringify(testContent));
 
 			const file = LoomFile.from( adapter, testFile);
-			const plugin: LoomFileConverter = {
-				$type: PLUGIN_TYPE.FILE_CONVERTER,
-				verify: (file: LoomFile) => file.extension === 'json',
-				parse: async <T>(file: LoomFile) => JSON.parse(await file.text()) as T,
-				stringify: async (file: LoomFile, content: unknown) => await file.write(JSON.stringify(content))
-			};
 			LoomFile.register(plugin);
 			const content = await file.json();
 			expect(content).toStrictEqual(testContent);
@@ -212,12 +207,6 @@ describe('Test File Service', () => {
 			const testFile = await testHelper.createFile(faker.system.commonFileName('json'));
 
 			const file = LoomFile.from( adapter, testFile);
-			const plugin: LoomFileConverter = {
-				$type: PLUGIN_TYPE.FILE_CONVERTER,
-				verify: (file: LoomFile) => file.extension === 'json',
-				parse: async <T>(file: LoomFile) => JSON.parse(await file.text()) as T,
-				stringify: async (file: LoomFile, content: unknown) => await file.write(JSON.stringify(content))
-			};
 			LoomFile.register(plugin);
 			await file.stringify(testContent);
 			await expect(file.text()).resolves.toBe(JSON.stringify(testContent));
