@@ -20,7 +20,7 @@ export enum FILE_SIZE_UNIT {
 
 export interface LoomPluginBase {
     $type: PLUGIN_TYPE,
-    nonce?: string | number
+    nonce: symbol
 }
 
 export interface LoomFileConverter extends LoomPluginBase {
@@ -31,7 +31,7 @@ export interface LoomFileConverter extends LoomPluginBase {
 }
 export interface LoomSourceAdapter extends LoomPluginBase{
     $type: PLUGIN_TYPE.SOURCE_ADAPTER,
-    source: (link: string, Type?: typeof Directory | typeof LoomFile) => MaybePromise<Directory | LoomFile> | void
+    source: (link: string, Type?: typeof Directory | typeof LoomFile) => MaybePromise<Directory | LoomFile> | void,
 }
 
 export type LoomPlugin = LoomFileConverter | LoomSourceAdapter;

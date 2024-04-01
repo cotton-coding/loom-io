@@ -9,11 +9,20 @@ describe('json-converter', () => {
 		expect(yamlConverter().$type).toBe(PLUGIN_TYPE.FILE_CONVERTER);
 	});
 
-	test('verify', () => {
-		const file = { extension: 'yaml' } as LoomFile;
+	test('nonce need to be same on each result', () => {
+		const converter = yamlConverter();
+		expect(converter.nonce).toBeDefined();
+		expect(yamlConverter().nonce).toBe(converter.nonce);
+	});
+
+	test.each(['yml', 'yaml'])('verify with %s', (ext) => {
+		const file = { extension: ext } as LoomFile;
 		expect(yamlConverter().verify(file)).toBe(true);
-		const file2 = { extension: 'yml' } as LoomFile;
-		expect(yamlConverter().verify(file2)).toBe(true);
+	});
+
+	test.each(['json', 'csv', 'md', 'xml', 'xsd', 'docx', 'pdf'])('verify with %s should false', (value) => {
+		const file = { extension: value } as LoomFile;
+		expect(yamlConverter().verify(file)).toBe(false);
 	});
 
 	test('stringify', async () => {

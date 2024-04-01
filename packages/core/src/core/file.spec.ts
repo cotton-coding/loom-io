@@ -23,6 +23,9 @@ class FileTest extends LoomFile {
 	static emptyPlugins() {
 		LoomFile.converterPlugins = [];
 	}
+	getConverterPlugin() {
+		return super.getConverterPlugin();
+	}
 }
 
 const plugin: LoomFileConverter = {
@@ -229,7 +232,50 @@ describe('Test File Service', () => {
 			await expect(file.json()).rejects.toThrow(FileConvertException);
 			await expect(file.stringify(testContent)).rejects.toThrow(FileConvertException);
 		});
+
+		test('get converter plugin', async () => {
+			const testContent = {test: true};
+			const testFile = await testHelper.createFile(faker.system.commonFileName('json'), JSON.stringify(testContent));
+
+			const file = new FileTest(adapter, testFile);
+			LoomFile.register(plugin);
+			const converter = await file.getConverterPlugin();
+			expect(converter).toBe(plugin);
+		});
+
+		test('get converter plugin with no plugin', async () => {
+			const testContent = {test: true};
+			const testFile = await testHelper.createFile(faker.system.commonFileName('json'), JSON.stringify(testContent));
+
+			const file = new FileTest(adapter, testFile);
+			await expect(file.getConverterPlugin()).rejects.toThrow(FileConvertException);
+		});
+
+		test('get converter plugin with multiple plugin', async () => {
+			const testContent = {test: true};
+			const testFile = await testHelper.createFile(faker.system.commonFileName('yml'), JSON.stringify(testContent));
+
+			const file = new FileTest(adapter, testFile);
+			LoomFile.register(plugin);
+			LoomFile.register({
+				$type: PLUGIN_TYPE.FILE_CONVERTER,
+				verify: (file: LoomFile) => file.extension === 'csv',
+				parse: async <T>(file: LoomFile) => JSON.parse(await file.text()) as T,
+				stringify: async (file: LoomFile, content: unknown) => await file.write(JSON.stringify(content))
+			});
+			const yamlConverter: LoomFileConverter = {
+				$type: PLUGIN_TYPE.FILE_CONVERTER,
+				verify: (file: LoomFile) => file.extension === 'yaml' || file.extension === 'yml',
+				parse: async <T>(file: LoomFile) => JSON.parse(await file.text()) as T,
+				stringify: async (file: LoomFile, content: unknown) => await file.write(JSON.stringify(content))
+			};
+			LoomFile.register(yamlConverter);
+			const converter = await file.getConverterPlugin();
+			expect(converter).toBe(yamlConverter);
+		});
 	});
+
+
 
 });
 

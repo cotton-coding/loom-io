@@ -8,5 +8,6 @@ export default (key: string = 'memory://') => ({
 			const path = link.slice(key.length);
 			return source(path, Type);
 		}
-	}
+	},
+	nonce: Symbol('in-memory-source-adapter')
 }) satisfies LoomSourceAdapter;

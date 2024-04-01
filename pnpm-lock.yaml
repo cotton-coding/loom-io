@@ -145,15 +145,6 @@ importers:
         specifier: ^2.4.1
         version: 2.4.1
 
-  tests/integration:
-    devDependencies:
-      '@loom-io/core':
-        specifier: workspace:*
-        version: link:../../packages/core
-      '@loom-io/test-utils':
-        specifier: workspace:*
-        version: link:../test-utils
-
   tests/interface-tests:
     dependencies:
       '@faker-js/faker':

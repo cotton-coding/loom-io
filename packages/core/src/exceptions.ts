@@ -24,8 +24,9 @@ export class PluginNotFoundException extends Error implements LoomException{
 
 export class FileConvertException extends Error implements LoomException{
 	__loomExceptionRef = EXCEPTION_REF.FILE_CONVERT;
-	constructor(path: string, message: string) {
+	constructor(path: string, message: string, error?: Error) {
 		super(`Error converting file ${path}: ${message}`);
+		this.stack = error?.stack;
 	}
 }
 

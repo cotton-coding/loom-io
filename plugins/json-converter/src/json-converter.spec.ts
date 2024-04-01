@@ -8,9 +8,21 @@ describe('json-converter', () => {
 		expect(jsonConverter()).toHaveProperty('$type');
 	});
 
+	test('nonce need to be same on each result', () => {
+		const converter = jsonConverter();
+		expect(converter.nonce).toBeDefined();
+		expect(jsonConverter().nonce).toBe(converter.nonce);
+	});
+
 	test('verify', () => {
 		const file = { extension: 'json' } as LoomFile;
 		expect(jsonConverter().verify(file)).toBe(true);
+
+	});
+
+	test.each(['yml', 'yaml', 'csv', 'md', 'xml', 'xsd', 'docx', 'pdf'])('verify with %s should false', (value) => {
+		const file = { extension: value } as LoomFile;
+		expect(jsonConverter().verify(file)).toBe(false);
 	});
 
 	test('stringify', async () => {
@@ -19,7 +31,7 @@ describe('json-converter', () => {
 		} as unknown as LoomFile;
 		const content = { test: true };
 		await jsonConverter().stringify(file, content);
-		expect(file.write).toHaveBeenCalledWith(JSON.stringify(content, null, 2));
+		expect(file.write).toHaveBeenCalledWith(JSON.stringify(content));
 	});
 
 	test('parse', async () => {

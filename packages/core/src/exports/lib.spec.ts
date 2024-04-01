@@ -9,12 +9,12 @@ import { LoomFile } from '../core/file.js';
 class LoomFsTest extends LoomIO {
 
 	static clean() {
-		LoomIO.pluginHashes = [];
+		LoomIO.pluginNonces = [];
 		LoomIO.sourceAdapters = [];
 	}
 
 	static getPluginHashes() {
-		return LoomIO.pluginHashes;
+		return LoomIO.pluginNonces;
 	}
 }
 
@@ -33,7 +33,14 @@ const mockSourceAdapter =
 
 const sourceAdapter: LoomSourceAdapter = {
 	$type: PLUGIN_TYPE.SOURCE_ADAPTER,
-	source: mockSourceAdapter
+	source: mockSourceAdapter,
+	nonce: Symbol()
+};
+
+const sourceAdapter2: LoomSourceAdapter = {
+	$type: PLUGIN_TYPE.SOURCE_ADAPTER,
+	source: () => mockSourceAdapter('fixture://test', Directory),
+	nonce: Symbol()
 };
 
 describe('Test Entry', () => {
@@ -60,6 +67,10 @@ describe('Test Entry', () => {
 		expect(pluginHashes).toHaveLength(1);
 		LoomIO.register(sourceAdapter);
 		expect(pluginHashes).toHaveLength(1);
+		LoomIO.register(sourceAdapter2);
+		expect(pluginHashes).toHaveLength(2);
+		LoomIO.register(sourceAdapter);
+		expect(pluginHashes).toHaveLength(2);
 	});
 
 	test('Get Dir Instance', async () => {

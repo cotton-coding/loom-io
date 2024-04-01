@@ -117,7 +117,6 @@ export class LoomFile {
 		}
 
 		try {
-
 			const plugin = await Promise.any(LoomFile.converterPlugins.map(async (plugin) => {
 				if(await plugin.verify(this)) {
 					return Promise.resolve(plugin);
@@ -128,7 +127,7 @@ export class LoomFile {
 			this._converter = plugin;
 			return plugin;
 
-		} catch {
+		} catch (error) {
 			throw new FileConvertException(this.path, 'No converter found for file');
 		}
 

@@ -173,10 +173,9 @@ describe.concurrent('test integration of bundle for interacting with filesystem'
 			await file.create();
 			const content = {test: 'content', test2: ['content', 'content2']};
 			await file.stringify(content);
-			expect(await file.text()).toBe('test: content\ntest2:\n  - content\n  - content2\n');
+			await expect(file.text()).resolves.toBe('test: content\ntest2:\n  - content\n  - content2\n');
 			await deleteRandomDirectory(dir);
 		});
-
 
 	});
 
