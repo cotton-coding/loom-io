@@ -1,4 +1,4 @@
-import { expect, test, describe, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
+import { vi, expect, test, describe, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
 import { LoomFile } from './file.js';
 import { FileConvertException } from '../exceptions.js';
 import { InMemoryAdapterHelper } from '@loom-io/test-utils';
@@ -32,7 +32,8 @@ const plugin: LoomFileConverter = {
 	$type: PLUGIN_TYPE.FILE_CONVERTER,
 	verify: (file: LoomFile) => file.extension === 'json',
 	parse: async <T>(file: LoomFile) => JSON.parse(await file.text()) as T,
-	stringify: async (file: LoomFile, content: unknown) => await file.write(JSON.stringify(content))
+	stringify: async (file: LoomFile, content: unknown) => await file.write(JSON.stringify(content)),
+	nonce: Symbol('json-converter')
 };
 
 describe('Test File Service', () => {
@@ -261,17 +262,40 @@ describe('Test File Service', () => {
 				$type: PLUGIN_TYPE.FILE_CONVERTER,
 				verify: (file: LoomFile) => file.extension === 'csv',
 				parse: async <T>(file: LoomFile) => JSON.parse(await file.text()) as T,
-				stringify: async (file: LoomFile, content: unknown) => await file.write(JSON.stringify(content))
+				stringify: async (file: LoomFile, content: unknown) => await file.write(JSON.stringify(content)),
+				nonce: Symbol('csv-converter')
 			});
 			const yamlConverter: LoomFileConverter = {
 				$type: PLUGIN_TYPE.FILE_CONVERTER,
 				verify: (file: LoomFile) => file.extension === 'yaml' || file.extension === 'yml',
 				parse: async <T>(file: LoomFile) => JSON.parse(await file.text()) as T,
-				stringify: async (file: LoomFile, content: unknown) => await file.write(JSON.stringify(content))
+				stringify: async (file: LoomFile, content: unknown) => await file.write(JSON.stringify(content)),
+				nonce: Symbol('yaml-converter')
 			};
 			LoomFile.register(yamlConverter);
 			const converter = await file.getConverterPlugin();
 			expect(converter).toBe(yamlConverter);
+		});
+
+		test('get converter reminds the plugin', async () => {
+			const testContent = {test: true};
+			const testFile = await testHelper.createFile(faker.system.commonFileName('json'), JSON.stringify(testContent));
+
+			const file = new FileTest(adapter, testFile);
+			LoomFile.register(plugin);
+			const verify = vi.fn();
+			LoomFile.register({
+				$type: PLUGIN_TYPE.FILE_CONVERTER,
+				verify,
+				nonce: Symbol('csv-converter')
+			} as unknown as LoomFileConverter);
+			expect(verify).toBeCalledTimes(0);
+			const converter = await file.getConverterPlugin();
+			expect(verify).toBeCalledTimes(1);
+			expect(converter).toBe(plugin);
+			const converter2 = await file.getConverterPlugin();
+			expect(verify).toBeCalledTimes(1);
+			expect(converter2).toBe(plugin);
 		});
 	});
 
