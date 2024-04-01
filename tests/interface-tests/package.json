@@ -8,7 +8,7 @@
 		"build": "tsc -p tsconfig.json"
 	},
 	"peerDependencies": {
-		"@loom-io/core": "workspace:^0.7.0"
+		"@loom-io/core": "workspace:^"
 	},
 	"dependencies": {
 		"@loom-io/common": "workspace:^",

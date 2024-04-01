@@ -42,7 +42,7 @@ importers:
         specifier: workspace:^
         version: link:../../packages/common
       '@loom-io/core':
-        specifier: workspace:^0.7.0
+        specifier: workspace:^0.8.0
         version: link:../../packages/core
     devDependencies:
       '@faker-js/faker':
@@ -58,7 +58,7 @@ importers:
         specifier: workspace:^
         version: link:../../packages/common
       '@loom-io/core':
-        specifier: ^0.7.0
+        specifier: ^0.8.0
         version: link:../../packages/core
       minio:
         specifier: ^7.1.3
@@ -77,7 +77,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/common
       '@loom-io/core':
-        specifier: ^0.7.0
+        specifier: ^0.8.0
         version: link:../../packages/core
     devDependencies:
       '@faker-js/faker':
@@ -134,12 +134,12 @@ importers:
     dependencies:
       '@loom-io/core':
         specifier: ^0.7.0
-        version: link:../../packages/core
+        version: 0.7.1
 
   plugins/yaml-converter:
     dependencies:
       '@loom-io/core':
-        specifier: ^0.7.0
+        specifier: ^0.8.0
         version: link:../../packages/core
       yaml:
         specifier: ^2.4.1
@@ -154,7 +154,7 @@ importers:
         specifier: workspace:^
         version: link:../../packages/common
       '@loom-io/core':
-        specifier: workspace:^0.7.0
+        specifier: workspace:^
         version: link:../../packages/core
       nanoid:
         specifier: ^5.0.6
@@ -717,6 +717,16 @@ packages:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.4.15
     dev: true
+
+  /@loom-io/common@1.0.1:
+    resolution: {integrity: sha512-M3QWzyUkPovL9vnlA90emBECTXyohnM1ND9VMo1CPFA7gIeaubcGtb0b23UFhfZinFBRRstMR3goJuhbe1qT7w==}
+    dev: false
+
+  /@loom-io/core@0.7.1:
+    resolution: {integrity: sha512-vKW1jzosRAIA1dTC0fjzdWAfs14rdR4b17tR9Ufp+iKaaT/qdeHSGRpXmfo433GbDjXfpNiJ7GI0FCfYsAbsOw==}
+    dependencies:
+      '@loom-io/common': 1.0.1
+    dev: false
 
   /@nodelib/fs.scandir@2.1.5:
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
