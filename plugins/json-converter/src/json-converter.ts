@@ -1,6 +1,5 @@
 import { PLUGIN_TYPE, type LoomFileConverter, LoomFile } from '@loom-io/core';
 
-
 const nonce = Symbol('json-converter');
 
 function verify(file: LoomFile): boolean {

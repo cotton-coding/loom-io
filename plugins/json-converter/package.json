@@ -11,7 +11,7 @@
 		"prepublishOnly": "npm run build && publint"
 	},
 	"peerDependencies": {
-		"@loom-io/core": "^0.7.0"
+		"@loom-io/core": "^0.8.0"
 	},
 	"keywords": [
 		"loom-io",
