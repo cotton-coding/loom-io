@@ -16,9 +16,9 @@ interface LoomException {
 
 export class FileConvertException extends Error implements LoomException{
 	__loomExceptionRef = EXCEPTION_REF.FILE_CONVERT;
-	constructor(path: string, message: string, error?: Error) {
+	constructor(path: string, message: string) {
 		super(`Error converting file ${path}: ${message}`);
-		this.stack = error?.stack;
+
 	}
 }
 
