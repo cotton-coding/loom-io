@@ -1,4 +1,4 @@
-import type { BucketItem, Client }	from 'minio';
+import type { Client }	from 'minio';
 import { ObjectDirent } from './object-dirent.js';
 import { FileHandler } from './file-handler.js';
 import { type SourceAdapter, type rmdirOptions, type ObjectDirentInterface, DirectoryNotEmptyException } from '@loom-io/core';
