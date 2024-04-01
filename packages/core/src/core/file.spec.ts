@@ -1,6 +1,6 @@
 import { expect, test, describe, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
 import { LoomFile } from './file.js';
-import { FileConvertException, PluginNotFoundException } from '../exceptions.js';
+import { FileConvertException } from '../exceptions.js';
 import { InMemoryAdapterHelper } from '@loom-io/test-utils';
 
 import { basename, dirname } from 'node:path';
@@ -21,7 +21,7 @@ class FileTest extends LoomFile {
 	}
 
 	static emptyPlugins() {
-		LoomFile.converterPlugins = new Map();
+		LoomFile.converterPlugins = [];
 	}
 }
 
@@ -198,9 +198,9 @@ describe('Test File Service', () => {
 			const file = LoomFile.from( adapter, testFile);
 			const plugin: LoomFileConverter = {
 				$type: PLUGIN_TYPE.FILE_CONVERTER,
-				extensions: ['json'],
-				parse: <T>(text: string) => JSON.parse(text) as T,
-				stringify: (content: unknown) => JSON.stringify(content)
+				verify: (file: LoomFile) => file.extension === 'json',
+				parse: async <T>(file: LoomFile) => JSON.parse(await file.text()) as T,
+				stringify: async (file: LoomFile, content: unknown) => await file.write(JSON.stringify(content))
 			};
 			LoomFile.register(plugin);
 			const content = await file.json();
@@ -214,9 +214,9 @@ describe('Test File Service', () => {
 			const file = LoomFile.from( adapter, testFile);
 			const plugin: LoomFileConverter = {
 				$type: PLUGIN_TYPE.FILE_CONVERTER,
-				extensions: ['json'],
-				parse: <T>(text: string) => JSON.parse(text) as T,
-				stringify: (content: unknown) => JSON.stringify(content)
+				verify: (file: LoomFile) => file.extension === 'json',
+				parse: async <T>(file: LoomFile) => JSON.parse(await file.text()) as T,
+				stringify: async (file: LoomFile, content: unknown) => await file.write(JSON.stringify(content))
 			};
 			LoomFile.register(plugin);
 			await file.stringify(testContent);
@@ -228,8 +228,8 @@ describe('Test File Service', () => {
 			const testFile = await testHelper.createFile(faker.system.commonFileName('json'), JSON.stringify(testContent));
 
 			const file = LoomFile.from( adapter, testFile);
-			await expect(file.json()).rejects.toThrow(PluginNotFoundException);
-			await expect(file.stringify(testContent)).rejects.toThrow(PluginNotFoundException);
+			await expect(file.json()).rejects.toThrow(FileConvertException);
+			await expect(file.stringify(testContent)).rejects.toThrow(FileConvertException);
 		});
 
 		test('No extension for file', async () => {
@@ -268,13 +268,13 @@ describe('Test Error handling'	, () => {
 		const testContent = 'test: true';
 		const testFile = await testHelper.createFile(faker.system.commonFileName('yaml'), testContent);
 		const file = LoomFile.from( adapter, testFile);
-		await expect(file.json()).rejects.toThrow(PluginNotFoundException);
+		await expect(file.json()).rejects.toThrow(FileConvertException);
 	});
 
 	test('Plugin not registered for path', async () => {
 		const testFile = testHelper.createFile(faker.system.commonFileName('json'), JSON.stringify({test: true}));
 		const file = LoomFile.from( adapter, testFile);
-		await expect(file.json()).rejects.toThrow(PluginNotFoundException);
+		await expect(file.json()).rejects.toThrow(FileConvertException);
 	});
 
 	test('File convert exception', async () => {
