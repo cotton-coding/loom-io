@@ -102,23 +102,6 @@ export class Adapter implements SourceAdapter {
 		});
 	}
 
-	protected async filesInDir(path: string): Promise<BucketItem[]> {
-		const pathWithTailSlash = path.endsWith('/') ? path : `${path}/`;
-		const bucketStream = await this.s3.listObjects(this.bucket, pathWithTailSlash);
-		return new Promise((resolve, reject) => {
-			const files: BucketItem[] = [];
-			bucketStream.on('data', (data) => {
-				files.push(data);
-			});
-			bucketStream.on('end', () => {
-				resolve(files);
-			});
-			bucketStream.on('error', (err) => {
-				reject(err);
-			});
-		});
-	}
-
 	async readdir(path: string): Promise<ObjectDirentInterface[]> {
 		const pathWithTailSlash = removePrecedingSlash(addTailSlash(path));
 		const bucketStream = await this.s3.listObjectsV2(this.bucket, pathWithTailSlash, false);
