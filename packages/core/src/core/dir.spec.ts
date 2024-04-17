@@ -212,5 +212,10 @@ describe('Test Directory Service', () => {
 			expect(String(dir)).toBe('/test/data');
 			expect(+dir).toBeNaN();
 		});
+
+		test('toStringTag', () => {
+			const dir = new Directory(adapter, '/test/data');
+			expect(Object.prototype.toString.call(dir)).toBe('[object LoomDirectory]');
+		});
 	});
 });

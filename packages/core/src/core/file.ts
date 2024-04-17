@@ -143,7 +143,7 @@ export class LoomFile {
 		return this.path;
 	}
 
-	[Symbol.toStringTag]() {
+	get [Symbol.toStringTag]() {
 		return 'LoomFile';
 	}
 }

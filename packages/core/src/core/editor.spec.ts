@@ -482,4 +482,13 @@ I also have some ideas in my mind, but not sure if they are worth to invest time
 		});
 
 	});
+
+	describe('test symbols', () => {
+
+		test('toStringTag', async () => {
+			const editor = await createEditor(adapter, TEST_FILE_PATH);
+			expect(Object.prototype.toString.call(editor)).toBe('[object LoomEditor]');
+			editor.close();
+		});
+	});
 });

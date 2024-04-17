@@ -109,7 +109,7 @@ export class Directory {
 		return this.path;
 	}
 
-	[Symbol.toStringTag]() {
+	get [Symbol.toStringTag]() {
 		return 'LoomDirectory';
 	}
 }

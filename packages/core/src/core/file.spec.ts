@@ -308,6 +308,11 @@ describe('Test File Service', () => {
 			expect(String(file)).toBe('test/data/test.json');
 			expect(+file).toBeNaN();
 		});
+
+		test('toStringTag', () => {
+			const file = LoomFile.from( adapter, './test/data/test.json');
+			expect(Object.prototype.toString.call(file)).toBe('[object LoomFile]');
+		});
 	});
 
 
