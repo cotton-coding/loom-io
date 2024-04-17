@@ -142,4 +142,8 @@ export class LoomFile {
 	[Symbol.toPrimitive](): string {
 		return this.path;
 	}
+
+	[Symbol.toStringTag]() {
+		return 'LoomFile'
+	}
 }

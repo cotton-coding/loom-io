@@ -108,4 +108,8 @@ export class Directory {
 	[Symbol.toPrimitive](): string {
 		return this.path;
 	}
+
+	[Symbol.toStringTag]() {
+		return 'LoomDirectory'
+	}
 }
