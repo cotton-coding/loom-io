@@ -203,4 +203,14 @@ describe('Test Directory Service', () => {
 
 
 	});
+
+	describe('test symbols', () => {
+		test('toPrimitive', () => {
+			const dir = new Directory(adapter, '/test/data');
+			expect(`${dir}`).toBe('/test/data');
+			expect(dir + '').toBe('/test/data');
+			expect(String(dir)).toBe('/test/data');
+			expect(+dir).toBeNaN();
+		});
+	});
 });
