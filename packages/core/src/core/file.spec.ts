@@ -300,6 +300,16 @@ describe('Test File Service', () => {
 	});
 
 
+	describe('Test Symbol', () => {
+		test('toPrimitive', () => {
+			const file = LoomFile.from( adapter, './test/data/test.json');
+			expect(`${file}`).toBe('test/data/test.json');
+			expect(file + '').toBe('test/data/test.json');
+			expect(String(file)).toBe('test/data/test.json');
+			expect(+file).toBeNaN();
+		});
+	});
+
 
 });
 
@@ -343,6 +353,7 @@ describe('Test Error handling'	, () => {
 		await expect(file.text()).resolves.toBe('{test: true}');
 		await expect(file.json()).rejects.toThrow(FileConvertException);
 	});
+
 });
 
 
