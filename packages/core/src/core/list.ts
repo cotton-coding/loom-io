@@ -142,6 +142,6 @@ export class List<T extends ListTypes = ListTypes> {
 	}
 
 	[Symbol.toStringTag]() {
-		return 'LoomList'
+		return 'LoomList';
 	}
 }

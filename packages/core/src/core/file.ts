@@ -144,6 +144,6 @@ export class LoomFile {
 	}
 
 	[Symbol.toStringTag]() {
-		return 'LoomFile'
+		return 'LoomFile';
 	}
 }

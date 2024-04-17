@@ -110,6 +110,6 @@ export class Directory {
 	}
 
 	[Symbol.toStringTag]() {
-		return 'LoomDirectory'
+		return 'LoomDirectory';
 	}
 }

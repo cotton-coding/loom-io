@@ -276,7 +276,7 @@ export class Editor implements Reader, Writer, ReaderInternal, Disposable{
 	}
 
 	[Symbol.toStringTag]() {
-		return 'LoomEditor'
+		return 'LoomEditor';
 	}
 
 }
