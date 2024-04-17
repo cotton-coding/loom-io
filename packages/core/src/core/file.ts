@@ -138,4 +138,12 @@ export class LoomFile {
 			LoomFile.converterPlugins.push(plugin);
 		}
 	}
+
+	[Symbol.toPrimitive](): string {
+		return this.path;
+	}
+
+	get [Symbol.toStringTag]() {
+		return 'LoomFile';
+	}
 }

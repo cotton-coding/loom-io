@@ -10,7 +10,7 @@ import { beforeAll } from 'vitest';
 import { InMemoryAdapterHelper } from '@loom-io/test-utils';
 import { SourceAdapter } from '../definitions';
 
-function createEditor(adapter, testFile: string) {
+function createEditor(adapter, testFile: string): Promise<Editor> {
 	const dir = new Directory(adapter, dirname(testFile));
 	const file = new LoomFile(adapter, dir, basename(testFile));
 	return Editor.from(adapter, file);
@@ -91,6 +91,11 @@ I also have some ideas in my mind, but not sure if they are worth to invest time
 		const reader: Reader = await Editor.from(adapter, file);
 		expect(reader).toBeInstanceOf(Editor);
 		reader.close();
+	});
+
+	test('close', async () => {
+		const reader = await createEditor(adapter, TEST_FILE_PATH);
+		expect(reader.close()).resolves.toBeUndefined();
 	});
 
 	test('from', async () => {
@@ -476,5 +481,14 @@ I also have some ideas in my mind, but not sure if they are worth to invest time
 			reader.close();
 		});
 
+	});
+
+	describe('test symbols', () => {
+
+		test('toStringTag', async () => {
+			const editor = await createEditor(adapter, TEST_FILE_PATH);
+			expect(Object.prototype.toString.call(editor)).toBe('[object LoomEditor]');
+			editor.close();
+		});
 	});
 });

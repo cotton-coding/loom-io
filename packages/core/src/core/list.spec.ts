@@ -314,4 +314,12 @@ describe('Test List', () => {
 		});
 
 	});
+
+	describe('test symbols', () => {
+
+		test('toStringTag', () => {
+			const list = new List();
+			expect(Object.prototype.toString.call(list)).toBe('[object LoomList]');
+		});
+	});
 });

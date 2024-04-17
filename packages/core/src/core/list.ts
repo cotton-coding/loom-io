@@ -140,4 +140,8 @@ export class List<T extends ListTypes = ListTypes> {
 			}
 		}
 	}
+
+	get [Symbol.toStringTag]() {
+		return 'LoomList';
+	}
 }

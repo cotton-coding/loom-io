@@ -104,4 +104,12 @@ export class Directory {
 			return fileList;
 		}
 	}
+
+	[Symbol.toPrimitive](): string {
+		return this.path;
+	}
+
+	get [Symbol.toStringTag]() {
+		return 'LoomDirectory';
+	}
 }

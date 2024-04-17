@@ -26,7 +26,7 @@ export interface Writer {
 	close(): Promise<void>;
 }
 
-export class Editor implements Reader, Writer, ReaderInternal{
+export class Editor implements Reader, Writer, ReaderInternal, Disposable{
 
 	protected chunkSize: number = 1024;
 	protected lineInfo: TextItemList | undefined;
@@ -65,6 +65,18 @@ export class Editor implements Reader, Writer, ReaderInternal{
 	async close(): Promise<void> {
 		await this.file.close();
 	}
+
+	/**
+	 * Symbol to close automatically with using
+	 */
+	async [Symbol.asyncDispose]() {
+		await this.close();
+	}
+
+	[Symbol.dispose](): void {
+		throw new Error('Method not implemented.');
+	}
+
 
 	/**
 	 * Alias for searchFirst
@@ -261,6 +273,10 @@ export class Editor implements Reader, Writer, ReaderInternal{
 		});
 
 		return new LineResult(last, bSeparator, this);
+	}
+
+	get [Symbol.toStringTag]() {
+		return 'LoomEditor';
 	}
 
 }
