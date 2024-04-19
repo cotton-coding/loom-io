@@ -1,0 +1,34 @@
+{
+	"name": "@loom-io/front-matter-converter",
+	"version": "0.8.0",
+	"description": "Convert front matter yaml and json into json with loom-io",
+	"main": "dist/yaml-converter.js",
+	"type": "module",
+	"scripts": {
+		"build": "tsc --project tsconfig.json",
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"prepublishOnly": "npm run build && publint"
+	},
+	"peerDependencies": {
+		"@loom-io/core": "^0.8.0"
+	},
+	"dependencies": {
+		"yaml": "^2.4.1"
+	},
+	"keywords": [
+		"loom-io",
+		"yaml",
+		"converter"
+	],
+	"author": "Wolfgang Rathgeb",
+	"exports": {
+		".": {
+			"types": "./dist/converter.d.ts",
+			"import": "./dist/converter.js"
+		}
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/cotton-coding/loom-io.git"
+	}
+}

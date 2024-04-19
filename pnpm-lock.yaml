@@ -127,6 +127,15 @@ importers:
         specifier: workspace:*
         version: link:../../tests/test-utils
 
+  plugins/front-matter-converter:
+    dependencies:
+      '@loom-io/core':
+        specifier: ^0.8.0
+        version: link:../../packages/core
+      yaml:
+        specifier: ^2.4.1
+        version: 2.4.1
+
   plugins/json-converter:
     dependencies:
       '@loom-io/core':
