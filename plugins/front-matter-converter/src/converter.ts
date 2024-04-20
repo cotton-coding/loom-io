@@ -1,19 +1,14 @@
-import { parse as parseYaml, stringify as stringifyYaml } from 'yaml';
-import { Editor, PLUGIN_TYPE, type LoomFile, type LoomFileConverter } from '@loom-io/core';
+import * as YAML from 'yaml';
+import { PLUGIN_TYPE, type LoomFile, type LoomFileConverter } from '@loom-io/core';
 import { LineResult } from '../../../packages/core/dist/helper/result';
 
 const nonce = Symbol('yaml-converter');
 
 type Config = {
-	extensions: string[];
+	extensions?: string[];
 }
 
-interface DataInterface<T = unknown> {
-	data: T;
-	content: string;
-}
-
-async function readFrontMatter(line: LineResult) {
+export async function readFrontMatter(line: LineResult) {
 	const frontMatter = [];
 	let lineContent = await line.read('utf8');
 	while(lineContent !== '---') {
@@ -24,48 +19,41 @@ async function readFrontMatter(line: LineResult) {
 	return frontMatter.join('\n');
 }
 
-async function readContent(line: LineResult) {
+export async function readContent(line: LineResult) {
 	const content = [];
-	let lineContent = await line.read('utf8');
-	while(await line.hasNext()) {
+	do {
+		const lineContent = await line.read('utf8');
 		content.push(lineContent);
 		await line.next();
-		lineContent = await line.read('utf-8');
-	}
+	} while(await line.hasNext());
 	return content.join('\n');
 }
 
-async function getFrontMatterConverter<T>(firstLine: LineResult): Promise<{parse: (content: string) => T, stringify: (content: T) => string}>{
+export async function getFrontMatterConverter<T>(firstLine: LineResult): Promise<{parse: (content: string) => T, stringify: (content: T) => string}>{
 	const type = (await firstLine.read('utf8')).replace('---', '');
 
 	if(['', 'yaml', 'yml'].includes(type)) {
-		return {
-			parse: parseYaml,
-			stringify: stringifyYaml
-		};
+		return YAML;
 	} else if	(type === 'json') {
-		return {
-			parse: JSON.parse,
-			stringify: JSON.stringify
-		};
+		return JSON;
 	}
 
 	throw new Error(`Unknown front matter type: ${type}`);
 }
 
-async function hasFrontMatter(line: LineResult) {
+export async function hasFrontMatter(line: LineResult) {
 	const firstLine = await line.read('utf8');
 	return firstLine.startsWith('---');
 }
 
-const prepareVerify = (config: Config) => (file: LoomFile): boolean => {
+const prepareVerify = (config: Config = {}) => (file: LoomFile): boolean => {
 	const { extensions = ['md'] } = config;
 	if(file.extension && extensions.includes(file.extension)) return true;
 	return false;
 };
 
 async function stringify<T = unknown>(file: LoomFile, content: T) {
-	const contentString = stringifyYaml(content);
+	const contentString = YAML.stringify(content);
 	await file.write(contentString);
 }
 
@@ -83,6 +71,8 @@ async function parse<T = unknown>(file: LoomFile): Promise<T> {
 		const frontMatter = await readFrontMatter(lineReader);
 		const { parse } = await getFrontMatterConverter<T>(lineReader);
 		result.data = await parse(frontMatter);
+
+		await lineReader.next();
 	}
 
 	result.content = await readContent(lineReader);
@@ -90,15 +80,7 @@ async function parse<T = unknown>(file: LoomFile): Promise<T> {
 	return result as T;
 }
 
-interface LoomFileConverter {
-	$type: PLUGIN_TYPE.FILE_CONVERTER,
-	nonce: symbol,
-	verify: (file: LoomFile) => boolean,
-	parse<T = unknown>(file: LoomFile): Promise<T | DataInterface<T>>,
-	stringify<T = unknown>(file: LoomFile, content: T): Promise<void>
-}
-
-export default (config: Config) => ({
+export default (config?: Config) => ({
 	$type: PLUGIN_TYPE.FILE_CONVERTER,
 	nonce,
 	verify: prepareVerify(config),
