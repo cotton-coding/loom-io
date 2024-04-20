@@ -35,8 +35,14 @@ class EditorMock {
 
 class FileMock {
 	lines: string[];
-	constructor(lines: string[] = []) {
+	extension: string;
+	constructor(lines: string[] = [], extension: string = 'md') {
 		this.lines = lines;
+		this.extension = extension;
+	}
+
+	get fullName() {
+		return 'file.' + this.extension;
 	}
 
 	reader() {
@@ -49,6 +55,39 @@ class FileMock {
 describe('FrontMatterConverter', () => {
 
 	describe('test main functionality', async () => {
+
+		test('verify', () => {
+			const file = (new FileMock()) as unknown as LoomFile;
+			const json = (new FileMock([], 'json')) as unknown as LoomFile;
+			const converter = frontMatterConverter();
+			expect(converter.verify(file)).toBe(true);
+			expect(converter.verify(json)).toBe(false);
+		});
+
+		test.each([
+			'nyk',
+			'page.md',
+			'blog.md',
+			'cotton-coding.md',
+			'loom.story.md'
+		])('verify with other extension %s', (extension) => {
+			const file = (new FileMock([], extension)) as unknown as LoomFile;
+			const other = (new FileMock([], 'lorem')) as unknown as LoomFile;
+			const converter = frontMatterConverter({ extensions: [extension]});
+			expect(converter.verify(file)).toBe(true);
+			expect(converter.verify(other)).toBe(false);
+		});
+
+		test('verify list of extensions', () => {
+			const md = (new FileMock()) as unknown as LoomFile;
+			const txt = (new FileMock([], 'txt')) as unknown as LoomFile;
+			const other = (new FileMock([], 'other')) as unknown as LoomFile;
+			const converter = frontMatterConverter({ extensions: ['md', 'txt']});
+			expect(converter.verify(md)).toBe(true);
+			expect(converter.verify(txt)).toBe(true);
+			expect(converter.verify(other)).toBe(false);
+		});
+
 		test('parse front matter', async () => {
 			const file = (new FileMock([
 				'---',

@@ -48,7 +48,11 @@ export async function hasFrontMatter(line: LineResult) {
 
 const prepareVerify = (config: Config = {}) => (file: LoomFile): boolean => {
 	const { extensions = ['md'] } = config;
-	if(file.extension && extensions.includes(file.extension)) return true;
+	for(const extension of extensions) {
+		if(file.fullName.endsWith(extension)) {
+			return true;
+		}
+	}
 	return false;
 };
 
