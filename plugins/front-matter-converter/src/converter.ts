@@ -2,8 +2,6 @@ import * as YAML from 'yaml';
 import { PLUGIN_TYPE, type LoomFile, type LoomFileConverter } from '@loom-io/core';
 import { LineResult } from '../../../packages/core/dist/helper/result';
 
-const nonce = Symbol('yaml-converter');
-
 type Config = {
 	extensions?: string[];
 }
@@ -56,6 +54,11 @@ const prepareVerify = (config: Config = {}) => (file: LoomFile): boolean => {
 	return false;
 };
 
+const generateNone = (config: Config = {}) => {
+	const configString = JSON.stringify(config);
+	return Symbol.for(`front-matter-converter-${configString}`);
+};
+
 async function stringify<T = unknown>(file: LoomFile, content: T) {
 	const contentString = YAML.stringify(content);
 	await file.write(contentString);
@@ -86,7 +89,7 @@ async function parse<T = unknown>(file: LoomFile): Promise<T> {
 
 export default (config?: Config) => ({
 	$type: PLUGIN_TYPE.FILE_CONVERTER,
-	nonce,
+	nonce: generateNone(config),
 	verify: prepareVerify(config),
 	parse,
 	stringify

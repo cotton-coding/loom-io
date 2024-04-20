@@ -56,6 +56,27 @@ describe('FrontMatterConverter', () => {
 
 	describe('test main functionality', async () => {
 
+		test('has nonce', () => {
+			const converter = frontMatterConverter();
+			expect(converter.nonce).toBeDefined();
+		});
+
+		test('has different nonce per config', () => {
+			const converter1 = frontMatterConverter();
+			const converter2 = frontMatterConverter({ extensions: ['md'] });
+			expect(converter1.nonce).not.toBe(converter2.nonce);
+		});
+
+		test('has same nonce for same config', () => {
+			const converter1 = frontMatterConverter();
+			const converter2 = frontMatterConverter();
+			const converter3 = frontMatterConverter({ extensions: ['test.lorem'] });
+			const converter4 = frontMatterConverter({ extensions: ['test.lorem'] });
+			expect(converter1.nonce).toBe(converter2.nonce);
+			expect(converter3.nonce).toBe(converter4.nonce);
+			expect(converter1.nonce).not.toBe(converter3.nonce);
+		});
+
 		test('verify', () => {
 			const file = (new FileMock()) as unknown as LoomFile;
 			const json = (new FileMock([], 'json')) as unknown as LoomFile;
