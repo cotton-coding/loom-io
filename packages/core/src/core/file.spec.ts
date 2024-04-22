@@ -105,6 +105,24 @@ describe('Test File Service', () => {
 		reader.close();
 	});
 
+	describe('Test meta data', () => {
+		test('Get extension', () => {
+			const file = LoomFile.from( adapter, './test/data/test.json');
+			expect(file.extension).toBe('json');
+		});
+
+		test('Get extension with no extension', () => {
+			const file = LoomFile.from( adapter, './test/data/test');
+			expect(file.extension).toBe(undefined);
+		});
+
+		test('Get File Name', () => {
+			const file = LoomFile.from( adapter, './test/data/test.json');
+			expect(file.name).toBe('test.json');
+		});
+
+	});
+
 	describe('Test with generated file', () => {
 
 		beforeEach(async () => {
