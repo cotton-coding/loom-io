@@ -21,13 +21,15 @@ export async function readContent(line: LineResult) {
 	const content = [];
 	do {
 		const lineContent = await line.read('utf8');
-		content.push(lineContent);
+		if(!(content.length === 0 && (lineContent === '---' || lineContent === ''))) {
+			content.push(lineContent);
+		}
 		await line.next();
 	} while(await line.hasNext());
 	return content.join('\n');
 }
 
-export async function getFrontMatterConverter<T>(firstLine: LineResult): Promise<{parse: (content: string) => T, stringify: (content: T) => string}>{
+export async function getFrontMatterConverter(firstLine: LineResult): Promise<{parse: (content: string) => unknown, stringify: (content: unknown) => string}>{
 	const type = (await firstLine.read('utf8')).replace('---', '');
 
 	if(['', 'yaml', 'yml'].includes(type)) {
@@ -47,7 +49,7 @@ export async function hasFrontMatter(line: LineResult) {
 const prepareVerify = (config: Config = {}) => (file: LoomFile): boolean => {
 	const { extensions = ['md'] } = config;
 	for(const extension of extensions) {
-		if(file.fullName.endsWith(extension)) {
+		if(file.name.endsWith(extension)) {
 			return true;
 		}
 	}
@@ -59,12 +61,54 @@ const generateNone = (config: Config = {}) => {
 	return Symbol.for(`front-matter-converter-${configString}`);
 };
 
-async function stringify<T = unknown>(file: LoomFile, content: T) {
-	const contentString = YAML.stringify(content);
-	await file.write(contentString);
+export async function writeToFile(file: LoomFile, matter: string = '', content: string = '') {
+	const emptyLineBeforeContent = content.length === 0 ? '' : '\n';
+	await file.write(`---\n${ensureNewLine(matter)}---\n${emptyLineBeforeContent}${content}`);
 }
 
-async function parse<T = unknown>(file: LoomFile): Promise<T> {
+export async function stringifyJson(file: LoomFile, data: unknown): Promise<string> {
+	if(data == null) {
+		return '';
+	}
+	const reader = await file.reader();
+	const lineReader = await reader.firstLine();
+	if(lineReader && await hasFrontMatter(lineReader)) {
+		const converter = await getFrontMatterConverter(lineReader);
+		return converter.stringify(data);
+	} else {
+		return YAML.stringify(data);
+	}
+}
+
+export function ensureNewLine(content: string | undefined) {
+	if(content && content.length > 0 && content[content.length - 1] !== '\n') {
+		return `${content}\n`;
+	}
+	return content;
+}
+
+async function stringify(file: LoomFile, content: unknown) {
+	if(content == null) {
+		await writeToFile(file);
+		return;
+	} else if(typeof content === 'string') {
+		await writeToFile(file, undefined, content);
+		return;
+	} else if (typeof content === 'object') {
+		if((Object.keys(content).length === 1 && ('data' in content || 'content' in content))
+			|| (Object.keys(content).length === 2 && 'data' in content && 'content' in content)
+		) {
+			const dataString = 'data' in content ? await stringifyJson(file, content.data) : '';
+			const contentString = 'content' in content ? String(content.content) : '';
+			await writeToFile(file, dataString, contentString);
+		} else {
+			const dataString = await stringifyJson(file, content);
+			await writeToFile(file, dataString);
+		}
+	}
+}
+
+async function parse(file: LoomFile): Promise<unknown> {
 	const reader = await file.reader();
 	const lineReader = await reader.firstLine();
 
@@ -76,7 +120,7 @@ async function parse<T = unknown>(file: LoomFile): Promise<T> {
 	if(await hasFrontMatter(lineReader)) {
 		lineReader.next();
 		const frontMatter = await readFrontMatter(lineReader);
-		const { parse } = await getFrontMatterConverter<T>(lineReader);
+		const { parse } = await getFrontMatterConverter(lineReader);
 		result.data = await parse(frontMatter);
 
 		await lineReader.next();
@@ -84,7 +128,7 @@ async function parse<T = unknown>(file: LoomFile): Promise<T> {
 
 	result.content = await readContent(lineReader);
 
-	return result as T;
+	return result;
 }
 
 export default (config?: Config) => ({

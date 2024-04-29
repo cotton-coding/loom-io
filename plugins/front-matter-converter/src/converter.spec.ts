@@ -1,6 +1,6 @@
-import { describe, test, expect } from 'vitest';
+import { describe, test, expect, SpyInstance } from 'vitest';
 import * as YAML from 'yaml';
-import frontMatterConverter, { getFrontMatterConverter, hasFrontMatter, readContent, readFrontMatter } from './converter';
+import frontMatterConverter, { ensureNewLine, getFrontMatterConverter, hasFrontMatter, readContent, readFrontMatter, stringifyJson, writeToFile } from './converter';
 import { LineResult } from '../../../packages/core/dist/helper/result';
 import { Editor, LoomFile } from '@loom-io/core';
 
@@ -29,6 +29,9 @@ class EditorMock {
 	constructor(public lines: string[]) {}
 
 	async firstLine() {
+		if(this.lines.length === 0) {
+			return undefined;
+		}
 		return new LineResultMock(this.lines) as unknown as LineResult;
 	}
 }
@@ -36,17 +39,22 @@ class EditorMock {
 class FileMock {
 	lines: string[];
 	extension: string;
-	constructor(lines: string[] = [], extension: string = 'md') {
+	constructor(lines: string[] = [''], extension: string = 'md') {
 		this.lines = lines;
 		this.extension = extension;
 	}
 
-	get fullName() {
+	get name() {
 		return 'file.' + this.extension;
 	}
 
 	reader() {
 		return new EditorMock(this.lines) as unknown as Editor;
+	}
+
+	write(content: string) {
+		this.lines = content.split('\n');
+		return Promise.resolve();
 	}
 
 }
@@ -120,6 +128,86 @@ describe('FrontMatterConverter', () => {
 			const parsed = await converter.parse(file) as {data: {key: string}, content: string};
 			expect(parsed.data).toEqual({ key: 'value' });
 			expect(parsed.content).toBe('content');
+		});
+
+		test('parse front matter and ignore empty line before content', async () => {
+			const file = (new FileMock([
+				'---',
+				'key: value',
+				'---',
+				'',
+				'content'
+			])) as unknown as LoomFile;
+			const converter = frontMatterConverter();
+			const parsed = await converter.parse(file) as {data: {key: string}, content: string};
+			expect(parsed.data).toEqual({ key: 'value' });
+			expect(parsed.content).toBe('content');
+		});
+
+		test('parse front matter and ignore empty line before multiline content', async () => {
+			const file = (new FileMock([
+				'---',
+				'key: value',
+				'---',
+				'',
+				'content',
+				'test',
+				'',
+				'line'
+			])) as unknown as LoomFile;
+			const converter = frontMatterConverter();
+			const parsed = await converter.parse(file) as {data: {key: string}, content: string};
+			expect(parsed.data).toEqual({ key: 'value' });
+			expect(parsed.content).toBe('content\ntest\n\nline');
+		});
+
+		test('stringify write empty data', async () => {
+			const file = new FileMock();
+			const converter = frontMatterConverter();
+			await converter.stringify(file as unknown as LoomFile, undefined);
+			expect(file.lines).toStrictEqual(['---', '---', '']);
+		});
+
+		test('stringify front matter', async () => {
+			const file = new FileMock();
+			const data = { key: 'value' };
+			const converter = frontMatterConverter();
+			await converter.stringify(file as unknown as LoomFile, data);
+			expect(file.lines).toStrictEqual(['---', 'key: value', '---', '']);
+		});
+
+		test('stringify front matter with multiline data', async () => {
+			const file = new FileMock();
+			const data = { key: 'value', 'cotton': 'coding' };
+			const converter = frontMatterConverter();
+			await converter.stringify(file as unknown as LoomFile, data);
+			expect(file.lines).toStrictEqual(['---', 'key: value', 'cotton: coding', '---', '']);
+		});
+
+		test('stringify front matter with content', async () => {
+			const file = new FileMock();
+			const data = { key: 'value' };
+			const content = 'content';
+			const converter = frontMatterConverter();
+			await converter.stringify(file as unknown as LoomFile, { data, content });
+			expect(file.lines).toStrictEqual(['---', 'key: value', '---', '', 'content']);
+		});
+
+		test('stringify front matter with multiline content', async () => {
+			const file = new FileMock();
+			const data = { key: 'value', 'cotton': 'coding' };
+			const content = 'content\nmore content\nand even more content';
+			const converter = frontMatterConverter();
+			await converter.stringify(file as unknown as LoomFile, { data, content });
+			expect(file.lines).toStrictEqual(['---', 'key: value', 'cotton: coding', '---', '', 'content', 'more content', 'and even more content']);
+		});
+
+		test('stringify with content only', async () => {
+			const file = new FileMock();
+			const content = 'content';
+			const converter = frontMatterConverter();
+			await converter.stringify(file as unknown as LoomFile, content);
+			expect(file.lines).toStrictEqual(['---', '---', '', 'content']);
 		});
 
 	});
@@ -198,7 +286,6 @@ describe('FrontMatterConverter', () => {
 			expect(getFrontMatterConverter(line)).resolves.toEqual(YAML);
 		});
 
-
 		test('readContent reads content', () => {
 			const line = (new LineResultMock([
 				'---',
@@ -213,5 +300,54 @@ describe('FrontMatterConverter', () => {
 			line.next();
 			expect(readContent(line)).resolves.toBe('content\nsome more content\neven more content');
 		});
+
+		test('addNewLine adds new line', async () => {
+			const testString = 'test';
+			expect(ensureNewLine(testString)).toBe('test\n');
+		});
+
+		test('addNewLine does not add new line if file already end with new line', async () => {
+			const testString = 'test\n';
+			expect(ensureNewLine(testString)).toBe('test\n');
+		});
+
+		test('writeToFile writes content', async () => {
+			const mockFile = new FileMock();
+			const file = (mockFile) as unknown as LoomFile;
+			const matter = 'key: value';
+			const content = 'content with bla bal bla lines';
+			await writeToFile(file, matter, content);
+			expect(mockFile.lines).toEqual(['---', 'key: value', '---', '', 'content with bla bal bla lines']);
+		});
+
+		test('writeToFile writes with empty data', async () => {
+			const mockFile = new FileMock();
+			const file = (mockFile) as unknown as LoomFile;
+			const content = '#headline\ncontent with bla bal bla lines';
+			await writeToFile(file, undefined, content);
+			expect(mockFile.lines).toEqual(['---', '---', '', '#headline', 'content with bla bal bla lines']);
+		});
+
+		test('stringifyJson returns empty string', async () => {
+			const file = (new FileMock()) as unknown as LoomFile;
+			const data1 = null;
+			expect(stringifyJson(file, data1)).resolves.toBe('');
+			const data2 = undefined;
+			expect(stringifyJson(file, data2)).resolves.toBe('');
+		});
+
+		test('stringifyJson returns yaml with newline', async () => {
+			const file = (new FileMock()) as unknown as LoomFile;
+			const data = { key: 'value', some: 'other' };
+			console.log(await stringifyJson(file, data));
+			expect(stringifyJson(file, data)).resolves.toBe('key: value\nsome: other\n');
+		});
+
+		test('stringifyJson returns json with new line', async () => {
+			const file = (new FileMock(['---json', '---'])) as unknown as LoomFile;
+			const data = { key: 'value', some: 'other' };
+			expect(stringifyJson(file, data)).resolves.toBe('{"key":"value","some":"other"}');
+		});
+
 	});
 });

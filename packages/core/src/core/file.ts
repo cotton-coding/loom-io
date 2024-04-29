@@ -73,10 +73,16 @@ export class LoomFile {
 		return bytes / Math.pow(1024, index);
 	}
 
-	async json<T>() {
+	async json(): Promise<unknown> {
 		const converter = await this.getConverterPlugin();
 
-		return converter.parse<T>(this);
+		return converter.parse(this);
+	}
+
+	async stringify(content: unknown) {
+		const converter = await this.getConverterPlugin();
+
+		converter.stringify(this, content);
 	}
 
 	async delete() {
@@ -109,11 +115,7 @@ export class LoomFile {
 		await this._adapter.writeFile(this.path, Buffer.alloc(0));
 	}
 
-	async stringify<T>(content: T) {
-		const converter = await this.getConverterPlugin();
 
-		converter.stringify(this, content);
-	}
 
 	protected async getConverterPlugin(): Promise<LoomFileConverter> {
 		if(this._converter !== undefined) {
