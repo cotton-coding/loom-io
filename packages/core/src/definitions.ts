@@ -26,8 +26,8 @@ export interface LoomPluginBase {
 export interface LoomFileConverter extends LoomPluginBase {
     $type: PLUGIN_TYPE.FILE_CONVERTER,
     verify: (file: LoomFile) => MaybePromise<boolean>
-    parse<T = unknown>(file: LoomFile): Promise<T>
-    stringify<T = unknown>(file: LoomFile, content: T): Promise<void>
+    parse(file: LoomFile): Promise<unknown>
+    stringify(file: LoomFile, content: unknown): Promise<void>
 }
 export interface LoomSourceAdapter extends LoomPluginBase{
     $type: PLUGIN_TYPE.SOURCE_ADAPTER,

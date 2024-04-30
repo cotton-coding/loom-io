@@ -27,7 +27,7 @@
 		"@loom-io/interface-tests": "workspace:^"
 	},
 	"peerDependencies": {
-		"@loom-io/core": "workspace:^0.8.0"
+		"@loom-io/core": "workspace:^"
 	},
 	"dependencies": {
 		"@loom-io/common": "workspace:^"

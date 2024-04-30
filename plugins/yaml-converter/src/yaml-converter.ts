@@ -8,12 +8,12 @@ function verify(file: LoomFile): boolean {
 	return false;
 }
 
-async function stringify<T = unknown>(file: LoomFile, content: T) {
+async function stringify(file: LoomFile, content: unknown) {
 	const contentString = stringifyYaml(content);
 	await file.write(contentString);
 }
 
-async function parse<T = unknown>(file: LoomFile): Promise<T> {
+async function parse(file: LoomFile): Promise<unknown> {
 	const content = await file.text();
 	return parseYaml(content);
 }
