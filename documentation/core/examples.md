@@ -1,34 +1,34 @@
 # Examples
 
-loom-io simplify the access to different storing systems and brings you additional functionality like reading directories recursive, search files, read them line by line or auto convert files to json.
+loom-io simplifies the access to different storage systems and brings you additional functionality like reading directories recursively, searching files, reading them line by line or automatically converting files to json.
 
-Take a look at the specific reference to get all details of functionality. This chapter will describe the api by use cases, but will not show the full functionality.
+Have a look at the specific reference to get all the details of the functionality. This chapter describes the API by use cases, but does not show the full functionality.
 
 ## Configure
 
-As show in the chapter before, do not forget to setup and config loom-io before usage
+As show in the chapter before, do not forget to setup and config loom-io before usage.
 
 ```ts
 import Loom from "@loom-io/core";
 import fsAdapter from "@loom-io/node-filesystem-adapter";
 
-// We add the adapter for filesystem now.
+// Now we add the filesystem adapter.
 // By default the root of our filesystem is your project directory
 Loom.register(fsAdapter("file://"));
 ```
 
-The following examples will not show a registration of a adapter every time, because you will probably do this only once.
+The following examples will not show registering an adapter every time, as you will probably only need to do this once.
 
-## Create a directory and a file
+## Creating a directory and a file
 
-Creating a directory or file object do not mean the directory or file does exists. This means you could firstly create a virtual object and than create the real object in the storage system
+Creating a directory or file object does not mean that the directory or file actually exists. This means that you could create a virtual object first and then create the real object in the storage system.
 
 ```ts
 import Loom from "@loom-io/core";
 
 const dir = await Loom.dir("file://welcome");
 const file = dir.file("hello-world.md");
-// till here everything is virtual and do not have to exit on your filesystem;
+// so far everything is virtual and does not need to exit to your file system;
 
 console.log(await file.exists()); // Will be false;
 console.log(await dir.exists()); // Will be false;
@@ -40,11 +40,11 @@ console.log(await dir.exists()); // Will be true;
 console.log(await file.exists()); // Will be false;
 ```
 
-While creating the file the directory was directly created too. To avoid and automatic creation of the directory use `file.write`
+When the file was created, the directory was also created directly. To avoid this and create the directory automatically, use `file.write`.
 
 ## List all files in a directory recursively
 
-This is one of the first functions implemented in the library and one of the main reason. We already registered an adapter above so it will be not necessary to have a second one, but to have a full example we will do it anyways. To get all details about the adapter or dir take a look to the doc sections
+This is one of the first functions implemented in the library, and one of the main reasons why. We have already registered one adapter above, so it will not be necessary to have a second one, but to have a complete example we will do it anyway. To get all the details about the adapter or dir, take a look at the doc sections
 
 ```ts
 import Loom from "@loom-io/core";
@@ -85,7 +85,7 @@ if(dir.parent !== undefined) {
 
 ## Read file content as json
 
-It could be annoying to think about the file format all the time when reading. At developing you are only interest is to handle the data as JSON, not if it is original a YAML, CSV, JSON or what else. loom-io will handle this for you if you have registered a file converter for it. So you just need to register a converter for any possible file type and you just can read a JSON.
+It can be annoying to think about the file format all the time when reading. When developing you are only interested in handling the data as JSON, not if it is originally a YAML, CSV, JSON or what else. loom-io will do this for you if you have registered a file converter for it. So you just have to register a converter for every possible file type and you can just read a JSON.
 
 ```ts
 import Loom from '@loom-io/core';
@@ -103,7 +103,7 @@ for(let filePath of filePaths) {
 
 ## Read file content
 
-Beside JSON any file you be read as Buffer or String
+In addition to JSON, you can read any file as a buffer or string.
 
 ```ts
 import Loom from "@loom-io/core";
@@ -118,7 +118,7 @@ const buffer = await file.plain();
 
 ## Get file size
 
-The file size could be read in bytes or directly calculated to YodaBytes
+The file size can be read in bytes or calculated directly in YodaBytes
 
 ```ts
 import Loom, { FILE_SIZE_UNIT } from "@loom-io/core";
@@ -148,7 +148,7 @@ const contentOfProjectRoot = await projectRoot.list();
 const directoriesInProjectRoot = contentOfProjectRoot.only("dirs");
 ```
 
-## Concat two list and iterate over them
+## Concatenate two lists and iterate over them
 
 ```ts
 import Loom, (isDirectory, isFile) from "@loom-io/core";
@@ -173,7 +173,7 @@ for(let element of srcAndTestDirContent) {
 
 ## Get directory list as array
 
-Instead of iterating over a list you can also get it as a Array.
+Instead of iterating over a list you can also get it as an Array.
 
 ```ts
 import Loom, (isDirectory, isFile) from "@loom-io/core";
@@ -183,9 +183,9 @@ const srcDirContent = await projectRoot.subDir("src").list();
 const contentOfSrcDirAsArray = srcDirContent.asArray();
 ```
 
-## Read a large file line by line
+## Reading a large file line by line
 
-To avoid loading large files into heap, you can use a reader which give you the possibility to read a file line by line or even search (next example). You can step forward `next()` or backwards `prev()` to each line. To save time and not reanalyze a given line the start and end position is stored. This also means you will currently not able to do this use full on changing files.
+To avoid loading large files into the heap, you can use a reader which allows you to read or even search a file line by line (next example). You can go forward `next()` or backward `prev()` to each line. To save time and not have to re-analyse a given line, the start and end positions are stored. This also means that you will not be able to use this feature fully on modified files at the moment.
 
 ```ts
 import Loom from "loom-io/fs";
@@ -206,9 +206,9 @@ do {
 await reader.close();
 ```
 
-## Search text in large a file
+## Searching for text in a large file
 
-Search a file for a given text from the beginning `search()`or `searchFirst()`or search a file for a given text from the end `searchLast()`. You can also use a buffer to search the text, but there is currently no regex support, because it will be hard to match the fragment size and overlapping of fragments to match probably. As with read line by line you can also step forward `next()`and backwards `prev()`. Also in this case the start and end position is stored for faster results.
+Search a file for a given text from the beginning `search()` or `searchFirst()` or search a file for a given text from the end `searchLast()`. You can also use a buffer to search the text, but there is currently no regex support because it will be hard to match the fragment size and overlap of fragments. As with reading line by line, you can also step forward `next()` and backward `prev()`. Again, the start and end positions are saved for faster results.
 
 ```ts
 import Loom from "loom-io/fs";
