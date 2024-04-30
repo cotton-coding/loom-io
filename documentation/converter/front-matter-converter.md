@@ -42,8 +42,8 @@ As seen in the example above, you can specify which file extension it should try
 If there is no front matter part, `data` will be undefined and if there is no content, `content` will be an empty string. When writing the stringify will analyse the given function and convert it to a file. If the given value has more than just a `data` or `content` key it will only be translated to a header. You can also set only one of the two keys.
 
 ```ts
-const yamlFile = await Loom.file("memory://some/yaml/file.md");
-const fileData = await yamlFile.json();
+const mdFile = await Loom.file("memory://some/yaml/file.md");
+const fileData = await mdFile.json();
 fileData.data.someValue = "test";
 fileData.content = `
 #Headline
@@ -51,5 +51,7 @@ fileData.content = `
 some random markdown
 
 `;
-yamlFile.stringify(data);
+mdFile.stringify(data);
 ```
+
+Be careful when writing. A `undefined` value for content or data will still overwrite the section!
