@@ -2,7 +2,7 @@
 	"name": "@loom-io/front-matter-converter",
 	"version": "0.8.0",
 	"description": "Convert front matter yaml and json into json with loom-io",
-	"main": "dist/yaml-converter.js",
+	"main": "dist/exports/lib.js",
 	"type": "module",
 	"scripts": {
 		"build": "tsc --project tsconfig.json",
@@ -23,8 +23,8 @@
 	"author": "Wolfgang Rathgeb",
 	"exports": {
 		".": {
-			"types": "./dist/converter.d.ts",
-			"import": "./dist/converter.js"
+			"types": "./dist/exports/lib.d.ts",
+			"import": "./dist/exports/lib.js"
 		}
 	},
 	"repository": {
