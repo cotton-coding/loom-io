@@ -1,10 +1,10 @@
 # Installation
 
-The Software is split in multiple adapter, that do a part of the work and give you the flexible. To start easily we would recomb to start with a pre configured bundle.
+The software is split into several adapters that do some of the work and give you flexibility. To get started easily, we would recombine to start with a pre-configured bundle.
 
-## Install bundle
+## Installing a bundle
 
-Currently there is only one bundle to work with the filesystem, at least also this bundle could be extended by other adapters and plugins and over the same functionality as the core package.
+Currently there is only one bundle to work with the filesystem, at least this bundle could be extended by other adapters and plugins and have the same functionality as the core package.
 
 ::: code-group
 
@@ -22,11 +22,11 @@ bun add @loom-io/base-fs
 
 :::
 
-## Install without bundle
+## Installing without a bundle
 
-If you try to avoid unused dependencies it is recommended to the modules yourself, but also if the base bundles offer you not enough functionality.
+If you are trying to avoid unused dependencies, it is recommended to install the modules yourself, but also if the base bundles do not offer you enough functionality.
 
-The heart connecting everything and implemented the used syntax is the core package.
+The core package is the heart that holds everything together and implements the syntax used.
 
 ::: code-group
 
@@ -44,7 +44,7 @@ bun add @loom-io/core
 
 :::
 
-This package will not work out of the box, because it is missing an adapter to connect a storage system e.g. S3, Filesystem . For example to get a similar functionality as in the filesystem bundle you need to install the filesystem adapter and some converter to convert different filetypes to json.
+This package will not work out of the box because it lacks an adapter to connect to a storage system, e.g. S3, Filesystem . For example, to get similar functionality as in the filesystem bundle, you need to install the filesystem adapter and some converters to convert different file types to json.
 
 ::: code-group
 
@@ -62,16 +62,16 @@ bun add @loom-io/core @loom-io/node-filesystem-adapter @loom-io/yaml-converter @
 
 :::
 
-You will find installation package in the adapter and converter descriptions.
+You can find the installation package in the adapter and converter descriptions.
 
 ## Basic Setup (S3)
 
-The default export of loom-io is a global Object you can import at server side without register a plugin or adapter again and again. We will import it as `Loom`, but you can give it any name.
+The default export of loom-io is a global object that you can import on the server side without having to register a plugin or adapter over and over again. We will import it as `Loom`, but you can give it any name you like.
 
-If you are not using a base bundle you need to register an adapter and probably some converters to read files as json.
-To keep the examples more generic we will import `Loom` from the core library. If you are using a bundle replace the import `@loom-io/core` with the bundle name e.g. `@loom-io/base-fs`.
+If you are not using a base bundle, you will need to register an adapter and probably some converters to read files as json.
+To keep the examples more generic, we will import `Loom` from the core library. If you are using a bundle replace the import `@loom-io/core` with the bundle name e.g. `@loom-io/base-fs`.
 
-For the setup you need the following packages:
+For the setup you need the following packages
 
 ::: code-group
 
@@ -89,7 +89,7 @@ bun add @loom-io/core @loom-io/s3-minio-adapter @loom-io/yaml-converter @loom-io
 
 :::
 
-Now you can setup a S3 connection. In this example we will use a open minio instance from [minio](https://min.io/)
+Now you can set up an S3 connection. In this example we will use an open minio instance from [minio](https://min.io/)
 
 ```ts
 import Loom from "@loom-io/core";
@@ -113,4 +113,4 @@ Loom.register(jsonConverter());
 Loom.register(yamlConverter());
 ```
 
-Now we can dive deeper into loom-io and the storing system to access or create files and directories.
+Now we can dive deeper into loom-io and the storage system to access or create files and directories.

@@ -3,7 +3,7 @@
 
 # S3 Adapter
 
-Connects your S3 as it is a filesystem storage and based on the minio library. Even if it based on the minio library you can use it with all other S3 Storage e.g.: Digital Ocean Spaces, Amazon S3
+Connects your S3 as it is a file system storage and based on the minio library. Even if it is based on the minio library you can use it with all other S3 storage e.g: Digital Ocean Spaces, Amazon S3
 
 ::: code-group
 
@@ -21,9 +21,9 @@ bun add @loom-io/minio-s3-adapter
 
 :::
 
-## Setup and config
+## Setup and configuration
 
-Mainly the configuration is the same as with [minio](https://min.io/docs/minio/linux/developers/javascript/API.html). You just have setup a bucket name in advance. The default key to identify is `s3://`
+Basically the configuration is the same as for [minio](https://min.io/docs/minio/linux/developers/javascript/API.html). You just have to set up a bucket name in advance. The default key for identification is `s3://`
 
 ```ts
 import Loom from "@loom-io/core";

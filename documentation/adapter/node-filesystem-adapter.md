@@ -1,9 +1,9 @@
 ---
 ---
 
-# Filesystem Adapter
+# File System Adapter
 
-Access Files from you local filesystem. Don't be confused from the node in the package name, it should also work with bun, because it is node compatible, but there are plans to do a more Bun specific adapter. For now you should also use this for bun, because all adapter exchange able you can easily switch later to the Bun specific adapter if you want to.
+Access files from your local filesystem. Don't be confused by the node in the package name, it should also work with bun as it is node compatible, but there are plans to make a more bun specific adapter. For now, you should use this for bun as well, as all adapters are interchangeable, you can easily switch to the bun specific adapter later if you want to.
 
 ::: code-group
 
@@ -21,9 +21,9 @@ bun add @loom-io/node-filesystem-adapter
 
 :::
 
-## Setup and config
+## Setup and configuration
 
-The default key for this adapter is `file://`, by default the adapter sets your project directory as root directory (manly the directory you starts you server from), but you can set any other directory. This directory looks like and is accessed like you root directory, so you will not be able to break out of this directory.
+The default key for this adapter is `file://`, by default the adapter sets your project directory as the root directory (manly the directory you start you server from), but you can set any other directory. This directory looks and is accessed like your root directory, so you will not be able to break out of it.
 
 ```ts
 import Loom from "@loom-io/core";

@@ -3,7 +3,7 @@
 
 # YAML Converter
 
-Adding this converter to read yaml-files as json.
+Add this converter to read yaml files as json.
 
 ::: code-group
 
@@ -23,7 +23,7 @@ bun add @loom-io/yaml-converter
 
 ## Usage
 
-Before usage you have to register the yaml converter
+Before using, you need to register the yaml converter
 
 ```ts
 import Loom from "@loom-io/core";
@@ -32,7 +32,7 @@ import yamlConverter from "@loom-io/yaml-converter";
 Loom.register(yamlConverter());
 ```
 
-The you can read and write yaml files with the ending `yaml` adn `yml`
+You can read and write yaml files with the suffixes `yaml` adn `yml`
 
 ```ts
 const yamlFile = await Loom.file("memory://some/yaml/file.yaml");

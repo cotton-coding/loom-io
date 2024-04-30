@@ -3,7 +3,7 @@
 
 # JSON Converter
 
-Adding this converter to read json-files as json.
+Add this converter to read json files as json.
 
 ::: code-group
 
@@ -23,7 +23,7 @@ bun add @loom-io/json-converter
 
 ## Usage
 
-Before usage you have to register the json converter
+Before using it you need to register the json converter
 
 ```ts
 import Loom from "@loom-io/core";
@@ -32,7 +32,7 @@ import jsonConverter from "@loom-io/json-converter";
 Loom.register(jsonConverter());
 ```
 
-The you can read and write json files
+This allows you to read and write json files
 
 ```ts
 const jsonFile = await Loom.file("memory://some/json/file.json");
