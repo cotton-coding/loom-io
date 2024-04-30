@@ -16,5 +16,11 @@ export async function getFrontMatterConverter(firstLine: LineResult): Promise<{p
 		return JSON;
 	}
 
-	throw new Error(`Unknown front matter type: ${type}`);
+	throw new FrontMatterTypeNotSupportedException(type);
+}
+
+export class FrontMatterTypeNotSupportedException extends Error {
+	constructor(type: string) {
+		super(`The frontmatter format inside the file not supported: ${type}`);
+	}
 }

@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
 import { LineResultMock } from '../test/mocks';
-import { getFrontMatterConverter, hasFrontMatter } from './utils';
+import { FrontMatterTypeNotSupportedException, getFrontMatterConverter, hasFrontMatter } from './utils';
 import { LineResult } from '@loom-io/core/internal';
 import * as YAML from 'yaml';
 
@@ -51,6 +51,16 @@ describe('utils', () => {
 			'content'
 		])) as unknown as LineResult;
 		expect(getFrontMatterConverter(line)).resolves.toEqual(YAML);
+	});
+
+	test('getFrontMatterConverter throw on unknown type', () => {
+		const line = (new LineResultMock([
+			'---test',
+			'key: value',
+			'---',
+			'content'
+		])) as unknown as LineResult;
+		expect(getFrontMatterConverter(line)).rejects.toThrow(FrontMatterTypeNotSupportedException);
 	});
 
 });
