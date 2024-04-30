@@ -49,10 +49,6 @@ export class LoomFile {
 		return this._extension;
 	}
 
-	get fullName() {
-		return this.name + (this.extension ? '.' + this.extension : '');
-	}
-
 	get dir(): Directory {
 		return this._dir;
 	}
