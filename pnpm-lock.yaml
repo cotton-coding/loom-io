@@ -39,7 +39,7 @@ importers:
         specifier: workspace:^
         version: link:../../packages/common
       '@loom-io/core':
-        specifier: workspace:^0.8.0
+        specifier: workspace:^
         version: link:../../packages/core
     devDependencies:
       '@faker-js/faker':
@@ -131,7 +131,7 @@ importers:
     dependencies:
       '@loom-io/core':
         specifier: ^0.8.0
-        version: link:../../packages/core
+        version: 0.8.0
       yaml:
         specifier: ^2.4.1
         version: 2.4.1
@@ -139,14 +139,14 @@ importers:
   plugins/json-converter:
     dependencies:
       '@loom-io/core':
-        specifier: ^0.8.0
-        version: 0.8.0
+        specifier: workspace:^0.9.0
+        version: link:../../packages/core
 
   plugins/yaml-converter:
     dependencies:
       '@loom-io/core':
-        specifier: ^0.8.0
-        version: 0.8.0
+        specifier: workspace:^0.9.0
+        version: link:../../packages/core
       yaml:
         specifier: ^2.4.1
         version: 2.4.1

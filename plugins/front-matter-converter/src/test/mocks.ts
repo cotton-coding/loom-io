@@ -17,7 +17,8 @@ export class LineResultMock {
 		return this.index < this.lines.length;
 	}
 
-	async read(encoding: string) {
+	// eslint-disable-next-line @typescript-eslint/no-unused-vars
+	async read(...params: Parameters<LineResult['read']>) {
 		return this.lines[this.index];
 	}
 }
