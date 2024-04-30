@@ -130,8 +130,8 @@ importers:
   plugins/front-matter-converter:
     dependencies:
       '@loom-io/core':
-        specifier: ^0.8.0
-        version: 0.8.0
+        specifier: workspace:^0.9.0
+        version: link:../../packages/core
       yaml:
         specifier: ^2.4.1
         version: 2.4.1
@@ -508,12 +508,6 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
-
-  '@loom-io/common@1.0.1':
-    resolution: {integrity: sha512-M3QWzyUkPovL9vnlA90emBECTXyohnM1ND9VMo1CPFA7gIeaubcGtb0b23UFhfZinFBRRstMR3goJuhbe1qT7w==}
-
-  '@loom-io/core@0.8.0':
-    resolution: {integrity: sha512-EEAeUnJXQtwaraOa8q/ipd5hYyMZ+qcw+bDzBFgBPKRo/+aUxjOv25y19z5fKjVYLt6B5y/BeOSOcOqU/kBgJg==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -2233,12 +2227,6 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.4.15
-
-  '@loom-io/common@1.0.1': {}
-
-  '@loom-io/core@0.8.0':
-    dependencies:
-      '@loom-io/common': 1.0.1
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
