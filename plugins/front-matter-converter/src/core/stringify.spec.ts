@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest';
 import { FileMock } from '../test/mocks';
 import { ensureNewLine, stringifyJson, writeToFile } from './stringify';
-import { LoomFile } from '@loom-io/core/internal';
+import { LoomFile } from '@loom-io/core';
 
 
 describe('stringify', () => {
