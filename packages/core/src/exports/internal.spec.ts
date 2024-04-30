@@ -1,5 +1,7 @@
 import { describe, test, expect, expectTypeOf } from 'vitest';
 import { LoomFile } from '../../dist/core/file';
+import { Directory } from '../../dist/core/dir';
+import { LineResult } from '../../dist/helper/result';
 
 describe('lib internal exports', () => {
 	test('Createable LoomFile', () => {
@@ -8,12 +10,12 @@ describe('lib internal exports', () => {
 	});
 
 	test('Crateable Directory', () => {
-		expect(LoomFile).toBeDefined();
-		expectTypeOf(LoomFile).instance.toHaveProperty('path');
+		expect(Directory).toBeDefined();
+		expectTypeOf(Directory).instance.toHaveProperty('path');
 	});
 
 	test('Crateable LineResult', () => {
-		expect(LoomFile).toBeDefined();
-		expectTypeOf(LoomFile).instance.toHaveProperty('next');
+		expect(LineResult).toBeDefined();
+		expectTypeOf(LineResult).instance.toHaveProperty('next');
 	});
 });
