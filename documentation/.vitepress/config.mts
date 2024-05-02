@@ -32,6 +32,7 @@ export default defineConfig({
       {
         text: 'Converter',
         items: [
+          { text: 'Front Matter', link: '/converter/front-matter-converter' },
           { text: 'JSON', link: '/converter/json-converter' },
           { text: 'YAML', link: '/converter/yaml-converter' }
         ]

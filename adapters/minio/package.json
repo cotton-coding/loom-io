@@ -1,6 +1,6 @@
 {
 	"name": "@loom-io/minio-s3-adapter",
-	"version": "0.9.0",
+	"version": "0.9.1",
 	"main": "dist/exports/lib.js",
 	"types": "dist/exports/lib.d.ts",
 	"author": "Cotton Coding",
@@ -47,6 +47,7 @@
 			"email": "ghost+npm@dropanote.de"
 		}
 	],
+	"homepage": "https://loom-io.cotton-coding.com",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/cotton-coding/loom-io.git"

@@ -1,6 +1,6 @@
 {
 	"name": "@loom-io/node-filesystem-adapter",
-	"version": "0.9.0",
+	"version": "0.9.1",
 	"main": "dist/exports/lib.js",
 	"types": "dist/exports/lib.d.ts",
 	"author": "Cotton Coding",
@@ -50,6 +50,7 @@
 		"type": "git",
 		"url": "https://github.com/cotton-coding/loom-io.git"
 	},
+	"homepage": "https://loom-io.cotton-coding.com",
 	"dependencies": {
 		"@loom-io/common": "workspace:*"
 	}

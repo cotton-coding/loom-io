@@ -27,6 +27,7 @@
 			"import": "./dist/yaml-converter.js"
 		}
 	},
+	"homepage": "https://loom-io.cotton-coding.com",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/cotton-coding/loom-io.git"
