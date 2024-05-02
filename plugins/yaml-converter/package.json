@@ -21,6 +21,9 @@
 		"converter"
 	],
 	"author": "Wolfgang Rathgeb",
+	"files": [
+		"dist"
+	],
 	"exports": {
 		".": {
 			"types": "./dist/yaml-converter.d.ts",

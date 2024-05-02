@@ -19,6 +19,9 @@
 		"converter"
 	],
 	"author": "Wolfgang Rathgeb",
+	"files": [
+		"dist"
+	],
 	"exports": {
 		".": {
 			"types": "./dist/json-converter.d.ts",
