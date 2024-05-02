@@ -1,3 +1,8 @@
+---
+title: Work with loom-io
+description: Loom-io is a great way to get access to your files and work with them more efficiently. Check out some of the ways you can use it in this article to see how it can help you.
+---
+
 # Examples
 
 loom-io simplifies the access to different storage systems and brings you additional functionality like reading directories recursively, searching files, reading them line by line or automatically converting files to json.

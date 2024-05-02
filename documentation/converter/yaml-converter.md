@@ -1,4 +1,6 @@
 ---
+title: YAML Converter
+description: This converter adapter for Loom-IO reads a YAML or YML file and transforms it into JSON, or it can write your JSON data into a YAML or YML file.
 ---
 
 # YAML Converter
