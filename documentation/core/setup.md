@@ -1,3 +1,8 @@
+---
+title: Setup loom-io
+describe: We'll walk you through setting up loom-io so you can get on with your life a bit easier with file storage systems and converting files.
+---
+
 # Installation
 
 The software is split into several adapters that do some of the work and give you flexibility. To get started easily, we would recombine to start with a pre-configured bundle.

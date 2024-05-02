@@ -1,4 +1,6 @@
 ---
+title: JSON Converter
+description: This converter adapter for Loom-IO reads a JSON file and transforms it into JSON, or it can write your JSON data into a JSON file.
 ---
 
 # JSON Converter
