@@ -1,5 +1,5 @@
 import { FileHandler as FileHandlerInterface, ReadBuffer, FileHandlerReadOptions } from '@loom-io/core';
-import { MemoryFile } from '../definitions';
+import { MemoryFile } from '../definitions.js';
 
 
 export class FileHandler implements FileHandlerInterface{

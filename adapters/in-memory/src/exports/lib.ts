@@ -1,4 +1,4 @@
-import { source } from '../core/source';
+import { source } from '../core/source.js';
 import { PLUGIN_TYPE, type LoomSourceAdapter, Directory, LoomFile } from '@loom-io/core';
 
 export default (key: string = 'memory://') => ({

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { TextItemList } from './textItemList';
+import { TextItemList } from './textItemList.js';
 import { faker } from '@faker-js/faker';
 
 class TestTextItemList extends TextItemList {
@@ -40,7 +40,7 @@ describe('LineList', () => {
 		const list40 = new TextItemList({ start: 40, end: 42 });
 		const list80 = new TextItemList({ start: 80, end: 87 });
 		const list97 = new TextItemList({ start: 97, end: 137 });
-		
+
 		list37.add(list13);
 		expect(list37.prev()).toBe(list13);
 		list37.add(list97);
@@ -143,7 +143,7 @@ describe('LineList', () => {
 		const list13 = new TestTextItemList({ start: 13, end: 20 });
 		const list40 = new TestTextItemList({ start: 40, end: 42 });
 		const list80 = new TestTextItemList({ start: 80, end: 87 });
-		
+
 		list80.unwrapSearchAndAddBefore(list13);
 		expect(list80.prev()).toBe(list13);
 		list80.unwrapSearchAndAddBefore(list40);
@@ -153,7 +153,7 @@ describe('LineList', () => {
 		list40.unwrapSearchAndAddBefore(list0);
 		expect(list40.prev()).toBe(list13);
 		expect(list13.prev()).toEqual(list0);
-		
+
 		list40.unwrapSearchAndAddBefore(list37);
 		expect(list40.prev()).toBe(list37);
 		expect(list40.next()).toBe(list80);
@@ -166,14 +166,14 @@ describe('LineList', () => {
 		const list13 = new TestTextItemList({ start: 13, end: 20 });
 		const list40 = new TestTextItemList({ start: 40, end: 42 });
 		const list80 = new TestTextItemList({ start: 80, end: 87 });
-		
+
 		list13.unwrapSearchAndAddAfter(list80);
 		expect(list13.next()).toBe(list80);
 		list13.unwrapSearchAndAddAfter(list40);
 		expect(list80.prev()).toBe(list40);
 		expect(list13.next()).toBe(list40);
 		expect(list40.next()).toBe(list80);
-		
+
 		list13.unwrapSearchAndAddAfter(list37);
 		expect(list13.next()).toBe(list37);
 
@@ -184,7 +184,7 @@ describe('LineList', () => {
 		const list13 = new TestTextItemList({ start: 13, end: 20 });
 		const list40 = new TestTextItemList({ start: 40, end: 42 });
 		const list80 = new TestTextItemList({ start: 80, end: 87 });
-		
+
 		list80.unwrapAddBefore(list13);
 		expect(list80.prev()).toBe(list13);
 		list80.unwrapAddBefore(list40);
@@ -200,7 +200,7 @@ describe('LineList', () => {
 		const list13 = new TestTextItemList({ start: 13, end: 20 });
 		const list40 = new TestTextItemList({ start: 40, end: 42 });
 		const list80 = new TestTextItemList({ start: 80, end: 87 });
-		
+
 		list80.unwrapAddAfter(list13);
 		expect(list80.next()).toBe(list13);
 		list80.unwrapAddAfter(list40);
@@ -215,7 +215,7 @@ describe('LineList', () => {
 		const list0 = new TextItemList({ start: 0, end: 7 });
 		const list80 = new TextItemList({ start: 80, end: 87 });
 		const list97 = new TextItemList({ start: 97, end: 137 });
-		
+
 		list0.add(list80);
 		expect(list0.hasNext()).toBe(true);
 		expect(list80.hasNext()).toBe(false);
@@ -230,7 +230,7 @@ describe('LineList', () => {
 		const list0 = new TextItemList({ start: 0, end: 7 });
 		const list80 = new TextItemList({ start: 80, end: 87 });
 		const list97 = new TextItemList({ start: 97, end: 137 });
-		
+
 		list0.add(list80);
 		expect(list0.hasPrev()).toBe(false);
 		expect(list80.hasPrev()).toBe(true);
@@ -251,7 +251,7 @@ describe('LineList', () => {
 			const list40 = new TextItemList({ start: 40, end: 42, readReverse: true });
 			const list80 = new TextItemList({ start: 80, end: 87, readReverse: true });
 			const list200 = new TextItemList({ start: 200, end: 300, readReverse: true });
-		
+
 			list0.add(list13);
 			list0.add(list37);
 			list0.add(list80);
@@ -276,7 +276,7 @@ describe('LineList', () => {
 			const list40 = new TextItemList({ start: 40, end: 42});
 			const list80 = new TextItemList({ start: 80, end: 87});
 			const list200 = new TextItemList({ start: 200, end: 300});
-		
+
 			list0.add(list13);
 			list0.add(list37);
 			list0.add(list80);
@@ -301,7 +301,7 @@ describe('LineList', () => {
 			const list40 = new TextItemList({ start: 40, end: 42, readReverse: true });
 			const list80 = new TextItemList({ start: 80, end: 87, readReverse: true });
 			const list200 = new TextItemList({ start: 200, end: 300, readReverse: true });
-		
+
 			list0.add(list13);
 			list0.add(list37);
 			list0.add(list80);
@@ -326,7 +326,7 @@ describe('LineList', () => {
 			const list40 = new TextItemList({ start: 40, end: 42, readReverse: true });
 			const list80 = new TextItemList({ start: 80, end: 87, readReverse: true });
 			const list97 = new TextItemList({ start: 97, end: 137, readReverse: true });
-		
+
 			list0.add(list13);
 			list0.add(list37);
 			list0.add(list80);
@@ -351,7 +351,7 @@ describe('LineList', () => {
 			const list40 = new TextItemList({ start: 40, end: 42, readReverse: true });
 			const list80 = new TextItemList({ start: 80, end: 87, readReverse: true });
 			const list97 = new TextItemList({ start: 97, end: 137, readReverse: true });
-		
+
 			list0.add(list13);
 			list0.add(list37);
 			list0.add(list80);
@@ -377,7 +377,7 @@ describe('LineList', () => {
 			const list40 = new TextItemList({ start: 40, end: 42 });
 			const list80 = new TextItemList({ start: 80, end: 87 });
 			const list97 = new TextItemList({ start: 97, end: 137 });
-		
+
 			list0.add(list13);
 			list0.add(list37);
 			list0.add(list80);

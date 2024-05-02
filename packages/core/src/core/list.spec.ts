@@ -1,7 +1,7 @@
 import { expect, describe, test, beforeEach, afterEach } from 'vitest';
-import { List } from './list';
-import { Directory } from './dir';
-import { LoomFile } from './file';
+import { List } from './list.js';
+import { Directory } from './dir.js';
+import { LoomFile } from './file.js';
 import { InMemoryAdapterHelper } from '@loom-io/test-utils';
 import { getUniqSegmentsOfPath, removePrecedingSlash } from '@loom-io/common';
 

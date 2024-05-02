@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
-import frontMatterConverter from './lib';
-import { FileMock } from '../test/mocks';
+import frontMatterConverter from './lib.js';
+import { FileMock } from '../test/mocks.js';
 import { LoomFile } from '@loom-io/core';
 
 describe('test library exports', async () => {

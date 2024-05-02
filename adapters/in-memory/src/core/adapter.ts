@@ -1,9 +1,9 @@
 import { FileHandler } from './file-handler.js';
 import { type SourceAdapter, type rmdirOptions, type ObjectDirentInterface, PathNotExistsException, DirectoryNotEmptyException } from '@loom-io/core';
-import { AlreadyExistsException, NotFoundException } from '../exceptions';
+import { AlreadyExistsException, NotFoundException } from '../exceptions.js';
 import { ObjectDirent } from './object-dirent.js';
-import { MEMORY_TYPE, MemoryDirectory, MemoryFile, MemoryObject, MemoryRoot } from '../definitions';
-import { isMemoryDirectoryAndMatchNamePrepared } from '../utils/validations';
+import { MEMORY_TYPE, MemoryDirectory, MemoryFile, MemoryObject, MemoryRoot } from '../definitions.js';
+import { isMemoryDirectoryAndMatchNamePrepared } from '../utils/validations.js';
 import { removePrecedingAndTrailingSlash, splitTailingPath } from '@loom-io/common';
 export class Adapter implements SourceAdapter {
 

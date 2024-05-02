@@ -1,7 +1,7 @@
 import { describe, test, expect, expectTypeOf } from 'vitest';
-import { LoomFile } from '../../dist/core/file';
-import { Directory } from '../../dist/core/dir';
-import { LineResult } from '../../dist/helper/result';
+import { LoomFile } from '../../dist/core/file.js';
+import { Directory } from '../../dist/core/dir.js';
+import { LineResult } from '../../dist/helper/result.js';
 
 describe('lib internal exports', () => {
 	test('Createable LoomFile', () => {

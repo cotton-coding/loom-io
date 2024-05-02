@@ -1,6 +1,6 @@
 import { Directory, LoomFile } from '@loom-io/core/internal';
 import { Client as MinioClient, ClientOptions as S3Options} from 'minio';
-import { Adapter } from './adapter';
+import { Adapter } from './adapter.js';
 import { dirname } from 'path';
 
 export { S3Options };

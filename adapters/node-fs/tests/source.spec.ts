@@ -1,7 +1,7 @@
 import { testSource } from '@loom-io/interface-tests';
-import FilesystemSourceAdapter from '../src/exports/lib';
+import FilesystemSourceAdapter from '../src/exports/lib.js';
 import { describe, expect, test } from 'vitest';
-import { source } from '../src/core/source';
+import { source } from '../src/core/source.js';
 import { LoomFile } from '@loom-io/core/internal';
 
 

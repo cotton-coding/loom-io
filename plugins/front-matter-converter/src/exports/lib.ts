@@ -1,6 +1,6 @@
 import { PLUGIN_TYPE, type LoomFile, type LoomFileConverter } from '@loom-io/core';
-import { parse } from '../core/parse';
-import { stringify } from '../core/stringify';
+import { parse } from '../core/parse.js';
+import { stringify } from '../core/stringify.js';
 type Config = {
 	extensions?: string[];
 }

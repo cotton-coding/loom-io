@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import LoomIO, {isDirectory, isFile} from '../src/bundle';
+import LoomIO, {isDirectory, isFile} from '../src/bundle.js';
 
 describe('minimal export test', async () => {
 

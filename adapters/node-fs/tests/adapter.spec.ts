@@ -1,6 +1,6 @@
 import { TestAdapter } from '@loom-io/interface-tests';
-//import { TestAdapter } from './adapter';
-import { Adapter } from '../src/core/adapter';
+//import { TestAdapter } from './adapter.js';
+import { Adapter } from '../src/core/adapter.js';
 import * as fs from 'fs/promises';
 import { resolve } from 'node:path';
 

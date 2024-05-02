@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { addPrecedingAndTailingSlash, getUniqSegmentsOfPath, getSegmentsOfPath, getPathDepth, removePrecedingAndTrailingSlash, splitTailingPath, removePrecedingSlash, removeTailingSlash } from './path';
+import { addPrecedingAndTailingSlash, getUniqSegmentsOfPath, getSegmentsOfPath, getPathDepth, removePrecedingAndTrailingSlash, splitTailingPath, removePrecedingSlash, removeTailingSlash } from './path.js';
 
 describe('path utils', async () => {
 

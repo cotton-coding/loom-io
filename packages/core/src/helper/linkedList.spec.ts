@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest';
-import { ListItem } from './linkedList';
+import { ListItem } from './linkedList.js';
 
 describe('LinkedList', () => {
 

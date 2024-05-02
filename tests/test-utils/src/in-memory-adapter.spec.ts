@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest';
-import { InMemoryAdapterHelper } from './in-memory-adapter';
+import { InMemoryAdapterHelper } from './in-memory-adapter.js';
 import { faker } from '@faker-js/faker';
 
 describe.concurrent('Test In Memory Adapter Helper', () => {

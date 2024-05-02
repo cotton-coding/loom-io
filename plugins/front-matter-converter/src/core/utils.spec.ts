@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
-import { LineResultMock } from '../test/mocks';
-import { FrontMatterTypeNotSupportedException, getFrontMatterConverter, hasFrontMatter } from './utils';
+import { LineResultMock } from '../test/mocks.js';
+import { FrontMatterTypeNotSupportedException, getFrontMatterConverter, hasFrontMatter } from './utils.js';
 import { LineResult } from '@loom-io/core/internal';
 import * as YAML from 'yaml';
 

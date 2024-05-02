@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
-import { AlreadyExistsException, NotFoundException } from './exceptions';
-import { MEMORY_TYPE } from './definitions';
+import { AlreadyExistsException, NotFoundException } from './exceptions.js';
+import { MEMORY_TYPE } from './definitions.js';
 
 describe('exceptions', () => {
 	test('NotFoundException with root', () => {

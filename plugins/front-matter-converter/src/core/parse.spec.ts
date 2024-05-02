@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest';
-import { LineResultMock } from '../test/mocks';
+import { LineResultMock } from '../test/mocks.js';
 import { LineResult } from '@loom-io/core/internal';
-import { readContent, readFrontMatter } from './parse';
+import { readContent, readFrontMatter } from './parse.js';
 
 
 describe('parse', () => {
