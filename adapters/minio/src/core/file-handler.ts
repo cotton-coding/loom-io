@@ -1,4 +1,4 @@
-import { Adapter } from './adapter';
+import { Adapter } from './adapter.js';
 import { FileHandler as FileHandlerInterface, ReadBuffer, FileHandlerReadOptions } from '@loom-io/core';
 
 export class FileHandler implements FileHandlerInterface{

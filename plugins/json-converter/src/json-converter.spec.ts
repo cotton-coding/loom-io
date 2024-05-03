@@ -1,5 +1,5 @@
 import { vi, describe, test, expect } from 'vitest';
-import jsonConverter from './json-converter';
+import jsonConverter from './json-converter.js';
 import { LoomFile } from '@loom-io/core';
 
 describe('json-converter', () => {

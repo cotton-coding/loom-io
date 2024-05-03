@@ -1,4 +1,4 @@
-import { MemoryDirectory, MemoryObject, MemoryRoot } from './definitions';
+import { MemoryDirectory, MemoryObject, MemoryRoot } from './definitions.js';
 
 export class NotFoundException extends Error {
 

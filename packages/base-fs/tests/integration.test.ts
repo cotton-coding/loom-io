@@ -1,7 +1,7 @@
 import { describe, test, expect, afterAll } from 'vitest';
 import { rmdir } from 'fs/promises';
 import { resolve as resolvePath } from 'node:path';
-import LoomIO, { Directory, DirectoryNotEmptyException, isDirectory } from '../src/bundle';
+import LoomIO, { Directory, DirectoryNotEmptyException, isDirectory } from '../src/bundle.js';
 
 const BASE_TEST_PATH = './tmp-test/';
 

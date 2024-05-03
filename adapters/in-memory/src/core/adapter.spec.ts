@@ -1,6 +1,6 @@
-import { MemoryDirectory, MEMORY_TYPE, MemoryRoot, MemoryObject, MemoryFile } from '../definitions';
-import { AlreadyExistsException, NotFoundException } from '../exceptions';
-import { Adapter } from './adapter';
+import { MemoryDirectory, MEMORY_TYPE, MemoryRoot, MemoryObject, MemoryFile } from '../definitions.js';
+import { AlreadyExistsException, NotFoundException } from '../exceptions.js';
+import { Adapter } from './adapter.js';
 import { describe, test, expect, beforeEach } from 'vitest';
 
 

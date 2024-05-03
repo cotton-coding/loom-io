@@ -1,6 +1,6 @@
-import { LoomFile } from '@loom-io/core';
+import type { LoomFile } from '@loom-io/core';
 import * as YAML from 'yaml';
-import { getFrontMatterConverter, hasFrontMatter } from './utils';
+import { getFrontMatterConverter, hasFrontMatter } from './utils.js';
 
 
 export async function writeToFile(file: LoomFile, matter: string = '', content: string = '') {

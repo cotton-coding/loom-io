@@ -1,5 +1,5 @@
 import { vi, describe, test, expect } from 'vitest';
-import yamlConverter from './yaml-converter';
+import yamlConverter from './yaml-converter.js';
 import { LoomFile, PLUGIN_TYPE } from '@loom-io/core';
 
 describe('json-converter', () => {

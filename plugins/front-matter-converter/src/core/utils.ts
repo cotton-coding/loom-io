@@ -1,4 +1,4 @@
-import { LineResult } from '@loom-io/core/internal';
+import type { LineResult } from '@loom-io/core/internal';
 import * as YAML from 'yaml';
 
 

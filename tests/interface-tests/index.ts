@@ -1,2 +1,2 @@
-export * from './src/adapter';
-export * from './src/source';
+export * from './src/adapter.js';
+export * from './src/source.js';

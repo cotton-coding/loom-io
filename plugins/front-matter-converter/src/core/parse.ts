@@ -1,6 +1,5 @@
-import { LoomFile } from '@loom-io/core';
-import { LineResult } from '@loom-io/core/internal';
-import { getFrontMatterConverter, hasFrontMatter } from './utils';
+import type { LineResult, LoomFile } from '@loom-io/core/internal';
+import { getFrontMatterConverter, hasFrontMatter } from './utils.js';
 
 
 export async function readFrontMatter(line: LineResult) {

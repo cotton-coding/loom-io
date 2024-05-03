@@ -1,5 +1,5 @@
 import { Directory, LoomFile } from '@loom-io/core/internal';
-import { Adapter } from './adapter';
+import { Adapter } from './adapter.js';
 import { dirname, basename } from 'node:path';
 import { splitTailingPath } from '@loom-io/common';
 

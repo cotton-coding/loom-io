@@ -1,5 +1,5 @@
 import { TestAdapter } from '@loom-io/interface-tests';
-import { Adapter } from '../src/core/adapter';
+import { Adapter } from '../src/core/adapter.js';
 import { Client } from 'minio';
 
 const DEFAULT_BUCKET: string = `cotton-coding-${Math.random().toString(36).substring(7)}`;

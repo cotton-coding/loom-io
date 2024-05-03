@@ -1,5 +1,5 @@
 import { ObjectDirentInterface } from '@loom-io/core';
-import { MEMORY_TYPE, MemoryObject } from '../definitions';
+import { MEMORY_TYPE, MemoryObject } from '../definitions.js';
 import { addPrecedingAndTailingSlash } from '@loom-io/common';
 
 export class ObjectDirent implements ObjectDirentInterface{

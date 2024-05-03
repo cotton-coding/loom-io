@@ -1,14 +1,14 @@
 import { describe, expect, test } from 'vitest';
-import { Editor, Reader } from './editor';
+import { Editor, Reader } from './editor.js';
 import { dirname, basename } from 'node:path';
-import { Directory } from './dir';
-import { LoomFile } from './file';
+import { Directory } from './dir.js';
+import { LoomFile } from './file.js';
 
 import { faker } from '@faker-js/faker';
-import { TextItemList } from '../helper/textItemList';
+import { TextItemList } from '../helper/textItemList.js';
 import { beforeAll } from 'vitest';
 import { InMemoryAdapterHelper } from '@loom-io/test-utils';
-import { SourceAdapter } from '../definitions';
+import { SourceAdapter } from '../definitions.js';
 
 function createEditor(adapter, testFile: string): Promise<Editor> {
 	const dir = new Directory(adapter, dirname(testFile));

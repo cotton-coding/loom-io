@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest';
-import { FileMock } from '../test/mocks';
-import { ensureNewLine, stringifyJson, writeToFile } from './stringify';
+import { FileMock } from '../test/mocks.js';
+import { ensureNewLine, stringifyJson, writeToFile } from './stringify.js';
 import { LoomFile } from '@loom-io/core';
 
 

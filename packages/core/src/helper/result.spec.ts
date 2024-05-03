@@ -1,7 +1,7 @@
 import { describe, test, expect, beforeAll } from 'vitest';
-import { LineResult, SearchResult } from './result';
-import { TextItemList } from './textItemList';
-import { ReaderInternal } from '../editor';
+import { LineResult, SearchResult } from './result.js';
+import { TextItemList } from './textItemList.js';
+import { ReaderInternal } from '../editor.js';
 import { faker } from '@faker-js/faker';
 
 class MockReader implements ReaderInternal {
@@ -43,7 +43,7 @@ class MockReader implements ReaderInternal {
 		const lorem = faker.lorem.paragraphs(10);
 		const part = lorem.substring(start, start+length);
 		return part;
-	
+
 	}
 
 	async close(): Promise<void> {}

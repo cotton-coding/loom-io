@@ -1,4 +1,4 @@
-import { source, type S3Options } from '../core/source';
+import { source, type S3Options } from '../core/source.js';
 import { type Directory, PLUGIN_TYPE, type LoomSourceAdapter, LoomFile, MaybePromise } from '@loom-io/core';
 
 export default (key: string = 's3://', bucket: string, s3config: S3Options): LoomSourceAdapter => ({

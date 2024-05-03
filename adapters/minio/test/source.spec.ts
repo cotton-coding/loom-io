@@ -1,5 +1,5 @@
 import { testSource } from '@loom-io/interface-tests';
-import S3MinioSourceAdapter from '../src/exports/lib';
+import S3MinioSourceAdapter from '../src/exports/lib.js';
 
 const s3config = {
 	endPoint: 'play.min.io',
