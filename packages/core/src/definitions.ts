@@ -1,5 +1,5 @@
-import type { Directory } from './core/dirjs';
-import { LoomFile } from './core/filejs';
+import type { Directory } from './core/dir.js';
+import { LoomFile } from './core/file.js';
 
 export enum PLUGIN_TYPE {
     FILE_CONVERTER,
