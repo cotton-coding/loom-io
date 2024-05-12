@@ -3,7 +3,6 @@ import { LoomFile } from './core/file.js';
 
 export enum PLUGIN_TYPE {
     FILE_CONVERTER,
-    SOURCE_ADAPTER
 }
 
 export enum FILE_SIZE_UNIT {
@@ -29,12 +28,12 @@ export interface LoomFileConverter extends LoomPluginBase {
     parse(file: LoomFile): Promise<unknown>
     stringify(file: LoomFile, content: unknown): Promise<void>
 }
-export interface LoomSourceAdapter extends LoomPluginBase{
-    $type: PLUGIN_TYPE.SOURCE_ADAPTER,
-    source: (link: string, Type?: typeof Directory | typeof LoomFile) => MaybePromise<Directory | LoomFile> | void,
+export interface LoomSourceAdapter{
+    file: (path: string) => MaybePromise<LoomFile>
+    dir: (path: string) => MaybePromise<Directory>
 }
 
-export type LoomPlugin = LoomFileConverter | LoomSourceAdapter;
+export type LoomPlugin = LoomFileConverter;
 
 export type MaybePromise<T> = Promise<T> | T;
 

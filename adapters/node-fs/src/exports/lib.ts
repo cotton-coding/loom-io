@@ -1,14 +1,19 @@
 import { PathLike } from 'node:fs';
-import { source } from '../core/source.js';
-import { PLUGIN_TYPE, type LoomSourceAdapter, Directory, LoomFile } from '@loom-io/core';
+import { type LoomSourceAdapter } from '@loom-io/core';
+import { Adapter } from '../core/adapter.js';
+import { dirname, basename } from 'node:path';
+import { Directory, LoomFile } from '@loom-io/core/internal';
 
-export default (key: string = 'file://', rootdir?: PathLike) => ({
-	$type: PLUGIN_TYPE.SOURCE_ADAPTER,
-	source: (link: string, Type?: typeof Directory | typeof LoomFile) => {
-		if(link.startsWith(key)) {
-			const path = link.slice(key.length);
-			return source(path, rootdir, Type);
-		}
-	},
-	nonce: Symbol('node-fs-source-adapter')
-}) satisfies LoomSourceAdapter;
+export class FilesystemAdapter implements LoomSourceAdapter {
+	protected adapter: Adapter;
+	constructor(rootdir: PathLike = process.cwd()) {
+		this.adapter = new Adapter(rootdir);
+	}
+	file(path: string): LoomFile {
+		const dir = new Directory(this.adapter, dirname(path));
+		return new LoomFile(this.adapter, dir, basename(path));
+	}
+	dir(path: string): Directory {
+		return new Directory(this.adapter, path);
+	}
+}
