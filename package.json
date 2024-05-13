@@ -3,7 +3,7 @@
 	"scripts": {
 		"build:common": "pnpm run --filter @loom-io/common build",
 		"build:core": "pnpm run --filter @loom-io/core build",
-		"build:memory": "pnpm run --filter @loom-io/memory build",
+		"build:memory": "pnpm run --filter @loom-io/in-memory-adapter build",
 		"build:pre": "pnpm run build:common && pnpm run build:core && pnpm run build:memory",
 		"build": "pnpm run build:pre && pnpm run --recursive build",
 		"prepublishOnly": "pnpm run build:pre && pnpm run --recursive prepublishOnly",
