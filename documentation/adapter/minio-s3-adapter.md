@@ -8,15 +8,15 @@ Connects your S3 as it is a file system storage and based on the minio library. 
 ::: code-group
 
 ```sh [npm]
-npm add @loom-io/minio-s3-adapter
+npm add @loom-io/minio-s3-adapter @loom-io/core
 ```
 
 ```sh [pnpm]
-pnpm add @loom-io/minio-s3-adapter
+pnpm add @loom-io/minio-s3-adapter @loom-io/core
 ```
 
 ```sh [bun]
-bun add @loom-io/minio-s3-adapter
+bun add @loom-io/minio-s3-adapter @loom-io/core
 ```
 
 :::
