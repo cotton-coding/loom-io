@@ -23,11 +23,10 @@ bun add @loom-io/minio-s3-adapter
 
 ## Setup and configuration
 
-Basically the configuration is the same as for [minio](https://min.io/docs/minio/linux/developers/javascript/API.html). You just have to set up a bucket name in advance. The default key for identification is `s3://`
+Basically the configuration is the same as for [minio](https://min.io/docs/minio/linux/developers/javascript/API.html). You just have to set up a bucket name in advance.
 
 ```ts
-import Loom from "@loom-io/core";
-import s3Adapter from "@loom-io/s3-minio-adapter";
+import S3Adapter from "@loom-io/s3-minio-adapter";
 
 const s3ConfigMinio = {
 	endPoint: "play.min.io",
@@ -43,8 +42,8 @@ const s3ConfigDigitalOcean = {
 	secretKey: "secret",
 };
 
-// Set own key, bucket name and config for minio
-Loom.register(memoryAdapter("my-s3://", "my-bucket", s3ConfigMinio));
-// set default key (s3://), bucket name and digital ocean space config
-Loom.register(memoryAdapter(undefined, "other-bucket", s3ConfigDigitalOcean));
+const minio = new S3Adapter("my-bucket", s3ConfigMinio);
+const ocean = new MinioAdapter("other-bucket", s3ConfigDigitalOcean);
+const file = minio.file("/some/file.pdf");
+const dir = ocean.dir("/some/dir");
 ```

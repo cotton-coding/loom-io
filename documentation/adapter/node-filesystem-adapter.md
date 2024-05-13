@@ -23,14 +23,13 @@ bun add @loom-io/node-filesystem-adapter
 
 ## Setup and configuration
 
-The default key for this adapter is `file://`, by default the adapter sets your project directory as the root directory (manly the directory you start you server from), but you can set any other directory. This directory looks and is accessed like your root directory, so you will not be able to break out of it.
+As a parameter, you can set the context where the adapter should interact. By default, this is the project directory. You can't go any lower than that.
 
 ```ts
-import Loom from "@loom-io/core";
-import filesystemAdapter from "@loom-io/node-filesystem-adapter";
+import FilesystemAdapter from "@loom-io/node-filesystem-adapter";
 
-// sets key to root:// and the root path to you filesystem root, be careful
-Loom.register(filesystemAdapter("root://", "/"));
-// use default config. Key is file:// and the "root"-Directory is your project root
-Loom.register(filesystemAdapter());
+const root = new FilesystemAdapter("/");
+const project = new FilesystemAdapter();
+const rootDir = root.dir("/");
+const projectDir = project("/");
 ```
