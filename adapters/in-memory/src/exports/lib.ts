@@ -1,13 +1,19 @@
-import { source } from '../core/source.js';
-import { PLUGIN_TYPE, type LoomSourceAdapter, Directory, LoomFile } from '@loom-io/core';
+import { Directory, LoomFile } from '@loom-io/core/internal';
+import { Adapter } from '../core/adapter.js';
+import { dirname, basename } from 'node:path';
+import { LoomSourceAdapter } from '@loom-io/core';
 
-export default (key: string = 'memory://') => ({
-	$type: PLUGIN_TYPE.SOURCE_ADAPTER,
-	source: (link: string, Type?: typeof Directory | typeof LoomFile) => {
-		if(link.startsWith(key)) {
-			const path = link.slice(key.length);
-			return source(path, Type);
-		}
-	},
-	nonce: Symbol('in-memory-source-adapter')
-}) satisfies LoomSourceAdapter;
+
+export class MemoryAdapter implements LoomSourceAdapter {
+	protected adapter: Adapter;
+	constructor() {
+		this.adapter = new Adapter();
+	}
+	async file(path: string): Promise<LoomFile> {
+		const dir = new Directory(this.adapter, dirname(path));
+		return new LoomFile(this.adapter, dir, basename(path));
+	}
+	async dir(path: string): Promise<Directory> {
+		return new Directory(this.adapter, path);
+	}
+}
