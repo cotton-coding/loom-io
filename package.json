@@ -3,7 +3,8 @@
 	"scripts": {
 		"build:common": "pnpm run --filter @loom-io/common build",
 		"build:core": "pnpm run --filter @loom-io/core build",
-		"build:pre": "pnpm run build:common && pnpm run build:core",
+		"build:memory": "pnpm run --filter @loom-io/memory build",
+		"build:pre": "pnpm run build:common && pnpm run build:core && pnpm run build:memory",
 		"build": "pnpm run build:pre && pnpm run --recursive build",
 		"prepublishOnly": "pnpm run build:pre && pnpm run --recursive prepublishOnly",
 		"test": "vitest",
@@ -11,7 +12,7 @@
 		"lint": "pnpm run --recursive lint",
 		"lint:fix": "pnpm run --recursive lint:fix",
 		"clean:dist": "rm -rf */**/dist",
-		"clean:node_modules": "rm -rf */**/node_modules"
+		"clean:node_modules": "rm -rf */**/node_modules && rm -rf node_modules"
 	},
 	"keywords": [],
 	"author": "",
