@@ -3,13 +3,16 @@
 	"scripts": {
 		"build:common": "pnpm run --filter @loom-io/common build",
 		"build:core": "pnpm run --filter @loom-io/core build",
-		"build:pre": "pnpm run build:common && pnpm run build:core",
+		"build:memory": "pnpm run --filter @loom-io/in-memory-adapter build",
+		"build:pre": "pnpm run build:common && pnpm run build:core && pnpm run build:memory",
 		"build": "pnpm run build:pre && pnpm run --recursive build",
 		"prepublishOnly": "pnpm run build:pre && pnpm run --recursive prepublishOnly",
 		"test": "vitest",
 		"test:ci": "vitest --run --coverage",
 		"lint": "pnpm run --recursive lint",
-		"lint:fix": "pnpm run --recursive lint:fix"
+		"lint:fix": "pnpm run --recursive lint:fix",
+		"clean:dist": "rm -rf */**/dist",
+		"clean:node_modules": "rm -rf */**/node_modules && rm -rf node_modules"
 	},
 	"keywords": [],
 	"author": "",
@@ -22,13 +25,13 @@
 	],
 	"devDependencies": {
 		"@faker-js/faker": "^8.4.1",
-		"@types/node": "^20.12.8",
+		"@types/node": "^20.12.11",
 		"@typescript-eslint/eslint-plugin": "latest",
 		"@typescript-eslint/parser": "latest",
-		"@vitest/coverage-v8": "^1.5.3",
+		"@vitest/coverage-v8": "^1.6.0",
 		"publint": "^0.2.7",
 		"typescript": "^5.4.5",
-		"vitest": "^1.5.3"
+		"vitest": "^1.6.0"
 	},
 	"repository": {
 		"type": "git",

@@ -1,7 +1,7 @@
 import { describe, test, expect, afterAll } from 'vitest';
 import { rmdir } from 'fs/promises';
 import { resolve as resolvePath } from 'node:path';
-import LoomIO, { Directory, DirectoryNotEmptyException, isDirectory } from '../src/bundle.js';
+import FilesystemAdapter, { Directory, DirectoryNotEmptyException, isDirectory } from '../src/bundle.js';
 
 const BASE_TEST_PATH = './tmp-test/';
 
@@ -13,12 +13,12 @@ const createRandomDirectory = async (): Promise<Directory> => {
 		return createRandomDirectory();
 	}
 	randomStrings.add(random);
-	return LoomIO.dir(`file://${BASE_TEST_PATH}/${random}`);
+	return (new FilesystemAdapter()).dir(`/${BASE_TEST_PATH}/${random}`);
 };
 
 const deleteRandomDirectory = async (dir: Directory) => {
 	const random = dir.path;
-	await rmdir(resolvePath(random), {recursive: true});
+	await rmdir(resolvePath(`.${random}`), {recursive: true});
 	randomStrings.delete(random);
 };
 
