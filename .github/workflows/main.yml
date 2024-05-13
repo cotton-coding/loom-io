@@ -27,7 +27,7 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: "pnpm"
       - name: Install
-        run: pnpm clean:dist && pnpm clean:node_modules && pnpm install
+        run: pnpm install
       - name: Lint & Fix
         run: pnpm lint:fix
       - name: Run build to resolve dependencies
