@@ -23,12 +23,13 @@ bun add @loom-io/in-memory-adapter
 
 ## Setup and configuration
 
-The adapter has only one default export and one export function to configure the adapter. In this case the only option is to set the key to reference it. As with all other adapters, you can register it with different identifiers. The default identifier is `memory://`.
+There aren't any configuration options, but you can create multiple versions of it just like you can with every other adapter to store different information. It'll be perfect for running tests – just replace it with your other adapter for testing.
 
 ```ts
-import Loom from "@loom-io/core";
-import memoryAdapter from "@loom-io/in-memory-adapter";
+import MemoryAdapter from "@loom-io/in-memory-adapter";
 
-Loom.register(memoryAdapter("my-memory://"));
-Loom.register(memoryAdapter());
+// you can even have multiples
+const memory = new MemoryAdapter();
+const file = memory.file("/some/file.pdf");
+const dir = memory.dir("/some/dir");
 ```
