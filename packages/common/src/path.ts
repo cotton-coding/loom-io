@@ -1,6 +1,3 @@
-
-
-
 export function removePrecedingSlash(path: string): string {
 	if (path.startsWith('/')) {
 		return path.slice(1);
