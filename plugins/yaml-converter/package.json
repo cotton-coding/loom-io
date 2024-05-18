@@ -1,6 +1,6 @@
 {
 	"name": "@loom-io/yaml-converter",
-	"version": "0.9.2",
+	"version": "0.10.0",
 	"description": "Convert yaml files to json with loom-io",
 	"main": "dist/yaml-converter.js",
 	"type": "module",

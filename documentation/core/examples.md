@@ -29,9 +29,9 @@ The following examples will not show registering an adapter every time, as you w
 Creating a directory or file object does not mean that the directory or file actually exists. This means that you could create a virtual object first and then create the real object in the storage system.
 
 ```ts
-import Loom from "@loom-io/core";
+import FsAdapter from "@loom-io/node-filesystem-adapter";
 
-const dir = await Loom.dir("file://welcome");
+const dir = new FsAdapter().dir("/welcome");
 const file = dir.file("hello-world.md");
 // so far everything is virtual and does not need to exit to your file system;
 
@@ -52,11 +52,13 @@ When the file was created, the directory was also created directly. To avoid thi
 This is one of the first functions implemented in the library, and one of the main reasons why. We have already registered one adapter above, so it will not be necessary to have a second one, but to have a complete example we will do it anyway. To get all the details about the adapter or dir, take a look at the doc sections
 
 ```ts
-import Loom from "@loom-io/core";
+import FsAdapter from "@loom-io/node-filesystem-adapter";
+
+const adapter = new FsAdapter();
 
 // the directory do not have to exist
 //select the root dir, in this case the project dir
-const dir = await Loom.dir("file://");
+const dir = await adapter.dir("/");
 //read dir recursive and search for files
 const files = await dir.files(true);
 
@@ -68,9 +70,11 @@ for (let file of files) {
 ## List content of a Directory
 
 ```ts
-import Loom, { isFile, isDirectory } from "@loom-io/core";
+import { isFile, isDirectory } from "@loom-io/core";
+import MemoryAdapter from "@loom-io/in-memory-adapter"
 
-const dir = await Loom.dir("file://");
+const adapter = new MemoryAdapter();
+const dir = adapter.dir('');
 const list = await dir.list() // returns a iterable to get Files and Directories
 
 for(let el of list) {
@@ -93,15 +97,20 @@ if(dir.parent !== undefined) {
 It can be annoying to think about the file format all the time when reading. When developing you are only interested in handling the data as JSON, not if it is originally a YAML, CSV, JSON or what else. loom-io will do this for you if you have registered a file converter for it. So you just have to register a converter for every possible file type and you can just read a JSON.
 
 ```ts
-import Loom from '@loom-io/core';
+import MemoryAdapter from "@loom-io/in-memory-adapter"
 import jsonConverter from '@loom-io/json-converter';
 import yamlConverter from '@loom-io/yaml-converter':
+
+Loom.register(jsonConverter());
+Loom.register(yamlConverter());
+
+const adapter = new MemoryAdapter()
 
 const filePaths = ['file://test.yml', 'file://test.json'];
 
 for(let filePath of filePaths) {
-  const file = await Loom.file(filePath);
-  console.log(file.json());
+  const file = adapter.file(filePath);
+  console.log(await file.json());
 }
 
 ```
@@ -111,9 +120,7 @@ for(let filePath of filePaths) {
 In addition to JSON, you can read any file as a buffer or string.
 
 ```ts
-import Loom from "@loom-io/core";
-
-const file = await Loom.file("file://some/random/file.txt");
+const file = await adapter.file("file://some/random/file.txt");
 
 const text = await file.text(); // default is utf-8
 const ascii = await file.text("ascii");
@@ -126,12 +133,12 @@ const buffer = await file.plain();
 The file size can be read in bytes or calculated directly in YodaBytes
 
 ```ts
-import Loom, { FILE_SIZE_UNIT } from "@loom-io/core";
-import filesystemAdapter from "@loom-io/node-filesystem-adapter";
+import { FILE_SIZE_UNIT } from "@loom-io/core";
+import FilesystemAdapter from "@loom-io/node-filesystem-adapter";
 
-Loom.register(filesystemAdapter("root://", "/"));
+const adapter = new FilesystemAdapter("/");
 
-const file = await Loom.file("root://var/log/system.log");
+const file = adapter.file("/var/log/system.log");
 
 const sizeInByte = file.getSize();
 const sizeInMegaByte = file.getSize(FILE_SIZE_UNIT.MEGABYTE);
@@ -142,9 +149,7 @@ const sizeInKiloByte = file.getSize("KB");
 ## Read files in a directory and filter them
 
 ```ts
-import Loom from "@loom-io/core";
-
-const projectRoot = await Loom.dir("file://");
+const projectRoot = await adapter.dir("/");
 const unitTestFiles = (await projectRoot.files(true)).filter((el) =>
 	el.name.endsWith(".spec.ts")
 );
@@ -156,9 +161,9 @@ const directoriesInProjectRoot = contentOfProjectRoot.only("dirs");
 ## Concatenate two lists and iterate over them
 
 ```ts
-import Loom, (isDirectory, isFile) from "@loom-io/core";
+import (isDirectory, isFile) from "@loom-io/core";
 
-const projectRoot = await Loom.dir("file://");
+const projectRoot = await adapter.dir("/");
 
 const srcDirContent = await projectRoot.subDir("src").list();
 const testDirContent = await projectRoot.subDir("test").list();
@@ -181,8 +186,8 @@ for(let element of srcAndTestDirContent) {
 Instead of iterating over a list you can also get it as an Array.
 
 ```ts
-import Loom, (isDirectory, isFile) from "@loom-io/core";
-const projectRoot = await Loom.dir("file://");
+import { isDirectory, isFile } from "@loom-io/core";
+const projectRoot = adapter.dir("/");
 const srcDirContent = await projectRoot.subDir("src").list();
 
 const contentOfSrcDirAsArray = srcDirContent.asArray();
@@ -193,9 +198,7 @@ const contentOfSrcDirAsArray = srcDirContent.asArray();
 To avoid loading large files into the heap, you can use a reader which allows you to read or even search a file line by line (next example). You can go forward `next()` or backward `prev()` to each line. To save time and not have to re-analyse a given line, the start and end positions are stored. This also means that you will not be able to use this feature fully on modified files at the moment.
 
 ```ts
-import Loom from "loom-io/fs";
-
-const file = Loom.file("file://some/large/readable.log");
+const file = adapter.file("/some/large/readable.log");
 const reader = await file.reader();
 
 const lineResult = await reader.firstLine();
@@ -216,9 +219,7 @@ await reader.close();
 Search a file for a given text from the beginning `search()` or `searchFirst()` or search a file for a given text from the end `searchLast()`. You can also use a buffer to search the text, but there is currently no regex support because it will be hard to match the fragment size and overlap of fragments. As with reading line by line, you can also step forward `next()` and backward `prev()`. Again, the start and end positions are saved for faster results.
 
 ```ts
-import Loom from "loom-io/fs";
-
-const file = Loom.file("file://other/large/readable.md");
+const file = adapter.file("/other/large/readable.md");
 const reader = await file.reader();
 
 const result = await reader.searchLast("a better world");

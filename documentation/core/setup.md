@@ -29,27 +29,28 @@ bun add @loom-io/base-fs
 
 ## Installing without a bundle
 
-If you are trying to avoid unused dependencies, it is recommended to install the modules yourself, but also if the base bundles do not offer you enough functionality.
-
-The core package is the heart that holds everything together and implements the syntax used.
+If you're trying to avoid unused dependencies, it's a good idea to install the modules yourself, but also if the base bundles don't offer you enough functionality.
+At least you need a source adapter to get started and the core package as a peer dependency. For S3, this could look like:
 
 ::: code-group
 
 ```sh [npm]
-npm add @loom-io/core
+npm add @loom-io/minio-s3-adapter @loom-io/core
 ```
 
 ```sh [pnpm]
-pnpm add @loom-io/core
+npm add @loom-io/minio-s3-adapter @loom-io/core
 ```
 
 ```sh [bun]
-bun add @loom-io/core
+npm add @loom-io/minio-s3-adapter @loom-io/core
 ```
 
 :::
 
-This package will not work out of the box because it lacks an adapter to connect to a storage system, e.g. S3, Filesystem . For example, to get similar functionality as in the filesystem bundle, you need to install the filesystem adapter and some converters to convert different file types to json.
+If you want to work with another source, check out the adapter section.
+
+To read different files as JSON, you'll also need a converter. For example, to get similar functionality as in the filesystem bundle, you need to install the filesystem adapter and some converters to convert different file types to JSON.
 
 ::: code-group
 
@@ -71,10 +72,9 @@ You can find the installation package in the adapter and converter descriptions.
 
 ## Basic Setup (S3)
 
-The default export of loom-io is a global object that you can import on the server side without having to register a plugin or adapter over and over again. We will import it as `Loom`, but you can give it any name you like.
+The default export of loom-io is a global object that you can import on the server side without having to register a converter over and over again. We will import it as `Loom`, but you can give it any name you like.
 
-If you are not using a base bundle, you will need to register an adapter and probably some converters to read files as json.
-To keep the examples more generic, we will import `Loom` from the core library. If you are using a bundle replace the import `@loom-io/core` with the bundle name e.g. `@loom-io/base-fs`.
+If you are not using a base bundle, you will need to register converters to read files as json.
 
 For the setup you need the following packages
 
@@ -98,7 +98,7 @@ Now you can set up an S3 connection. In this example we will use an open minio i
 
 ```ts
 import Loom from "@loom-io/core";
-import s3MinioAdapter from "@loom-io/minio-s3-adapter";
+import S3MinioAdapter from "@loom-io/minio-s3-adapter";
 import jsonConverter from "@loom-io/json-converter";
 import yamlConverter from "@loom-io/yaml-converter";
 
@@ -112,7 +112,7 @@ const minioConfig = {
 
 const bucketName = "loom-io-test-bucket";
 
-Loom.register(s3MinioAdapter("s3://", bucketName, minioConfig));
+const s3Source = new S3MinioAdapter(bucketName, minioConfig));
 
 Loom.register(jsonConverter());
 Loom.register(yamlConverter());
