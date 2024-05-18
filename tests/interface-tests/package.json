@@ -1,6 +1,6 @@
 {
 	"name": "@loom-io/interface-tests",
-	"version": "0.10.0",
+	"version": "0.10.1",
 	"description": "Reuseable tests to test the interface of a loom-io plugin",
 	"main": "./dist/index.js",
 	"type": "module",
