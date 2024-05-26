@@ -89,9 +89,17 @@ export class LoomFile {
 		await this._adapter.deleteFile(this.path);
 	}
 
-	async copy(to: Directory) {
-		if(this.adapter.isCopyable(to.adapter)) {
-			await this._adapter.copyFile(this.path, to.path);
+	async copyTo(target: Directory | LoomFile) {
+
+		if(this.adapter.isCopyable(target.adapter)) {
+			if(target instanceof Directory) {
+				const targetFile = target.file(this.name);
+				await this._adapter.copyFile(this.path, targetFile.path);
+				return targetFile;
+			} else {
+				await this._adapter.copyFile(this.path, target.path);
+				return target;
+			}
 		} else {
 			throw new Error('Coping between different adapters is currently not supported');
 		}

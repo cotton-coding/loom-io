@@ -1,4 +1,4 @@
-import { join as joinPath, relative as relativePath} from 'node:path';
+import { dirname, join as joinPath, relative as relativePath} from 'node:path';
 import { LoomFile } from './file.js';
 import { List } from './list.js';
 import { SourceAdapter } from '../definitions.js';
@@ -49,13 +49,19 @@ export class Directory {
 		await this._adapter.mkdir(this.path);
 	}
 
-	// async copy(target: Directory): Promise<void> {
-	// 	if(target.adapter.isCopyable(this.adapter)) {
-	// 		await this._adapter.copyDir(this.path, target.path);
-	// 	} else {
-	// 		throw new Error('Coping between different adapters is currently not supported');
-	// 	}
-	// }
+	async copyTo(target: Directory): Promise<void> {
+		if(target.adapter.isCopyable(this.adapter)) {
+			const files = await this.files(true);
+			for(const file of files) {
+				const subPath = this.relativePath(file)!;
+				const subDir = target.subDir(dirname(subPath));
+				await subDir.create();
+				await file.copyTo(subDir);
+			}
+		} else {
+			throw new Error('Coping between different adapters is currently not supported');
+		}
+	}
 
 	async delete(recursive: boolean = false): Promise<void> {
 		try {
