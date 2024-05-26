@@ -297,6 +297,11 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 			expect( await adapter.dirExists(dir)).toBe(true);
 		});
 
+		test('is copyable', async () => {
+			expect(adapter.isCopyable).toBeDefined();
+			expect(typeof await adapter.isCopyable(adapter)).toBe('boolean');
+		});
+
 		test('copy file', async () => {
 			const path = getRandomFilePath('txt');
 			const content = faker.lorem.words(3);
