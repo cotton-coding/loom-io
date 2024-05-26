@@ -1,5 +1,5 @@
 import { FileHandler } from './file-handler.js';
-import { type SourceAdapter, type rmdirOptions, type ObjectDirentInterface, PathNotExistsException, DirectoryNotEmptyException } from '@loom-io/core';
+import { type SourceAdapter, type rmdirOptions, type ObjectDirentInterface, PathNotExistsException, DirectoryNotEmptyException, MaybePromise } from '@loom-io/core';
 import { AlreadyExistsException, NotFoundException } from '../exceptions.js';
 import { ObjectDirent } from './object-dirent.js';
 import { MEMORY_TYPE, MemoryDirectory, MemoryFile, MemoryObject, MemoryRoot } from '../definitions.js';
@@ -14,6 +14,9 @@ export class Adapter implements SourceAdapter {
 			$type: MEMORY_TYPE.ROOT,
 			content: []
 		};
+	}
+	copyDir(from: string, to: string): MaybePromise<void> {
+		throw new Error('Method not implemented.');
 	}
 
 	protected compareNameAndType<T extends MemoryObject>(item: T, name: string, type?: MEMORY_TYPE): item is T{
@@ -263,16 +266,6 @@ export class Adapter implements SourceAdapter {
 			}
 			throw err;
 		}
-	}
-
-	copyDir(from: string, to: string): void {
-		const dir = this.getLastPartOfPath(from, MEMORY_TYPE.DIRECTORY);
-		const [subPath, tail] = splitTailingPath(to);
-		if(tail === undefined) {
-			throw new Error('Invalid path'); // TODO: Create a custom exception
-		}
-		const subElement = this.getLastPartOfPath(subPath, MEMORY_TYPE.DIRECTORY);
-		subElement.content.push(this.createDirectory(tail, dir.content));
 	}
 
 }

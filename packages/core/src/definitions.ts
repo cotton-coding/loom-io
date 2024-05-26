@@ -82,7 +82,6 @@ export interface SourceAdapter {
     fileExists(path: string): MaybePromise<boolean>
     isCopyable(adapter: SourceAdapter): MaybePromise<boolean>
     copyFile(from: string, to: string): MaybePromise<void>
-    copyDir(from: string, to: string): MaybePromise<void>
 
 }
 
