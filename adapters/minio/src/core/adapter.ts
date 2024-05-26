@@ -1,8 +1,10 @@
 import type { Client }	from 'minio';
+import { CopyConditions } from 'minio';
 import { ObjectDirent } from './object-dirent.js';
 import { FileHandler } from './file-handler.js';
 import { type SourceAdapter, type rmdirOptions, type ObjectDirentInterface, DirectoryNotEmptyException } from '@loom-io/core';
 import { removePrecedingSlash } from '@loom-io/common';
+import { join } from 'path';
 
 function addTailSlash(path: string): string {
 	return path.endsWith('/') ? path : `${path}/`;
@@ -176,6 +178,26 @@ export class Adapter implements SourceAdapter {
 
 	async openFile(path: string): Promise<FileHandler> {
 		return new FileHandler(this, this.bucket, path);
+	}
+
+	async isCopyable(adapter: SourceAdapter): Promise<boolean> {
+		if(adapter instanceof Adapter) {
+			return adapter.bucketName === this.bucket;
+		}
+		return false;
+	}
+
+	async copyFile(src: string, dest: string): Promise<void> {
+		const conds = new CopyConditions();
+		await this.s3.copyObject(this.bucket, dest, join(this.bucket, src), conds);
+	}
+
+	async copyDir(src: string, dest: string): Promise<void> {
+		const objects = await this.s3.listObjectsV2(this.bucket, src, true);
+		const conds = new CopyConditions();
+		for await (const obj of objects) {
+			await this.s3.copyObject(this.bucket, obj.name, dest + obj.name.slice(src.length), conds);
+		}
 	}
 
 }

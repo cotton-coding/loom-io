@@ -37,12 +37,24 @@ export class Directory {
 		return new Directory(this._adapter, `/${split.join('/')}`);
 	}
 
+	get adapter() {
+		return this._adapter;
+	}
+
 	async exists(): Promise<boolean> {
 		return await this._adapter.dirExists(this.path);
 	}
 
 	async create(): Promise<void> {
 		await this._adapter.mkdir(this.path);
+	}
+
+	async copy(target: Directory): Promise<void> {
+		if(target.adapter.isCopyable(this.adapter)) {
+			await this._adapter.copyDir(this.path, target.path);
+		} else {
+			throw new Error('Coping between different adapters is currently not supported');
+		}
 	}
 
 	async delete(recursive: boolean = false): Promise<void> {

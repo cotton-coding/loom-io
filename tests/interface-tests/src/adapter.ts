@@ -297,6 +297,20 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 			expect( await adapter.dirExists(dir)).toBe(true);
 		});
 
+		test('copy file', async () => {
+			const path = getRandomFilePath('txt');
+			const content = faker.lorem.words(3);
+			await adapter.mkdir(dirname(path));
+			await adapter.writeFile(path, content);
+			const newFile = getRandomFilePath('txt');
+			await adapter.mkdir(dirname(newFile));
+			await adapter.copyFile(path, newFile);
+
+			expect( await adapter.fileExists(newFile)).toBe(true);
+		});
+
+
+
 		test('open file handler', async () => {
 			const path = await getPathWithBase(faker.system.commonFileName('md'));
 			const content = faker.lorem.words(100);

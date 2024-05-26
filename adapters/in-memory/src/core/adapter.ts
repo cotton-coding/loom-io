@@ -5,6 +5,7 @@ import { ObjectDirent } from './object-dirent.js';
 import { MEMORY_TYPE, MemoryDirectory, MemoryFile, MemoryObject, MemoryRoot } from '../definitions.js';
 import { isMemoryDirectoryAndMatchNamePrepared } from '../utils/validations.js';
 import { removePrecedingAndTrailingSlash, splitTailingPath } from '@loom-io/common';
+import { basename, dirname } from 'path';
 export class Adapter implements SourceAdapter {
 
 	protected storage: MemoryRoot;
@@ -119,7 +120,7 @@ export class Adapter implements SourceAdapter {
 	protected exists(path: string, ref: MEMORY_TYPE): boolean {
 		try {
 			this.getLastPartOfPath(path, ref);
-			return true;//lastPart.$type === ref || (ref === MEMORY_TYPE.DIRECTORY && lastPart.$type === MEMORY_TYPE.ROOT);
+			return true;
 		} catch {
 			return false;
 		}
@@ -238,6 +239,40 @@ export class Adapter implements SourceAdapter {
 	openFile(path: string, mode: 'r' | 'w' = 'r'): FileHandler {
 		const file = this.getLastPartOfPath(path, MEMORY_TYPE.FILE);
 		return new FileHandler(file, mode);
+	}
+
+	isCopyable<T extends SourceAdapter>(adapter: T): boolean {
+		if(adapter instanceof Adapter) {
+			return (adapter as Adapter) === this;
+		}
+		return false;
+	}
+
+	copyFile(from: string, to: string): void {
+		let fromExists = false;
+		try {
+			const file = this.getLastPartOfPath(from, MEMORY_TYPE.FILE);
+			fromExists = true;
+			const target = dirname(to);
+			const newFileName = basename(to);
+			const subElement = this.getLastPartOfPath(target, MEMORY_TYPE.DIRECTORY);
+			subElement.content.push(this.createFile(newFileName, file.content));
+		} catch (err) {
+			if(err instanceof NotFoundException) {
+				throw new PathNotExistsException(fromExists ? to : from);
+			}
+			throw err;
+		}
+	}
+
+	copyDir(from: string, to: string): void {
+		const dir = this.getLastPartOfPath(from, MEMORY_TYPE.DIRECTORY);
+		const [subPath, tail] = splitTailingPath(to);
+		if(tail === undefined) {
+			throw new Error('Invalid path'); // TODO: Create a custom exception
+		}
+		const subElement = this.getLastPartOfPath(subPath, MEMORY_TYPE.DIRECTORY);
+		subElement.content.push(this.createDirectory(tail, dir.content));
 	}
 
 }

@@ -124,4 +124,20 @@ export class Adapter implements SourceAdapter {
 		return new FileHandler(fileHandle);
 	}
 
+	async isCopyable(adapter: SourceAdapter): Promise<boolean> {
+		return adapter instanceof Adapter;
+	}
+
+	async copyFile(from: string, to: string): Promise<void> {
+		const fromPath = this.getFullPath(from);
+		const toPath = this.getFullPath(to);
+		await fs.copyFile(fromPath, toPath);
+	}
+
+	async copyDir(from: string, to: string): Promise<void> {
+		const fromPath = this.getFullPath(from);
+		const toPath = this.getFullPath(to);
+		await fs.copyFile(fromPath, toPath);
+	}
+
 }
