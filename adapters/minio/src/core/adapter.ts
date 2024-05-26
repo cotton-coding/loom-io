@@ -2,7 +2,7 @@ import type { Client }	from 'minio';
 import { CopyConditions } from 'minio';
 import { ObjectDirent } from './object-dirent.js';
 import { FileHandler } from './file-handler.js';
-import { type SourceAdapter, type rmdirOptions, type ObjectDirentInterface, DirectoryNotEmptyException, MaybePromise } from '@loom-io/core';
+import { type SourceAdapter, type rmdirOptions, type ObjectDirentInterface, DirectoryNotEmptyException } from '@loom-io/core';
 import { removePrecedingSlash } from '@loom-io/common';
 import { join } from 'path';
 
@@ -15,9 +15,6 @@ export class Adapter implements SourceAdapter {
 		protected s3: Client,
 		protected bucket: string
 	) {
-	}
-	copyDir(from: string, to: string): MaybePromise<void> {
-		throw new Error('Method not implemented.');
 	}
 	async deleteFile(path: string): Promise<void> {
 		await this.s3.removeObject(this.bucket, path);

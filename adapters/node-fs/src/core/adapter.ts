@@ -1,6 +1,6 @@
 import { FileHandler } from './file-handler.js';
 import * as fs from 'node:fs/promises';
-import type { SourceAdapter, rmdirOptions, ObjectDirentInterface, MaybePromise } from '@loom-io/core';
+import type { SourceAdapter, rmdirOptions, ObjectDirentInterface } from '@loom-io/core';
 import { DirectoryNotEmptyException, PathNotExistsException } from '@loom-io/core';
 import { PathLike } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -15,9 +15,6 @@ export class Adapter implements SourceAdapter {
 	) {
 		const fullPath = resolve(rootdir.toString());
 		this.rootdir = fullPath.endsWith('/') ? fullPath : `${fullPath}/`;
-	}
-	copyDir(from: string, to: string): MaybePromise<void> {
-		throw new Error('Method not implemented.');
 	}
 
 	get raw() {
