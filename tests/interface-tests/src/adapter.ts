@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
-import { DirectoryNotEmptyException, PathNotExistsException, type SourceAdapter } from '@loom-io/core';
+import { DirectoryNotEmptyException, PathNotFoundException, type SourceAdapter } from '@loom-io/core';
 import { faker } from '@faker-js/faker';
 import { basename, dirname, join } from 'node:path';
 import { getUniqSegmentsOfPath, splitTailingPath } from '@loom-io/common';
@@ -209,13 +209,13 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 
 		});
 
-		test('if write fails if path not exists it should fail with PathNotExistsException', async () => {
+		test('if write fails if path not exists it should fail with PathNotFoundException', async () => {
 			const path = getRandomPath('test/other/mkdir');
 			const fileName = faker.system.commonFileName('txt');
 			try {
 				await adapter.writeFile(`${path}/${fileName}`, 'test');
 			} catch (error) {
-				expect(error).toBeInstanceOf(PathNotExistsException);
+				expect(error).toBeInstanceOf(PathNotFoundException);
 			}
 		});
 
@@ -322,8 +322,8 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 				await adapter.copyFile(path, newFile);
 				expect(true).toBe(false);
 			} catch (error) {
-				expect(error).toBeInstanceOf(PathNotExistsException);
-				expect((error as PathNotExistsException).path).toBe(path);
+				expect(error).toBeInstanceOf(PathNotFoundException);
+				expect((error as PathNotFoundException).path).toBe(path);
 			}
 
 			await adapter.mkdir(dirname(path));
@@ -332,8 +332,8 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 			try {
 				await adapter.copyFile(path, newFile);
 			} catch (error) {
-				expect(error).toBeInstanceOf(PathNotExistsException);
-				expect((error as PathNotExistsException).path).toBe(dirname(newFile));
+				expect(error).toBeInstanceOf(PathNotFoundException);
+				expect((error as PathNotFoundException).path).toBe(dirname(newFile));
 			}
 
 		});

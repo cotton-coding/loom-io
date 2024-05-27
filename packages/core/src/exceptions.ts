@@ -22,7 +22,7 @@ export class FileConvertException extends Error implements LoomException{
 	}
 }
 
-export class PathNotExistsException extends Error implements LoomException{
+export class PathNotFoundException extends Error implements LoomException{
 	__loomExceptionRef = EXCEPTION_REF.PATH_NOT_EXISTS;
 	constructor(protected _path: string) {
 		super(`Path ${_path} does not exist`);

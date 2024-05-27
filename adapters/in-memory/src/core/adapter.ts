@@ -1,5 +1,5 @@
 import { FileHandler } from './file-handler.js';
-import { type SourceAdapter, type rmdirOptions, type ObjectDirentInterface, PathNotExistsException, DirectoryNotEmptyException } from '@loom-io/core';
+import { type SourceAdapter, type rmdirOptions, type ObjectDirentInterface, PathNotFoundException, DirectoryNotEmptyException } from '@loom-io/core';
 import { AlreadyExistsException, NotFoundException } from '../exceptions.js';
 import { ObjectDirent } from './object-dirent.js';
 import { MEMORY_TYPE, MemoryDirectory, MemoryFile, MemoryObject, MemoryRoot } from '../definitions.js';
@@ -172,7 +172,7 @@ export class Adapter implements SourceAdapter {
 			if((!options.recursive && !options.force)) {
 				const element = subElement.content.find(isMemoryDirectoryAndMatchNamePrepared(tail));
 				if(element == null) {
-					throw new PathNotExistsException(path);
+					throw new PathNotFoundException(path);
 				}else if(element.content.length > 0) {
 					throw new DirectoryNotEmptyException(path);
 				}
@@ -182,7 +182,7 @@ export class Adapter implements SourceAdapter {
 
 		} catch (err) {
 			if(err instanceof NotFoundException) {
-				throw new PathNotExistsException(path);
+				throw new PathNotFoundException(path);
 			}
 			throw err;
 		}
@@ -221,7 +221,7 @@ export class Adapter implements SourceAdapter {
 					err.last.content.push(file);
 					return;
 				}
-				throw new PathNotExistsException(path);
+				throw new PathNotFoundException(path);
 			}
 			throw err;
 		}
@@ -259,7 +259,7 @@ export class Adapter implements SourceAdapter {
 			subElement.content.push(this.createFile(newFileName, file.content));
 		} catch (err) {
 			if(err instanceof NotFoundException) {
-				throw new PathNotExistsException(fromExists ? dirname(to) : from);
+				throw new PathNotFoundException(fromExists ? dirname(to) : from);
 			}
 			throw err;
 		}

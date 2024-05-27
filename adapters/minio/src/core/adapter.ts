@@ -2,7 +2,7 @@ import type { Client }	from 'minio';
 import { CopyConditions } from 'minio';
 import { ObjectDirent } from './object-dirent.js';
 import { FileHandler } from './file-handler.js';
-import { type SourceAdapter, type rmdirOptions, type ObjectDirentInterface, DirectoryNotEmptyException, PathNotExistsException } from '@loom-io/core';
+import { type SourceAdapter, type rmdirOptions, type ObjectDirentInterface, DirectoryNotEmptyException, PathNotFoundException } from '@loom-io/core';
 import { removePrecedingSlash } from '@loom-io/common';
 import { join } from 'path';
 import { S3Error } from 'minio/dist/esm/errors.mjs';
@@ -196,7 +196,7 @@ export class Adapter implements SourceAdapter {
 			if(err instanceof S3Error) {
 				if(err.code === 'NoSuchKey') {
 					// @ts-expect-error property code does not exist on S3Error
-					throw new PathNotExistsException(err.key);
+					throw new PathNotFoundException(err.key);
 				}
 
 				throw err;
