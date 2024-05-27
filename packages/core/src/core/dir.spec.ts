@@ -5,6 +5,7 @@ import { InMemoryAdapterHelper } from '@loom-io/test-utils';
 import { LoomFile } from './file.js';
 import { DirectoryNotEmptyException } from '../exceptions.js';
 import { addPrecedingSlash, getUniqSegmentsOfPath } from '@loom-io/common';
+import exp from 'node:constants';
 
 describe('Test Directory Service', () => {
 
@@ -76,6 +77,22 @@ describe('Test Directory Service', () => {
 			const dir = new Directory(adapter, adapterHelper.last!, 'to_delete');
 			await dir.create();
 			await expect(dir.exists()).resolves.toBeTruthy();
+		});
+
+		test('copyTo', async () => {
+			const basePath = adapterHelper.last!;
+			const dir = new Directory(adapter, basePath, 'loom');
+			await dir.create();
+			await adapterHelper.createDirectory(joinPath(basePath, 'loom/cotton'));
+			await adapterHelper.createFile(joinPath(basePath, 'loom/cotton.txt'));
+			const target = new Directory(adapter, basePath, 'target');
+			await target.create();
+			await dir.copyTo(target);
+			const file = await target.file('loom/cotton.txt');
+			expect(await file.exists()).toBeTruthy();
+
+			const copiedDir = await target.subDir('loom/cotton');
+			expect(await copiedDir.exists()).toBeTruthy();
 		});
 
 		describe('delete', () => {

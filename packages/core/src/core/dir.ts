@@ -1,8 +1,10 @@
-import { dirname, join as joinPath, relative as relativePath} from 'node:path';
+import { dirname, join, join as joinPath, relative as relativePath} from 'node:path';
 import { LoomFile } from './file.js';
 import { List } from './list.js';
 import { SourceAdapter } from '../definitions.js';
 import { DirectoryNotEmptyException, EXCEPTION_REF, isInstanceOfLoomException } from '../exceptions.js';
+import { removeTailingSlash } from '@loom-io/common';
+import { isFile } from '../exports/lib.js';
 
 export class Directory {
 
@@ -30,6 +32,15 @@ export class Directory {
 		return this._path;
 	}
 
+	get name() {
+		if(this.isRoot) {
+			return '';
+		}
+
+		const split = removeTailingSlash(this.path).split('/');
+		return split.pop()!;
+	}
+
 	get parent(): Directory | undefined {
 		if(this.isRoot) return undefined;
 		const split = this.path.split('/');
@@ -51,12 +62,15 @@ export class Directory {
 
 	async copyTo(target: Directory): Promise<void> {
 		if(target.adapter.isCopyable(this.adapter)) {
-			const files = await this.files(true);
-			for(const file of files) {
-				const subPath = this.relativePath(file)!;
-				const subDir = target.subDir(dirname(subPath));
-				await subDir.create();
-				await file.copyTo(subDir);
+			const targetSub = await target.subDir(this.name);
+			await targetSub.create();
+			const list = await this.list();
+			for(const element of list) {
+				if(target instanceof Directory) {
+					await element.copyTo(targetSub);
+				} else {
+					await element.copyTo(targetSub);
+				}
 			}
 		} else {
 			throw new Error('Coping between different adapters is currently not supported');
