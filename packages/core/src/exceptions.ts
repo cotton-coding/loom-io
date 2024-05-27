@@ -33,13 +33,6 @@ export class PathNotFoundException extends Error implements LoomException{
 	}
 }
 
-export class NoSourceAdapterException extends Error implements LoomException {
-	__loomExceptionRef = EXCEPTION_REF.NO_SOURCE_ADAPTER;
-	constructor(path: string) {
-		super(`No source adapter found for ${path}`);
-	}
-}
-
 export class DirectoryNotEmptyException extends Error implements LoomException {
 
 	__loomExceptionRef = EXCEPTION_REF.DIRECTORY_NOT_EMPTY;
