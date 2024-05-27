@@ -33,7 +33,7 @@ export class Adapter implements SourceAdapter {
 	protected getLastPartOfPath(path: string | undefined, ref?: MEMORY_TYPE): MemoryObject | MemoryRoot;
 	protected getLastPartOfPath(path: string | undefined, ref?: MEMORY_TYPE): MemoryObject | MemoryRoot {
 		path = path?.trim();
-		if(path === undefined || path === '' || path === '/') {
+		if(path === undefined || path === '' || path === '/' || path === '.') {
 			return this.storage;
 		}
 		const parts = removePrecedingAndTrailingSlash(path).split('/');

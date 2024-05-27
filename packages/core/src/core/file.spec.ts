@@ -186,14 +186,35 @@ describe('Test File Service', () => {
 			expect(await file.exists()).toBeTruthy();
 		});
 
+		test('Copy file into file', async () => {
+			const testFile = await testHelper.createFile(undefined, 'test');
+			const file = LoomFile.from( adapter, testFile);
+			await file.create();
+			await file.write('new content');
+			const newFile = new LoomFile(adapter, file.dir, 'newFile.txt');
+			await file.copyTo(newFile);
+			expect(await newFile.exists()).toBeTruthy();
+		});
+
+		test('Copy file into directory', async () => {
+			const testFile = await testHelper.createFile(undefined, 'test');
+			const file = LoomFile.from( adapter, testFile);
+			await file.create();
+			await file.write('new content');
+			const newDir = new Directory(adapter, 'newDir');
+			await newDir.create();
+			const newFile = await file.copyTo(newDir);
+			expect(await newFile.exists()).toBeTruthy();
+			expect(newFile.name).toBe(file.name);
+			expect(newFile.text()).resolves.toBe('new content');
+		});
+
 		test('Delete file', async () => {
 			const testFile = await testHelper.createFile(undefined, 'test');
 			const file = LoomFile.from( adapter, testFile);
 			await file.delete();
 			expect(await file.exists()).toBeFalsy();
 		});
-
-
 
 	});
 

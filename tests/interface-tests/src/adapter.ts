@@ -312,9 +312,8 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 			await adapter.copyFile(path, newFile);
 
 			expect( await adapter.fileExists(newFile)).toBe(true);
+			expect( await adapter.readFile(newFile, 'utf-8')).toBe(content);
 		});
-
-
 
 		test('open file handler', async () => {
 			const path = await getPathWithBase(faker.system.commonFileName('md'));
