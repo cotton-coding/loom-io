@@ -1,6 +1,6 @@
 {
 	"name": "@loom-io/node-filesystem-adapter",
-	"version": "0.10.1",
+	"version": "0.11.0",
 	"main": "dist/exports/lib.js",
 	"types": "dist/exports/lib.d.ts",
 	"author": "Cotton Coding",
