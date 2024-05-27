@@ -1,10 +1,11 @@
 import { FileHandler } from './file-handler.js';
-import { type SourceAdapter, type rmdirOptions, type ObjectDirentInterface, PathNotExistsException, DirectoryNotEmptyException } from '@loom-io/core';
+import { type SourceAdapter, type rmdirOptions, type ObjectDirentInterface, PathNotFoundException, DirectoryNotEmptyException } from '@loom-io/core';
 import { AlreadyExistsException, NotFoundException } from '../exceptions.js';
 import { ObjectDirent } from './object-dirent.js';
 import { MEMORY_TYPE, MemoryDirectory, MemoryFile, MemoryObject, MemoryRoot } from '../definitions.js';
 import { isMemoryDirectoryAndMatchNamePrepared } from '../utils/validations.js';
 import { removePrecedingAndTrailingSlash, splitTailingPath } from '@loom-io/common';
+import { basename, dirname } from 'path';
 export class Adapter implements SourceAdapter {
 
 	protected storage: MemoryRoot;
@@ -32,7 +33,7 @@ export class Adapter implements SourceAdapter {
 	protected getLastPartOfPath(path: string | undefined, ref?: MEMORY_TYPE): MemoryObject | MemoryRoot;
 	protected getLastPartOfPath(path: string | undefined, ref?: MEMORY_TYPE): MemoryObject | MemoryRoot {
 		path = path?.trim();
-		if(path === undefined || path === '' || path === '/') {
+		if(path === undefined || path === '' || path === '/' || path === '.') {
 			return this.storage;
 		}
 		const parts = removePrecedingAndTrailingSlash(path).split('/');
@@ -119,7 +120,7 @@ export class Adapter implements SourceAdapter {
 	protected exists(path: string, ref: MEMORY_TYPE): boolean {
 		try {
 			this.getLastPartOfPath(path, ref);
-			return true;//lastPart.$type === ref || (ref === MEMORY_TYPE.DIRECTORY && lastPart.$type === MEMORY_TYPE.ROOT);
+			return true;
 		} catch {
 			return false;
 		}
@@ -171,7 +172,7 @@ export class Adapter implements SourceAdapter {
 			if((!options.recursive && !options.force)) {
 				const element = subElement.content.find(isMemoryDirectoryAndMatchNamePrepared(tail));
 				if(element == null) {
-					throw new PathNotExistsException(path);
+					throw new PathNotFoundException(path);
 				}else if(element.content.length > 0) {
 					throw new DirectoryNotEmptyException(path);
 				}
@@ -181,7 +182,7 @@ export class Adapter implements SourceAdapter {
 
 		} catch (err) {
 			if(err instanceof NotFoundException) {
-				throw new PathNotExistsException(path);
+				throw new PathNotFoundException(path);
 			}
 			throw err;
 		}
@@ -220,7 +221,7 @@ export class Adapter implements SourceAdapter {
 					err.last.content.push(file);
 					return;
 				}
-				throw new PathNotExistsException(path);
+				throw new PathNotFoundException(path);
 			}
 			throw err;
 		}
@@ -238,6 +239,30 @@ export class Adapter implements SourceAdapter {
 	openFile(path: string, mode: 'r' | 'w' = 'r'): FileHandler {
 		const file = this.getLastPartOfPath(path, MEMORY_TYPE.FILE);
 		return new FileHandler(file, mode);
+	}
+
+	isCopyable<T extends SourceAdapter>(adapter: T): boolean {
+		if(adapter instanceof Adapter) {
+			return (adapter as Adapter) === this;
+		}
+		return false;
+	}
+
+	copyFile(from: string, to: string): void {
+		let fromExists = false;
+		try {
+			const file = this.getLastPartOfPath(from, MEMORY_TYPE.FILE);
+			fromExists = true;
+			const target = dirname(to);
+			const newFileName = basename(to);
+			const subElement = this.getLastPartOfPath(target, MEMORY_TYPE.DIRECTORY);
+			subElement.content.push(this.createFile(newFileName, file.content));
+		} catch (err) {
+			if(err instanceof NotFoundException) {
+				throw new PathNotFoundException(fromExists ? dirname(to) : from);
+			}
+			throw err;
+		}
 	}
 
 }

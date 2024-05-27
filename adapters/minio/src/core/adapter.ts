@@ -1,8 +1,11 @@
 import type { Client }	from 'minio';
+import { CopyConditions } from 'minio';
 import { ObjectDirent } from './object-dirent.js';
 import { FileHandler } from './file-handler.js';
-import { type SourceAdapter, type rmdirOptions, type ObjectDirentInterface, DirectoryNotEmptyException } from '@loom-io/core';
+import { type SourceAdapter, type rmdirOptions, type ObjectDirentInterface, DirectoryNotEmptyException, PathNotFoundException } from '@loom-io/core';
 import { removePrecedingSlash } from '@loom-io/common';
+import { join } from 'path';
+import { S3Error } from 'minio/dist/esm/errors.mjs';
 
 function addTailSlash(path: string): string {
 	return path.endsWith('/') ? path : `${path}/`;
@@ -177,5 +180,29 @@ export class Adapter implements SourceAdapter {
 	async openFile(path: string): Promise<FileHandler> {
 		return new FileHandler(this, this.bucket, path);
 	}
+
+	async isCopyable(adapter: SourceAdapter): Promise<boolean> {
+		if(adapter instanceof Adapter) {
+			return adapter.bucketName === this.bucket;
+		}
+		return false;
+	}
+
+	async copyFile(src: string, dest: string): Promise<void> {
+		try {
+			const conds = new CopyConditions();
+			await this.s3.copyObject(this.bucket, dest, join(this.bucket, src), conds);
+		} catch(err) {
+			if(err instanceof S3Error) {
+				if(err.code === 'NoSuchKey') {
+					// @ts-expect-error property code does not exist on S3Error
+					throw new PathNotFoundException(err.key);
+				}
+
+				throw err;
+			}
+		}
+	}
+
 
 }

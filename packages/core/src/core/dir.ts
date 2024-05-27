@@ -3,6 +3,7 @@ import { LoomFile } from './file.js';
 import { List } from './list.js';
 import { SourceAdapter } from '../definitions.js';
 import { DirectoryNotEmptyException, EXCEPTION_REF, isInstanceOfLoomException } from '../exceptions.js';
+import { removeTailingSlash } from '@loom-io/common';
 
 export class Directory {
 
@@ -30,11 +31,24 @@ export class Directory {
 		return this._path;
 	}
 
+	get name() {
+		if(this.isRoot) {
+			return '';
+		}
+
+		const split = removeTailingSlash(this.path).split('/');
+		return split.pop()!;
+	}
+
 	get parent(): Directory | undefined {
 		if(this.isRoot) return undefined;
 		const split = this.path.split('/');
 		split.pop();
 		return new Directory(this._adapter, `/${split.join('/')}`);
+	}
+
+	get adapter() {
+		return this._adapter;
 	}
 
 	async exists(): Promise<boolean> {
@@ -43,6 +57,23 @@ export class Directory {
 
 	async create(): Promise<void> {
 		await this._adapter.mkdir(this.path);
+	}
+
+	async copyTo(target: Directory): Promise<void> {
+		if(target.adapter.isCopyable(this.adapter)) {
+			const targetSub = await target.subDir(this.name);
+			await targetSub.create();
+			const list = await this.list();
+			for(const element of list) {
+				if(target instanceof Directory) {
+					await element.copyTo(targetSub);
+				} else {
+					await element.copyTo(targetSub);
+				}
+			}
+		} else {
+			throw new Error('Coping between different adapters is currently not supported');
+		}
 	}
 
 	async delete(recursive: boolean = false): Promise<void> {

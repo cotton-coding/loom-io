@@ -56,6 +56,23 @@ describe('Test Directory Service', () => {
 		expect(dir.parent!.path).toBe('/');
 	});
 
+	test.each([
+		['/test/data/', 'data'],
+		['/test/data', 'data'],
+		['cotton/coding/loom', 'loom'],
+		['/test/', 'test'],
+		['/test', 'test']
+	])('get name %s', (path: string, name: string) => {
+		const dir = new Directory(adapter, path);
+		expect(dir.name).toBe(name);
+	});
+
+	test('get name of root', () => {
+		const root = new Directory(adapter, '/');
+		expect(root.name).toBe('');
+	});
+
+
 	describe('with generated file', () => {
 
 		let adapterHelper: InMemoryAdapterHelper;
@@ -76,6 +93,22 @@ describe('Test Directory Service', () => {
 			const dir = new Directory(adapter, adapterHelper.last!, 'to_delete');
 			await dir.create();
 			await expect(dir.exists()).resolves.toBeTruthy();
+		});
+
+		test('copyTo', async () => {
+			const basePath = adapterHelper.last!;
+			const dir = new Directory(adapter, basePath, 'loom');
+			await dir.create();
+			await adapterHelper.createDirectory(joinPath(basePath, 'loom/cotton'));
+			await adapterHelper.createFile(joinPath(basePath, 'loom/cotton.txt'));
+			const target = new Directory(adapter, basePath, 'target');
+			await target.create();
+			await dir.copyTo(target);
+			const file = await target.file('loom/cotton.txt');
+			expect(await file.exists()).toBeTruthy();
+
+			const copiedDir = await target.subDir('loom/cotton');
+			expect(await copiedDir.exists()).toBeTruthy();
 		});
 
 		describe('delete', () => {

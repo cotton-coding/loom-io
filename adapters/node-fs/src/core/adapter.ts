@@ -1,9 +1,9 @@
 import { FileHandler } from './file-handler.js';
 import * as fs from 'node:fs/promises';
 import type { SourceAdapter, rmdirOptions, ObjectDirentInterface } from '@loom-io/core';
-import { DirectoryNotEmptyException, PathNotExistsException } from '@loom-io/core';
+import { DirectoryNotEmptyException, PathNotFoundException } from '@loom-io/core';
 import { PathLike } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { isNodeErrnoExpression } from '../utils/error-handling.js';
 import { ObjectDirent } from './object-dirent.js';
 export class Adapter implements SourceAdapter {
@@ -23,6 +23,10 @@ export class Adapter implements SourceAdapter {
 
 	protected getFullPath(path: string): string {
 		return join(this.rootdir || '', path);
+	}
+
+	protected getRelativePath(path: string): string {
+		return path.replace(this.rootdir, '/');
 	}
 
 	protected async exists(path: string, ref: number): Promise<boolean> {
@@ -75,7 +79,7 @@ export class Adapter implements SourceAdapter {
 				case 'ENOTEMPTY':
 					throw new DirectoryNotEmptyException(path);
 				case 'ENOENT':
-					throw new PathNotExistsException(path);
+					throw new PathNotFoundException(path);
 				}
 			}
 			throw err;
@@ -106,7 +110,7 @@ export class Adapter implements SourceAdapter {
 			if(isNodeErrnoExpression(err)) {
 				switch(err.code) {
 				case 'ENOENT':
-					throw new PathNotExistsException(fullPath);
+					throw new PathNotFoundException(fullPath);
 				}
 			}
 			throw err;
@@ -123,5 +127,26 @@ export class Adapter implements SourceAdapter {
 		const fileHandle = await fs.open(fullPath, mode);
 		return new FileHandler(fileHandle);
 	}
+
+	async isCopyable(adapter: SourceAdapter): Promise<boolean> {
+		return adapter instanceof Adapter;
+	}
+
+	async copyFile(from: string, to: string): Promise<void> {
+		try {
+			const fromPath = this.getFullPath(from);
+			const toPath = this.getFullPath(to);
+			await fs.copyFile(fromPath, toPath);
+		} catch (err) {
+			if(isNodeErrnoExpression(err)) {
+				if(err.code === 'ENOENT') {
+					const srcExists = await this.fileExists(from);
+					throw new PathNotFoundException(srcExists ? dirname(to) : from);
+				}
+			}
+			throw err;
+		}
+	}
+
 
 }

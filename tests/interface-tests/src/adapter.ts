@@ -1,5 +1,5 @@
 import { describe, test, expect, beforeAll, afterAll, beforeEach, afterEach } from 'vitest';
-import { DirectoryNotEmptyException, PathNotExistsException, type SourceAdapter } from '@loom-io/core';
+import { DirectoryNotEmptyException, PathNotFoundException, type SourceAdapter } from '@loom-io/core';
 import { faker } from '@faker-js/faker';
 import { basename, dirname, join } from 'node:path';
 import { getUniqSegmentsOfPath, splitTailingPath } from '@loom-io/common';
@@ -209,13 +209,13 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 
 		});
 
-		test('if write fails if path not exists it should fail with PathNotExistsException', async () => {
+		test('if write fails if path not exists it should fail with PathNotFoundException', async () => {
 			const path = getRandomPath('test/other/mkdir');
 			const fileName = faker.system.commonFileName('txt');
 			try {
 				await adapter.writeFile(`${path}/${fileName}`, 'test');
 			} catch (error) {
-				expect(error).toBeInstanceOf(PathNotExistsException);
+				expect(error).toBeInstanceOf(PathNotFoundException);
 			}
 		});
 
@@ -295,6 +295,47 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 			await adapter.deleteFile(path);
 			expect( await adapter.fileExists(path)).toBe(false);
 			expect( await adapter.dirExists(dir)).toBe(true);
+		});
+
+		test('is copyable', async () => {
+			expect(adapter.isCopyable).toBeDefined();
+			expect(typeof await adapter.isCopyable(adapter)).toBe('boolean');
+		});
+
+		test('copy file', async () => {
+			const path = getRandomFilePath('txt');
+			const content = faker.lorem.words(3);
+			await adapter.mkdir(dirname(path));
+			await adapter.writeFile(path, content);
+			const newFile = getRandomFilePath('txt');
+			await adapter.mkdir(dirname(newFile));
+			await adapter.copyFile(path, newFile);
+
+			expect( await adapter.fileExists(newFile)).toBe(true);
+			expect( await adapter.readFile(newFile, 'utf-8')).toBe(content);
+		});
+
+		test('try copy of non existing file should fail', async () => {
+			const path = getRandomFilePath('txt');
+			const newFile = getRandomFilePath('txt');
+			try {
+				await adapter.copyFile(path, newFile);
+				expect(true).toBe(false);
+			} catch (error) {
+				expect(error).toBeInstanceOf(PathNotFoundException);
+				expect((error as PathNotFoundException).path).toBe(path);
+			}
+
+			await adapter.mkdir(dirname(path));
+			await adapter.writeFile(path, 'some content');
+
+			try {
+				await adapter.copyFile(path, newFile);
+			} catch (error) {
+				expect(error).toBeInstanceOf(PathNotFoundException);
+				expect((error as PathNotFoundException).path).toBe(dirname(newFile));
+			}
+
 		});
 
 		test('open file handler', async () => {

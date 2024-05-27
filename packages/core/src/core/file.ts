@@ -57,6 +57,10 @@ export class LoomFile {
 		return this.dir;
 	}
 
+	get adapter() {
+		return this._adapter;
+	}
+
 	async getSizeInBytes() {
 		const stats = await this._adapter.stat(this.path);
 		return stats.size;
@@ -83,6 +87,23 @@ export class LoomFile {
 
 	async delete() {
 		await this._adapter.deleteFile(this.path);
+	}
+
+	async copyTo(target: Directory | LoomFile) {
+
+		if(this.adapter.isCopyable(target.adapter)) {
+			if(target instanceof Directory) {
+				const targetFile = target.file(this.name);
+				await this._adapter.copyFile(this.path, targetFile.path);
+				return targetFile;
+			} else {
+				console.log('Copying to file', this.path, target.path);
+				await this._adapter.copyFile(this.path, target.path);
+				return target;
+			}
+		} else {
+			throw new Error('Coping between different adapters is currently not supported');
+		}
 	}
 
 	async exists() {

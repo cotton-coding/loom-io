@@ -80,6 +80,8 @@ export interface SourceAdapter {
     rmdir(path: string, options?: rmdirOptions): MaybePromise<void>
     dirExists(path: string): MaybePromise<boolean>
     fileExists(path: string): MaybePromise<boolean>
+    isCopyable(adapter: SourceAdapter): MaybePromise<boolean>
+    copyFile(from: string, to: string): MaybePromise<void>
 
 }
 
