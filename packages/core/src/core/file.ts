@@ -106,6 +106,16 @@ export class LoomFile {
 		}
 	}
 
+	rename(newName: string) {
+		if(this.adapter.renameFile instanceof Function) {
+			this.adapter.renameFile(this.path, joinPath(this.dir.path, newName));
+		} else {
+			this.adapter.copyFile(this.path, joinPath(this.dir.path, newName));
+			this.adapter.deleteFile(this.path);
+		}
+		this._name = newName;
+	}
+
 	async exists() {
 		const fullPath = joinPath(this.dir.path, this.name);
 		return this._adapter.fileExists(fullPath);
