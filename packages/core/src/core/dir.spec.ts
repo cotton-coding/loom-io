@@ -5,7 +5,6 @@ import { InMemoryAdapterHelper } from '@loom-io/test-utils';
 import { LoomFile } from './file.js';
 import { DirectoryNotEmptyException } from '../exceptions.js';
 import { addPrecedingSlash, getUniqSegmentsOfPath } from '@loom-io/common';
-import exp from 'node:constants';
 
 describe('Test Directory Service', () => {
 
@@ -56,6 +55,23 @@ describe('Test Directory Service', () => {
 		expect(dir.parent).toBeDefined();
 		expect(dir.parent!.path).toBe('/');
 	});
+
+	test.each([
+		['/test/data/', 'data'],
+		['/test/data', 'data'],
+		['cotton/coding/loom', 'loom'],
+		['/test/', 'test'],
+		['/test', 'test']
+	])('get name %s', (path: string, name: string) => {
+		const dir = new Directory(adapter, path);
+		expect(dir.name).toBe(name);
+	});
+
+	test('get name of root', () => {
+		const root = new Directory(adapter, '/');
+		expect(root.name).toBe('');
+	});
+
 
 	describe('with generated file', () => {
 

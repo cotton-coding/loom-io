@@ -1,10 +1,9 @@
-import { dirname, join, join as joinPath, relative as relativePath} from 'node:path';
+import { join as joinPath, relative as relativePath} from 'node:path';
 import { LoomFile } from './file.js';
 import { List } from './list.js';
 import { SourceAdapter } from '../definitions.js';
 import { DirectoryNotEmptyException, EXCEPTION_REF, isInstanceOfLoomException } from '../exceptions.js';
 import { removeTailingSlash } from '@loom-io/common';
-import { isFile } from '../exports/lib.js';
 
 export class Directory {
 
