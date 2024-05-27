@@ -3,7 +3,7 @@ import * as fs from 'node:fs/promises';
 import type { SourceAdapter, rmdirOptions, ObjectDirentInterface } from '@loom-io/core';
 import { DirectoryNotEmptyException, PathNotExistsException } from '@loom-io/core';
 import { PathLike } from 'node:fs';
-import { join, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { isNodeErrnoExpression } from '../utils/error-handling.js';
 import { ObjectDirent } from './object-dirent.js';
 export class Adapter implements SourceAdapter {
@@ -23,6 +23,10 @@ export class Adapter implements SourceAdapter {
 
 	protected getFullPath(path: string): string {
 		return join(this.rootdir || '', path);
+	}
+
+	protected getRelativePath(path: string): string {
+		return path.replace(this.rootdir, '/');
 	}
 
 	protected async exists(path: string, ref: number): Promise<boolean> {
@@ -129,9 +133,19 @@ export class Adapter implements SourceAdapter {
 	}
 
 	async copyFile(from: string, to: string): Promise<void> {
-		const fromPath = this.getFullPath(from);
-		const toPath = this.getFullPath(to);
-		await fs.copyFile(fromPath, toPath);
+		try {
+			const fromPath = this.getFullPath(from);
+			const toPath = this.getFullPath(to);
+			await fs.copyFile(fromPath, toPath);
+		} catch (err) {
+			if(isNodeErrnoExpression(err)) {
+				if(err.code === 'ENOENT') {
+					const srcExists = await this.fileExists(from);
+					throw new PathNotExistsException(srcExists ? dirname(to) : from);
+				}
+			}
+			throw err;
+		}
 	}
 
 

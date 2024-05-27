@@ -259,7 +259,7 @@ export class Adapter implements SourceAdapter {
 			subElement.content.push(this.createFile(newFileName, file.content));
 		} catch (err) {
 			if(err instanceof NotFoundException) {
-				throw new PathNotExistsException(fromExists ? to : from);
+				throw new PathNotExistsException(fromExists ? dirname(to) : from);
 			}
 			throw err;
 		}

@@ -315,6 +315,29 @@ export const TestAdapter = (adapter: SourceAdapter, config?: TestAdapterOptions 
 			expect( await adapter.readFile(newFile, 'utf-8')).toBe(content);
 		});
 
+		test('try copy of non existing file should fail', async () => {
+			const path = getRandomFilePath('txt');
+			const newFile = getRandomFilePath('txt');
+			try {
+				await adapter.copyFile(path, newFile);
+				expect(true).toBe(false);
+			} catch (error) {
+				expect(error).toBeInstanceOf(PathNotExistsException);
+				expect((error as PathNotExistsException).path).toBe(path);
+			}
+
+			await adapter.mkdir(dirname(path));
+			await adapter.writeFile(path, 'some content');
+
+			try {
+				await adapter.copyFile(path, newFile);
+			} catch (error) {
+				expect(error).toBeInstanceOf(PathNotExistsException);
+				expect((error as PathNotExistsException).path).toBe(dirname(newFile));
+			}
+
+		});
+
 		test('open file handler', async () => {
 			const path = await getPathWithBase(faker.system.commonFileName('md'));
 			const content = faker.lorem.words(100);
