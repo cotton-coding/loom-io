@@ -18,11 +18,6 @@ const prepareVerify =
 		return false;
 	};
 
-const generateNone = (config: Config = {}) => {
-	const configString = JSON.stringify(config);
-	return Symbol.for(`front-matter-converter-${configString}`);
-};
-
 export default (config?: Config) =>
 	({
 		verify: prepareVerify(config),

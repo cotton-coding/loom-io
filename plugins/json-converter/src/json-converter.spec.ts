@@ -1,31 +1,22 @@
-import { vi, describe, test, expect } from 'vitest';
-import jsonConverter from './json-converter.js';
-import { LoomFile } from '@loom-io/core';
+import { vi, describe, test, expect } from "vitest";
+import jsonConverter from "./json-converter.js";
+import { LoomFile } from "@loom-io/core";
 
-describe('json-converter', () => {
-
-	test('type', () => {
-		expect(jsonConverter()).toHaveProperty('$type');
-	});
-
-	test('nonce need to be same on each result', () => {
-		const converter = jsonConverter();
-		expect(converter.nonce).toBeDefined();
-		expect(jsonConverter().nonce).toBe(converter.nonce);
-	});
-
-	test('verify', () => {
-		const file = { extension: 'json' } as LoomFile;
+describe("json-converter", () => {
+	test("verify", () => {
+		const file = { extension: "json" } as LoomFile;
 		expect(jsonConverter().verify(file)).toBe(true);
-
 	});
 
-	test.each(['yml', 'yaml', 'csv', 'md', 'xml', 'xsd', 'docx', 'pdf'])('verify with %s should false', (value) => {
-		const file = { extension: value } as LoomFile;
-		expect(jsonConverter().verify(file)).toBe(false);
-	});
+	test.each(["yml", "yaml", "csv", "md", "xml", "xsd", "docx", "pdf"])(
+		"verify with %s should false",
+		(value) => {
+			const file = { extension: value } as LoomFile;
+			expect(jsonConverter().verify(file)).toBe(false);
+		}
+	);
 
-	test('stringify', async () => {
+	test("stringify", async () => {
 		const file = {
 			write: vi.fn(),
 		} as unknown as LoomFile;
@@ -34,7 +25,7 @@ describe('json-converter', () => {
 		expect(file.write).toHaveBeenCalledWith(JSON.stringify(content));
 	});
 
-	test('parse', async () => {
+	test("parse", async () => {
 		const file = {
 			text: vi.fn().mockReturnValue(Promise.resolve('{"test":true}')),
 		} as unknown as LoomFile;
