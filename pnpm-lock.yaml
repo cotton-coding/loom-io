@@ -93,25 +93,6 @@ importers:
         specifier: ^1.1.4
         version: 1.1.4(@algolia/client-search@4.23.3)(@types/node@20.12.12)(postcss@8.4.38)(search-insights@2.13.0)(typescript@5.4.5)
 
-  packages/base-fs:
-    dependencies:
-      '@loom-io/core':
-        specifier: workspace:^
-        version: link:../core
-      '@loom-io/json-converter':
-        specifier: workspace:^
-        version: link:../../plugins/json-converter
-      '@loom-io/node-filesystem-adapter':
-        specifier: workspace:^
-        version: link:../../adapters/node-fs
-      '@loom-io/yaml-converter':
-        specifier: workspace:^
-        version: link:../../plugins/yaml-converter
-    devDependencies:
-      '@loom-io/test-utils':
-        specifier: workspace:*
-        version: link:../../tests/test-utils
-
   packages/combined-converter:
     dependencies:
       '@loom-io/core':
