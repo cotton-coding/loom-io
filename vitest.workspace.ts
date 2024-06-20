@@ -1,15 +1,22 @@
-import { defineWorkspace } from 'vitest/config';
+import { defineWorkspace } from "vitest/config";
 
 export default defineWorkspace([
-	'packages/*',
-	'adapters/*',
+	"packages/*",
 	{
 		test: {
-			include: ['tests/test-utils/**/*.spec.ts'],
-			name: 'test-helper',
-			environment: 'node'
-		}
+			include: ["adapters/**/*.spec.ts"],
+			name: "adapters",
+			environment: "node",
+			hookTimeout: 30000,
+		},
 	},
-	'plugins/*',
+	{
+		test: {
+			include: ["tests/test-utils/**/*.spec.ts"],
+			name: "test-helper",
+			environment: "node",
+		},
+	},
+	"plugins/*",
 	//'test/*/vitest.config.ts',
 ]);
