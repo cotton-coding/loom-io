@@ -12,10 +12,10 @@
 		"@loom-io/test-utils": "workspace:*"
 	},
 	"dependencies": {
-		"@loom-io/core": "workspace:^",
-		"@loom-io/node-filesystem-adapter": "workspace:^",
-		"@loom-io/yaml-converter": "workspace:^",
-		"@loom-io/json-converter": "workspace:^"
+		"@loom-io/core": "^0.11.0",
+		"@loom-io/node-filesystem-adapter": "^0.11.0",
+		"@loom-io/yaml-converter": "^0.11.0",
+		"@loom-io/json-converter": "^0.11.0"
 	},
 	"exports": {
 		".": {
