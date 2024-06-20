@@ -116,6 +116,9 @@ importers:
 
   plugins/front-matter-converter:
     dependencies:
+      '@loom-io/converter':
+        specifier: workspace:^
+        version: link:../../packages/combined-converter
       '@loom-io/core':
         specifier: workspace:^
         version: link:../../packages/core
@@ -125,12 +128,18 @@ importers:
 
   plugins/json-converter:
     dependencies:
+      '@loom-io/converter':
+        specifier: workspace:^
+        version: link:../../packages/combined-converter
       '@loom-io/core':
         specifier: workspace:^
         version: link:../../packages/core
 
   plugins/yaml-converter:
     dependencies:
+      '@loom-io/converter':
+        specifier: workspace:^
+        version: link:../../packages/combined-converter
       '@loom-io/core':
         specifier: workspace:^
         version: link:../../packages/core

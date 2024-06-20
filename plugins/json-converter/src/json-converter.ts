@@ -1,9 +1,8 @@
-import { PLUGIN_TYPE, type LoomFileConverter, LoomFile } from '@loom-io/core';
-
-const nonce = Symbol('json-converter');
+import { FileConverter } from "@loom-io/converter";
+import { LoomFile } from "@loom-io/core";
 
 function verify(file: LoomFile): boolean {
-	if (file.extension === 'json') return true;
+	if (file.extension === "json") return true;
 	return false;
 }
 
@@ -17,10 +16,9 @@ async function parse(file: LoomFile): Promise<unknown> {
 	return JSON.parse(content);
 }
 
-export default () => ({
-	$type: PLUGIN_TYPE.FILE_CONVERTER,
-	nonce,
-	verify,
-	parse,
-	stringify,
-}) satisfies LoomFileConverter;
+export default () =>
+	({
+		verify,
+		parse,
+		stringify,
+	} satisfies FileConverter);

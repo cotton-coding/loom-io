@@ -11,7 +11,16 @@
 		"prepublishOnly": "npm run build && publint"
 	},
 	"peerDependencies": {
-		"@loom-io/core": "workspace:^"
+		"@loom-io/core": "workspace:^",
+		"@loom-io/converter": "workspace:^"
+	},
+	"peerDependenciesMeta": {
+		"@loom-io/core": {
+			"optional": true
+		},
+		"@loom-io/converter": {
+			"optional": true
+		}
 	},
 	"keywords": [
 		"loom-io",
