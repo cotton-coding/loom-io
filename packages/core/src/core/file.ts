@@ -1,25 +1,24 @@
-import { PLUGIN_TYPE, type LoomFileConverter, FILE_SIZE_UNIT, SourceAdapter } from '../definitions.js';
-import { FileConvertException } from '../exceptions.js';
-import { Directory } from './dir.js';
-import { join as joinPath, extname, dirname, basename } from 'node:path';
-import { Editor } from './editor.js';
+import { FILE_SIZE_UNIT, SourceAdapter } from "../definitions.js";
+import { Directory } from "./dir.js";
+import { join as joinPath, extname, dirname, basename } from "node:path";
+import { Editor } from "./editor.js";
 
 export interface PrefixDefinition {
-	dept: number,
-	separator: string
+	dept: number;
+	separator: string;
 }
 
 export class LoomFile {
-
-	protected static converterPlugins: Array<LoomFileConverter> = [];
 	protected _extension: string | undefined;
-	protected _converter: LoomFileConverter | undefined;
 
-	static from(adapter: SourceAdapter ,dir: Directory, name: string): LoomFile
-	static from(adapter: SourceAdapter, path: string): LoomFile
-	static from(adapter: SourceAdapter, dirOrPath: Directory | string, name: string = ''){
-
-		if(typeof dirOrPath === 'string') {
+	static from(adapter: SourceAdapter, dir: Directory, name: string): LoomFile;
+	static from(adapter: SourceAdapter, path: string): LoomFile;
+	static from(
+		adapter: SourceAdapter,
+		dirOrPath: Directory | string,
+		name: string = ""
+	) {
+		if (typeof dirOrPath === "string") {
 			name = basename(dirOrPath);
 			dirOrPath = new Directory(adapter, dirname(dirOrPath));
 		}
@@ -30,7 +29,7 @@ export class LoomFile {
 	constructor(
 		protected _adapter: SourceAdapter,
 		protected _dir: Directory,
-    protected _name: string
+		protected _name: string
 	) {}
 
 	get path(): string {
@@ -42,9 +41,9 @@ export class LoomFile {
 	}
 
 	get extension() {
-		if(this._extension === undefined) {
+		if (this._extension === undefined) {
 			const ext = extname(this.name);
-			this._extension = ext === '' ? undefined: ext.slice(1);
+			this._extension = ext === "" ? undefined : ext.slice(1);
 		}
 		return this._extension;
 	}
@@ -73,36 +72,25 @@ export class LoomFile {
 		return bytes / Math.pow(1024, index);
 	}
 
-	async json(): Promise<unknown> {
-		const converter = await this.getConverterPlugin();
-
-		return converter.parse(this);
-	}
-
-	async stringify(content: unknown) {
-		const converter = await this.getConverterPlugin();
-
-		converter.stringify(this, content);
-	}
-
 	async delete() {
 		await this._adapter.deleteFile(this.path);
 	}
 
 	async copyTo(target: Directory | LoomFile) {
-
-		if(this.adapter.isCopyable(target.adapter)) {
-			if(target instanceof Directory) {
+		if (this.adapter.isCopyable(target.adapter)) {
+			if (target instanceof Directory) {
 				const targetFile = target.file(this.name);
 				await this._adapter.copyFile(this.path, targetFile.path);
 				return targetFile;
 			} else {
-				console.log('Copying to file', this.path, target.path);
+				console.log("Copying to file", this.path, target.path);
 				await this._adapter.copyFile(this.path, target.path);
 				return target;
 			}
 		} else {
-			throw new Error('Coping between different adapters is currently not supported');
+			throw new Error(
+				"Coping between different adapters is currently not supported"
+			);
 		}
 	}
 
@@ -119,7 +107,7 @@ export class LoomFile {
 		return await this._adapter.readFile(this.path);
 	}
 
-	async text(encoding: BufferEncoding = 'utf8') {
+	async text(encoding: BufferEncoding = "utf8") {
 		return await this._adapter.readFile(this.path, encoding);
 	}
 
@@ -132,41 +120,11 @@ export class LoomFile {
 		await this._adapter.writeFile(this.path, Buffer.alloc(0));
 	}
 
-
-
-	protected async getConverterPlugin(): Promise<LoomFileConverter> {
-		if(this._converter !== undefined) {
-			return this._converter;
-		}
-
-		try {
-			const plugin = await Promise.any(LoomFile.converterPlugins.map(async (plugin) => {
-				if(await plugin.verify(this)) {
-					return Promise.resolve(plugin);
-				}
-				return Promise.reject();
-			}));
-
-			this._converter = plugin;
-			return plugin;
-
-		} catch (error) {
-			throw new FileConvertException(this.path, 'No converter found for file');
-		}
-
-	}
-
-	static register(plugin: LoomFileConverter) {
-		if(plugin.$type === PLUGIN_TYPE.FILE_CONVERTER) {
-			LoomFile.converterPlugins.push(plugin);
-		}
-	}
-
 	[Symbol.toPrimitive](): string {
 		return this.path;
 	}
 
 	get [Symbol.toStringTag]() {
-		return 'LoomFile';
+		return "LoomFile";
 	}
 }
