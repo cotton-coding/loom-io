@@ -1,0 +1,47 @@
+{
+	"name": "@loom-io/converter",
+	"version": "0.11.0",
+	"main": "dist/exports/lib.js",
+	"types": "dist/exports/lib.d.ts",
+	"author": "Cotton Coding",
+	"description": "Combines loom-io converters to convert from or to files",
+	"keywords": [
+		"loom-io",
+		"converter",
+		"file",
+		"json",
+		"yaml"
+	],
+	"files": [
+		"dist"
+	],
+	"type": "module",
+	"scripts": {
+		"test": "vitest --typecheck.enabled --test-timeout=500",
+		"test:ci": "npm run test -- --run --coverage",
+		"lint": "eslint --ext .ts .",
+		"lint:fix": "eslint --ext .ts . --fix",
+		"build": "tsc --project tsconfig.json",
+		"prepublishOnly": "npm run build && publint"
+	},
+	"peerDependencies": {
+		"@loom-io/core": "^0.11.0"
+	},
+	"exports": {
+		".": {
+			"types": "./dist/exports/lib.d.ts",
+			"import": "./dist/exports/lib.js"
+		}
+	},
+	"maintainers": [
+		{
+			"name": "Wolfgang Rathgeb",
+			"email": "ghost+npm@dropanote.de"
+		}
+	],
+	"homepage": "https://loom-io.cotton-coding.com",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/cotton-coding/loom-io.git"
+	}
+}
