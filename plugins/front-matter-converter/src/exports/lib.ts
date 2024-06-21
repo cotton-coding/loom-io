@@ -18,9 +18,12 @@ const prepareVerify =
 		return false;
 	};
 
-export default (config?: Config) =>
-	({
+export function createFrontMatterConverter(config?: Config) {
+	return {
 		verify: prepareVerify(config),
 		parse,
 		stringify,
-	} satisfies FileConverter);
+	} satisfies FileConverter;
+}
+
+export default createFrontMatterConverter;
