@@ -25,20 +25,14 @@ bun add @loom-io/json-converter
 
 ## Usage
 
-Before using it you need to register the json converter
+Under the hood the json converter fits the standard `JSON.parse` and `JSON.stringify` and just reads the data from file as text. So the benefits are mainly existing in combination with the [CombinedConverter](/converter/combined-converter)
 
 ```ts
-import Loom from "@loom-io/core";
-import jsonConverter from "@loom-io/json-converter";
+import { createJsonConverter } from "@loom-io/json-converter";
 
-Loom.register(jsonConverter());
-```
-
-This allows you to read and write json files
-
-```ts
-const jsonFile = await Loom.file("memory://some/json/file.json");
-const data = await jsonFile.json();
+const jsonFile = adapter.file("some/yaml/file.json");
+const converter = createJsonConverter();
+const data = await converter.parse(jsonFile);
 data.val = "test";
-jsonFile.stringify(data);
+await converter.stringify(jsonFile, data);
 ```
