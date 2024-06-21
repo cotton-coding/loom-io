@@ -4,6 +4,7 @@ import { FileConverter } from "./definitions";
 import { LoomFile } from "@loom-io/core";
 
 import { faker } from "@faker-js/faker";
+import { NoValidFileConverterException } from "./exceptions";
 
 function createConverter(): FileConverter {
 	return {
@@ -18,6 +19,11 @@ describe("Test Combined Converter", () => {
 		const converter = createConverter();
 		const combined = new CombinedConverter(converter);
 		expect(combined).toBeInstanceOf(CombinedConverter);
+	});
+
+	test("Default Options", () => {
+		const combined = new CombinedConverter(createConverter());
+		expect(combined.options).toEqual({ failOnNoConverter: true });
 	});
 
 	test("Add Converter", () => {
@@ -56,6 +62,20 @@ describe("Test Combined Converter", () => {
 		}
 	);
 
+	test("Verify with no converter should return false", async () => {
+		const converters: FileConverter[] = [];
+		const amount = faker.number.int({ min: 1, max: 20 });
+		for (let i = 0; i < amount; i++) {
+			const converter = createConverter();
+			// @ts-expect-error verify is a mock
+			converter.verify.mockReturnValueOnce(false);
+			converters.push(converter);
+		}
+		const combined = new CombinedConverter(converters);
+		const file = {} as LoomFile;
+		expect(await combined.verify(file)).toBe(false);
+	});
+
 	test("parse", async () => {
 		const converters: FileConverter[] = [];
 		const converterNumber = faker.number.int({ min: 1, max: 20 });
@@ -72,6 +92,22 @@ describe("Test Combined Converter", () => {
 		const file = {} as LoomFile;
 		expect(await combined.parse(file)).toBe(converterNumber);
 		expect(converters[converterNumber].parse).toHaveBeenCalledWith(file);
+	});
+
+	test("parse with no converter should throw an error", async () => {
+		const converters: FileConverter[] = [];
+		const amount = faker.number.int({ min: 1, max: 20 });
+		for (let i = 0; i <= amount; i++) {
+			const converter = createConverter();
+			// @ts-expect-error verify is a mock
+			converter.verify.mockReturnValueOnce(false);
+			converters.push(converter);
+		}
+		const combined = new CombinedConverter(converters);
+		const file = {} as LoomFile;
+		await expect(combined.parse(file)).rejects.toThrow(
+			NoValidFileConverterException
+		);
 	});
 
 	test("stringify", async () => {
@@ -91,6 +127,57 @@ describe("Test Combined Converter", () => {
 		await combined.stringify(file, { test: "test" });
 		expect(converters[converterNumber].stringify).toHaveBeenCalledWith(file, {
 			test: "test",
+		});
+	});
+
+	test("stringify with no converter should throw an error", async () => {
+		const converters: FileConverter[] = [];
+		const amount = faker.number.int({ min: 1, max: 20 });
+		for (let i = 0; i <= amount; i++) {
+			const converter = createConverter();
+			// @ts-expect-error verify is a mock
+			converter.verify.mockReturnValueOnce(false);
+			converters.push(converter);
+		}
+		const combined = new CombinedConverter(converters);
+		const file = {} as LoomFile;
+		await expect(combined.stringify(file, { test: "test" })).rejects.toThrow(
+			NoValidFileConverterException
+		);
+	});
+
+	describe("Do not fail on no converter (options test)", () => {
+		test("parse", async () => {
+			const converters: FileConverter[] = [];
+			const amount = faker.number.int({ min: 1, max: 20 });
+			for (let i = 0; i <= amount; i++) {
+				const converter = createConverter();
+				// @ts-expect-error verify is a mock
+				converter.verify.mockReturnValueOnce(false);
+				converters.push(converter);
+			}
+			const combined = new CombinedConverter(converters, {
+				failOnNoConverter: false,
+			});
+			const file = {} as LoomFile;
+			expect(combined.parse(file)).resolves.toBeUndefined();
+		});
+
+		test("stringify", async () => {
+			const converters: FileConverter[] = [];
+			const amount = faker.number.int({ min: 1, max: 20 });
+			for (let i = 0; i <= amount; i++) {
+				const converter = createConverter();
+				// @ts-expect-error verify is a mock
+				converter.verify.mockReturnValueOnce(false);
+				converters.push(converter);
+			}
+			const combined = new CombinedConverter(converters);
+			combined.options = { failOnNoConverter: false };
+			const file = {} as LoomFile;
+			expect(
+				combined.stringify(file, { test: "test" })
+			).resolves.toBeUndefined();
 		});
 	});
 });

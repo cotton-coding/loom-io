@@ -1,9 +1,14 @@
 import { LoomFile } from "@loom-io/core";
 import { FileConverter } from "./definitions.js";
+import { NoValidFileConverterException } from "./exceptions.js";
 
 export interface CombinedConverterOptions {
 	failOnNoConverter?: boolean;
 }
+
+const defaultOptions: CombinedConverterOptions = {
+	failOnNoConverter: true,
+};
 
 export class CombinedConverter implements FileConverter {
 	protected converters: Array<FileConverter>;
@@ -13,7 +18,10 @@ export class CombinedConverter implements FileConverter {
 		converters: Array<FileConverter> | FileConverter,
 		options: CombinedConverterOptions = {}
 	) {
-		this.config = options;
+		this.config = {
+			...defaultOptions,
+			...options,
+		};
 		this.converters = Array.from(
 			new Set(Array.isArray(converters) ? converters : [converters])
 		);
@@ -49,7 +57,9 @@ export class CombinedConverter implements FileConverter {
 		this.converterSetAction("delete", converter, ...converters);
 	}
 
-	protected async getConverter(file: LoomFile): Promise<FileConverter> {
+	protected async getConverter(
+		file: LoomFile
+	): Promise<FileConverter | undefined> {
 		try {
 			return await Promise.any(
 				this.converters.map(async (converter) => {
@@ -60,7 +70,9 @@ export class CombinedConverter implements FileConverter {
 				})
 			);
 		} catch (error) {
-			throw new Error("No converter found for file");
+			if (this.config.failOnNoConverter) {
+				throw new NoValidFileConverterException(file.name);
+			}
 		}
 	}
 
@@ -75,11 +87,13 @@ export class CombinedConverter implements FileConverter {
 
 	async stringify(file: LoomFile, content: unknown): Promise<void> {
 		const converter = await this.getConverter(file);
+		if (!converter) return;
 		await converter.stringify(file, content);
 	}
 
 	async parse(file: LoomFile): Promise<unknown> {
 		const converter = await this.getConverter(file);
+		if (!converter) return;
 		return converter.parse(file);
 	}
 }

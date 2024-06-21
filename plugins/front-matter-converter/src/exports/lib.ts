@@ -1,4 +1,4 @@
-import { type LoomFile } from "@loom-io/core";
+import type { LoomFile } from "@loom-io/core";
 import { parse } from "../core/parse.js";
 import { stringify } from "../core/stringify.js";
 import { FileConverter } from "@loom-io/converter";
