@@ -17,9 +17,12 @@ async function parse(file: LoomFile): Promise<unknown> {
 	return parseYaml(content);
 }
 
-export default () =>
-	({
+export function createYamlConverter() {
+	return {
 		verify,
 		parse,
 		stringify,
-	} satisfies FileConverter);
+	} as FileConverter;
+}
+
+export default createYamlConverter;

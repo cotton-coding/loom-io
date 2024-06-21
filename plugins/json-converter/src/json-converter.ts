@@ -16,9 +16,12 @@ async function parse(file: LoomFile): Promise<unknown> {
 	return JSON.parse(content);
 }
 
-export default () =>
-	({
+export function createJsonConverter() {
+	return {
 		verify,
 		parse,
 		stringify,
-	} satisfies FileConverter);
+	} as FileConverter;
+}
+
+export default createJsonConverter;
