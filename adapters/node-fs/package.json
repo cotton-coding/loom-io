@@ -1,18 +1,18 @@
 {
 	"name": "@loom-io/node-filesystem-adapter",
-	"version": "0.11.0",
+	"version": "0.12.0",
 	"main": "dist/exports/lib.js",
 	"types": "dist/exports/lib.d.ts",
 	"author": "Cotton Coding",
 	"description": "A file system wrapper for Node.js and Bun",
 	"keywords": [
+		"loom-io",
 		"fs",
 		"filesystem",
 		"node",
 		"bun",
 		"nodejs",
-		"adapter",
-		"@loom-io"
+		"adapter"
 	],
 	"files": [
 		"dist"

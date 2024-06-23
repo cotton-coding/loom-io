@@ -1,16 +1,14 @@
 {
 	"name": "@loom-io/converter",
-	"version": "0.11.0",
+	"version": "0.12.0",
 	"main": "dist/exports/lib.js",
 	"types": "dist/exports/lib.d.ts",
 	"author": "Cotton Coding",
 	"description": "Combines loom-io converters to convert from or to files",
 	"keywords": [
 		"loom-io",
-		"converter",
-		"file",
-		"json",
-		"yaml"
+		"loom-io-converter",
+		"converter"
 	],
 	"files": [
 		"dist"
@@ -25,7 +23,7 @@
 		"prepublishOnly": "npm run build && publint"
 	},
 	"peerDependencies": {
-		"@loom-io/core": "^0.11.0"
+		"@loom-io/core": "^0.12.0"
 	},
 	"exports": {
 		".": {

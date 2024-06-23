@@ -22,7 +22,7 @@ export function createYamlConverter() {
 		verify,
 		parse,
 		stringify,
-	} as FileConverter;
+	} satisfies FileConverter;
 }
 
 export default createYamlConverter;

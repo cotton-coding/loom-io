@@ -1,16 +1,16 @@
 {
 	"name": "@loom-io/minio-s3-adapter",
-	"version": "0.11.0",
+	"version": "0.12.0",
 	"main": "dist/exports/lib.js",
 	"types": "dist/exports/lib.d.ts",
 	"author": "Cotton Coding",
 	"description": "A file system wrapper for Node.js and Bun",
 	"keywords": [
+		"loom-io",
 		"adapter",
 		"minio",
 		"s3",
-		"file",
-		"@loom-io"
+		"file"
 	],
 	"files": [
 		"dist"
