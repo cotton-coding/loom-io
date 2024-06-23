@@ -14,12 +14,11 @@ Have a look at the specific reference to get all the details of the functionalit
 As show in the chapter before, do not forget to setup and config loom-io before usage.
 
 ```ts
-import Loom from "@loom-io/core";
-import fsAdapter from "@loom-io/node-filesystem-adapter";
+import FsAdapter from "@loom-io/node-filesystem-adapter";
 
-// Now we add the filesystem adapter.
+// Now we create a instance of the filesystem adapter.
 // By default the root of our filesystem is your project directory
-Loom.register(fsAdapter("file://"));
+const adapter = new FsAdapter();
 ```
 
 The following examples will not show registering an adapter every time, as you will probably only need to do this once.
@@ -100,9 +99,11 @@ It can be annoying to think about the file format all the time when reading. Whe
 import MemoryAdapter from "@loom-io/in-memory-adapter"
 import jsonConverter from '@loom-io/json-converter';
 import yamlConverter from '@loom-io/yaml-converter':
+import { createCombinedConverter } from '@loom-io/converter'
 
-Loom.register(jsonConverter());
-Loom.register(yamlConverter());
+
+const converter = createCombinedConverter([jsonConverter(), yamlConverter()])
+
 
 const adapter = new MemoryAdapter()
 
@@ -110,7 +111,7 @@ const filePaths = ['file://test.yml', 'file://test.json'];
 
 for(let filePath of filePaths) {
   const file = adapter.file(filePath);
-  console.log(await file.json());
+  console.log(await converter.parse(file));
 }
 
 ```
