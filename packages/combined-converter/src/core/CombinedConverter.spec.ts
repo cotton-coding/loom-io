@@ -10,7 +10,7 @@ function createConverter(): FileConverter {
 	return {
 		verify: vi.fn(),
 		parse: vi.fn(),
-		stringify: vi.fn(),
+		unify: vi.fn(),
 	};
 }
 
@@ -110,7 +110,7 @@ describe("Test Combined Converter", () => {
 		);
 	});
 
-	test("stringify", async () => {
+	test("unify", async () => {
 		const converters: FileConverter[] = [];
 		const converterNumber = faker.number.int({ min: 1, max: 20 });
 		const amount = faker.number.int({ min: converterNumber, max: 21 });
@@ -119,18 +119,18 @@ describe("Test Combined Converter", () => {
 			// @ts-expect-error verify is a mock
 			converter.verify.mockReturnValueOnce(i === converterNumber);
 			// @ts-expect-error verify is a mock
-			converter.stringify.mockResolvedValueOnce(i);
+			converter.unify.mockResolvedValueOnce(i);
 			converters.push(converter);
 		}
 		const combined = new CombinedConverter(converters);
 		const file = {} as LoomFile;
-		await combined.stringify(file, { test: "test" });
-		expect(converters[converterNumber].stringify).toHaveBeenCalledWith(file, {
+		await combined.unify(file, { test: "test" });
+		expect(converters[converterNumber].unify).toHaveBeenCalledWith(file, {
 			test: "test",
 		});
 	});
 
-	test("stringify with no converter should throw an error", async () => {
+	test("unify with no converter should throw an error", async () => {
 		const converters: FileConverter[] = [];
 		const amount = faker.number.int({ min: 1, max: 20 });
 		for (let i = 0; i <= amount; i++) {
@@ -141,7 +141,7 @@ describe("Test Combined Converter", () => {
 		}
 		const combined = new CombinedConverter(converters);
 		const file = {} as LoomFile;
-		await expect(combined.stringify(file, { test: "test" })).rejects.toThrow(
+		await expect(combined.unify(file, { test: "test" })).rejects.toThrow(
 			NoValidFileConverterException
 		);
 	});
@@ -163,7 +163,7 @@ describe("Test Combined Converter", () => {
 			expect(combined.parse(file)).resolves.toBeUndefined();
 		});
 
-		test("stringify", async () => {
+		test("unify", async () => {
 			const converters: FileConverter[] = [];
 			const amount = faker.number.int({ min: 1, max: 20 });
 			for (let i = 0; i <= amount; i++) {
@@ -175,9 +175,7 @@ describe("Test Combined Converter", () => {
 			const combined = new CombinedConverter(converters);
 			combined.options = { failOnNoConverter: false };
 			const file = {} as LoomFile;
-			expect(
-				combined.stringify(file, { test: "test" })
-			).resolves.toBeUndefined();
+			expect(combined.unify(file, { test: "test" })).resolves.toBeUndefined();
 		});
 	});
 });

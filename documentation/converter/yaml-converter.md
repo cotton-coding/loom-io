@@ -25,20 +25,14 @@ bun add @loom-io/yaml-converter
 
 ## Usage
 
-Before using, you need to register the yaml converter
+You can read and write yaml files with the suffixes `yaml` adn `yml`.
 
 ```ts
-import Loom from "@loom-io/core";
-import yamlConverter from "@loom-io/yaml-converter";
+import { createYamlConverter } from "@loom-io/yaml-converter";
 
-Loom.register(yamlConverter());
-```
-
-You can read and write yaml files with the suffixes `yaml` adn `yml`
-
-```ts
-const yamlFile = await Loom.file("memory://some/yaml/file.yaml");
-const data = await yamlFile.json();
+const yamlFile = adapter.file("some/yaml/file.yaml");
+const converter = createJsonConverter();
+const data = await converter.parse(yamlFile);
 data.val = "test";
-yamlFile.stringify(data);
+await converter.unify(yamlFile, data);
 ```

@@ -1,6 +1,6 @@
 import type { LoomFile } from "@loom-io/core";
 import { parse } from "../core/parse.js";
-import { stringify } from "../core/stringify.js";
+import { unify } from "../core/unify.js";
 import { FileConverter } from "@loom-io/converter";
 type Config = {
 	extensions?: string[];
@@ -22,7 +22,7 @@ export function createFrontMatterConverter(config?: Config) {
 	return {
 		verify: prepareVerify(config),
 		parse,
-		stringify,
+		unify,
 	} satisfies FileConverter;
 }
 

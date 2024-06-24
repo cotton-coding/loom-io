@@ -16,12 +16,12 @@ describe("json-converter", () => {
 		}
 	);
 
-	test("stringify", async () => {
+	test("unify", async () => {
 		const file = {
 			write: vi.fn(),
 		} as unknown as LoomFile;
 		const content = { test: true };
-		await jsonConverter().stringify(file, content);
+		await jsonConverter().unify(file, content);
 		expect(file.write).toHaveBeenCalledWith(JSON.stringify(content));
 	});
 
