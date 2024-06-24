@@ -16,12 +16,12 @@ describe("json-converter", () => {
 		}
 	);
 
-	test("stringify", async () => {
+	test("unify", async () => {
 		const file = {
 			write: vi.fn(),
 		} as unknown as LoomFile;
 		const content = { test: true };
-		await yamlConverter().stringify(file, content);
+		await yamlConverter().unify(file, content);
 		expect(file.write).toHaveBeenCalledWith("test: true\n");
 	});
 

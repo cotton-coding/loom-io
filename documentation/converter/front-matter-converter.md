@@ -38,7 +38,7 @@ const nykMatterConverter = createFrontMatterConverter({
 })
 
 ```
-If there is no front matter part, `data` will be undefined and if there is no content, `content` will be an empty string. When writing the stringify will analyse the given function and convert it to a file. If the given value has more than just a `data` or `content` key it will only be translated to a header. You can also set only one of the two keys.
+If there is no front matter part, `data` will be undefined and if there is no content, `content` will be an empty string. When writing the unify function will analyse the given function and convert it to a file. If the given value has more than just a `data` or `content` key it will only be translated to a header. You can also set only one of the two keys.
 
 ```ts
 const adapter = new MemoryAdapter();
@@ -53,7 +53,7 @@ some random markdown
 
 `;
 
-converter.stringify(mdFile, fileData);
+converter.unify(mdFile, fileData);
 
 ```
 

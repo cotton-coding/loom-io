@@ -86,26 +86,26 @@ describe("test library exports", async () => {
 		expect(parsed.content).toBe("content\ntest\n\nline");
 	});
 
-	test("stringify write empty data", async () => {
+	test("unify write empty data", async () => {
 		const file = new FileMock();
 		const converter = frontMatterConverter();
-		await converter.stringify(file as unknown as LoomFile, undefined);
+		await converter.unify(file as unknown as LoomFile, undefined);
 		expect(file.lines).toStrictEqual(["---", "---", ""]);
 	});
 
-	test("stringify front matter", async () => {
+	test("unify front matter", async () => {
 		const file = new FileMock();
 		const data = { key: "value" };
 		const converter = frontMatterConverter();
-		await converter.stringify(file as unknown as LoomFile, data);
+		await converter.unify(file as unknown as LoomFile, data);
 		expect(file.lines).toStrictEqual(["---", "key: value", "---", ""]);
 	});
 
-	test("stringify front matter with multiline data", async () => {
+	test("unify front matter with multiline data", async () => {
 		const file = new FileMock();
 		const data = { key: "value", cotton: "coding" };
 		const converter = frontMatterConverter();
-		await converter.stringify(file as unknown as LoomFile, data);
+		await converter.unify(file as unknown as LoomFile, data);
 		expect(file.lines).toStrictEqual([
 			"---",
 			"key: value",
@@ -115,12 +115,12 @@ describe("test library exports", async () => {
 		]);
 	});
 
-	test("stringify front matter with content", async () => {
+	test("unify front matter with content", async () => {
 		const file = new FileMock();
 		const data = { key: "value" };
 		const content = "content";
 		const converter = frontMatterConverter();
-		await converter.stringify(file as unknown as LoomFile, { data, content });
+		await converter.unify(file as unknown as LoomFile, { data, content });
 		expect(file.lines).toStrictEqual([
 			"---",
 			"key: value",
@@ -130,12 +130,12 @@ describe("test library exports", async () => {
 		]);
 	});
 
-	test("stringify front matter with multiline content", async () => {
+	test("unify front matter with multiline content", async () => {
 		const file = new FileMock();
 		const data = { key: "value", cotton: "coding" };
 		const content = "content\nmore content\nand even more content";
 		const converter = frontMatterConverter();
-		await converter.stringify(file as unknown as LoomFile, { data, content });
+		await converter.unify(file as unknown as LoomFile, { data, content });
 		expect(file.lines).toStrictEqual([
 			"---",
 			"key: value",
@@ -148,11 +148,11 @@ describe("test library exports", async () => {
 		]);
 	});
 
-	test("stringify with content only", async () => {
+	test("unify with content only", async () => {
 		const file = new FileMock();
 		const content = "content";
 		const converter = frontMatterConverter();
-		await converter.stringify(file as unknown as LoomFile, content);
+		await converter.unify(file as unknown as LoomFile, content);
 		expect(file.lines).toStrictEqual(["---", "---", "", "content"]);
 	});
 });

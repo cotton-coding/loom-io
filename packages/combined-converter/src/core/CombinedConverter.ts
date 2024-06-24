@@ -85,10 +85,10 @@ export class CombinedConverter implements FileConverter {
 		}
 	}
 
-	async stringify(file: LoomFile, content: unknown): Promise<void> {
+	async unify(file: LoomFile, content: unknown): Promise<void> {
 		const converter = await this.getConverter(file);
 		if (!converter) return;
-		await converter.stringify(file, content);
+		await converter.unify(file, content);
 	}
 
 	async parse(file: LoomFile): Promise<unknown> {

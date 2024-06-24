@@ -7,7 +7,7 @@ function verify(file: LoomFile): boolean {
 	return false;
 }
 
-async function stringify(file: LoomFile, content: unknown) {
+async function unify(file: LoomFile, content: unknown) {
 	const contentString = stringifyYaml(content);
 	await file.write(contentString);
 }
@@ -21,7 +21,7 @@ export function createYamlConverter() {
 	return {
 		verify,
 		parse,
-		stringify,
+		unify,
 	} satisfies FileConverter;
 }
 

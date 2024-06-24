@@ -34,5 +34,5 @@ const yamlFile = adapter.file("some/yaml/file.yaml");
 const converter = createJsonConverter();
 const data = await converter.parse(yamlFile);
 data.val = "test";
-await converter.stringify(yamlFile, data);
+await converter.unify(yamlFile, data);
 ```

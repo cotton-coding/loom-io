@@ -96,8 +96,8 @@ importers:
   packages/combined-converter:
     dependencies:
       '@loom-io/core':
-        specifier: ^0.11.0
-        version: 0.11.0
+        specifier: workspace:^
+        version: link:../core
 
   packages/common: {}
 
@@ -642,12 +642,6 @@ packages:
 
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
-
-  '@loom-io/common@1.0.2':
-    resolution: {integrity: sha512-4VuPRHB0LnTSebcO51+/sssAyOgdRv0Z0Zhr6Cix1lqr19tjGS+xVMWczhevlD5uDaPCRFKPXL2XQCNl2Y5VOg==}
-
-  '@loom-io/core@0.11.0':
-    resolution: {integrity: sha512-ru6b87LSkaQZvkddfsuSUST1QIp3nAjnph9u1dMCTgP+UrDHKvJbo5JbNkaqX+Ddo/LY1B5NBts5GT41MwPvhg==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -2462,12 +2456,6 @@ snapshots:
     dependencies:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.4.15
-
-  '@loom-io/common@1.0.2': {}
-
-  '@loom-io/core@0.11.0':
-    dependencies:
-      '@loom-io/common': 1.0.2
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:

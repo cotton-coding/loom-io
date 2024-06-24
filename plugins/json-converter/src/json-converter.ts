@@ -6,7 +6,7 @@ function verify(file: LoomFile): boolean {
 	return false;
 }
 
-async function stringify(file: LoomFile, content: unknown) {
+async function unify(file: LoomFile, content: unknown) {
 	const contentString = JSON.stringify(content);
 	await file.write(contentString);
 }
@@ -20,7 +20,7 @@ export function createJsonConverter() {
 	return {
 		verify,
 		parse,
-		stringify,
+		unify,
 	} as FileConverter;
 }
 
