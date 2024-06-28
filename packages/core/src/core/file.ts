@@ -40,6 +40,11 @@ export class LoomFile {
 		return this._name;
 	}
 
+	getNameWithoutExtension() {
+		const ext = this.extension;
+		return ext ? this.name.slice(0, -ext.length - 1) : this.name;
+	}
+
 	get extension() {
 		if (this._extension === undefined) {
 			const ext = extname(this.name);
