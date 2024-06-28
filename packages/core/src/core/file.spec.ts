@@ -84,6 +84,13 @@ describe("Test File Service", () => {
 		test("Get File Name", () => {
 			const file = LoomFile.from(adapter, "./test/data/test.json");
 			expect(file.name).toBe("test.json");
+			expect(file.getNameWithoutExtension()).toBe("test");
+		});
+
+		test("Get File Name with no extension", () => {
+			const file = LoomFile.from(adapter, "./test/data/test");
+			expect(file.name).toBe("test");
+			expect(file.getNameWithoutExtension()).toBe("test");
 		});
 	});
 
