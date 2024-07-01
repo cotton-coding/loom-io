@@ -21,7 +21,10 @@ export class FilesystemAdapter implements LoomSourceAdapter {
 		return new Directory(this.adapter, path);
 	}
 
-	getFullPath(dirOrFile: Directory | LoomFile) {
+	getFullPath(dirOrFile: Directory | LoomFile, ignoreAdapter = false) {
+		if (!ignoreAdapter && this.adapter !== dirOrFile.adapter) {
+			throw new Error("The directory or file does not belong to this adapter");
+		}
 		return resolve(this.rootdir.toString(), dirOrFile.path);
 	}
 }

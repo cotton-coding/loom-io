@@ -19,6 +19,20 @@ describe("FilesystemAdapter", () => {
 		expect(adapter.getFullPath(dir)).toBe("/etc/loom/dir");
 	});
 
+	test("fullPath should fail to other adapters", () => {
+		const adapter = new FilesystemAdapter("/etc/loom");
+		const adapter2 = new FilesystemAdapter("/etc/loom");
+		const dir2 = adapter2.dir("dir");
+		expect(() => adapter.getFullPath(dir2)).toThrowError();
+	});
+
+	test("fullPath should return the full path also from other adapter if flag is set", () => {
+		const adapter = new FilesystemAdapter("/etc/loom");
+		const adapter2 = new FilesystemAdapter("/etc/loom");
+		const dir2 = adapter2.dir("dir");
+		expect(adapter.getFullPath(dir2, true)).toBe("/etc/loom/dir");
+	});
+
 	test("fullPath should return the full path of a file (cwd)", () => {
 		const adapter = new FilesystemAdapter();
 		const file = adapter.file("file.txt");
