@@ -6,22 +6,22 @@ function verify(file: LoomFile): boolean {
 	return false;
 }
 
-async function unify(file: LoomFile, content: unknown) {
+async function unify<T>(file: LoomFile, content: T) {
 	const contentString = JSON.stringify(content);
 	await file.write(contentString);
 }
 
-async function parse(file: LoomFile): Promise<unknown> {
+async function parse<T>(file: LoomFile): Promise<T> {
 	const content = await file.text();
-	return JSON.parse(content);
+	return JSON.parse(content) as T;
 }
 
-export function createJsonConverter() {
+export function createJsonConverter<T = unknown>() {
 	return {
 		verify,
-		parse,
-		unify,
-	} as FileConverter;
+		parse: parse<T>,
+		unify: unify<T>,
+	} as FileConverter<T>;
 }
 
 export default createJsonConverter;

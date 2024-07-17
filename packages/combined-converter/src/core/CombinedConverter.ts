@@ -10,12 +10,12 @@ const defaultOptions: CombinedConverterOptions = {
 	failOnNoConverter: true,
 };
 
-export class CombinedConverter implements FileConverter {
-	protected converters: Array<FileConverter>;
+export class CombinedConverter<T> implements FileConverter {
+	protected converters: Array<FileConverter<T>>;
 	protected config: CombinedConverterOptions;
 
 	constructor(
-		converters: Array<FileConverter> | FileConverter,
+		converters: Array<FileConverter<T>> | FileConverter<T>,
 		options: CombinedConverterOptions = {}
 	) {
 		this.config = {
@@ -29,7 +29,7 @@ export class CombinedConverter implements FileConverter {
 
 	protected converterSetAction(
 		action: "add" | "delete",
-		...converters: Array<FileConverter>
+		...converters: Array<FileConverter<T>>
 	) {
 		const convertersSet = new Set(this.converters);
 		converters.forEach((converter) => {
@@ -46,20 +46,20 @@ export class CombinedConverter implements FileConverter {
 		return this.config;
 	}
 
-	addConverter(converter: FileConverter, ...converters: Array<FileConverter>) {
+	addConverter(converter: FileConverter<T>, ...converters: Array<FileConverter<T>>) {
 		this.converterSetAction("add", converter, ...converters);
 	}
 
 	removeConverter(
-		converter: FileConverter,
-		...converters: Array<FileConverter>
+		converter: FileConverter<T>,
+		...converters: Array<FileConverter<T>>
 	) {
 		this.converterSetAction("delete", converter, ...converters);
 	}
 
 	protected async getConverter(
 		file: LoomFile
-	): Promise<FileConverter | undefined> {
+	): Promise<FileConverter<T> | undefined> {
 		try {
 			return await Promise.any(
 				this.converters.map(async (converter) => {
@@ -85,13 +85,13 @@ export class CombinedConverter implements FileConverter {
 		}
 	}
 
-	async unify(file: LoomFile, content: unknown): Promise<void> {
+	async unify(file: LoomFile, content: T): Promise<void> {
 		const converter = await this.getConverter(file);
 		if (!converter) return;
 		await converter.unify(file, content);
 	}
 
-	async parse(file: LoomFile): Promise<unknown> {
+	async parse(file: LoomFile): Promise<T | void> {
 		const converter = await this.getConverter(file);
 		if (!converter) return;
 		return converter.parse(file);
