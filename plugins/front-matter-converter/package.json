@@ -1,8 +1,10 @@
 {
 	"name": "@loom-io/front-matter-converter",
-	"version": "0.12.4",
-	"description": "Convert front matter yaml and json into json with loom-io",
+	"version": "0.12.5",
+	"description": "Convert front matter yaml and json into json from loom-io files",
 	"main": "dist/exports/lib.js",
+	"module": "dist/exports/lib.js",
+	"types": "dist/exports/lib.d.ts",
 	"type": "module",
 	"scripts": {
 		"build": "tsc --project tsconfig.json",

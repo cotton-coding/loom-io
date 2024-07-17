@@ -1,9 +1,10 @@
 {
 	"name": "@loom-io/json-converter",
-	"version": "0.12.4",
+	"version": "0.12.5",
 	"description": "A plugin for @loom-io to convert json files to JSON",
 	"main": "dist/json-converter.js",
 	"module": "dist/json-converter.js",
+	"types": "dist/json-converter.d.ts",
 	"type": "module",
 	"scripts": {
 		"build": "tsc --project tsconfig.json",
