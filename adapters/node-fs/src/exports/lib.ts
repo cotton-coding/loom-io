@@ -4,7 +4,7 @@ import { Adapter } from "../core/adapter.js";
 import { dirname, basename } from "node:path";
 import { Directory, LoomFile } from "@loom-io/core/internal";
 
-import { resolve } from "node:path";
+import { join as joinPath } from "node:path";
 
 export class FilesystemAdapter implements LoomSourceAdapter {
 	protected adapter: Adapter;
@@ -25,6 +25,6 @@ export class FilesystemAdapter implements LoomSourceAdapter {
 		if (!ignoreAdapter && this.adapter !== dirOrFile.adapter) {
 			throw new Error("The directory or file does not belong to this adapter");
 		}
-		return resolve(this.rootdir.toString(), dirOrFile.path);
+		return joinPath(this.rootdir.toString(), dirOrFile.path);
 	}
 }

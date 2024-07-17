@@ -39,6 +39,12 @@ describe("FilesystemAdapter", () => {
 		expect(adapter.getFullPath(file)).toBe(process.cwd() + "/file.txt");
 	});
 
+	test("fullPath should return the full path of a file (cwd)", () => {
+		const adapter = new FilesystemAdapter();
+		const file = adapter.file("/deep/file.txt");
+		expect(adapter.getFullPath(file)).toBe(process.cwd() + "/deep/file.txt");
+	});
+
 	test("fullPath should return the full path of a directory (cwd)", () => {
 		const adapter = new FilesystemAdapter();
 		const dir = adapter.dir("dir");
