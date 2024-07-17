@@ -7,22 +7,22 @@ function verify(file: LoomFile): boolean {
 	return false;
 }
 
-async function unify(file: LoomFile, content: unknown) {
+async function unify<T>(file: LoomFile, content: T) {
 	const contentString = stringifyYaml(content);
 	await file.write(contentString);
 }
 
-async function parse(file: LoomFile): Promise<unknown> {
+async function parse<T>(file: LoomFile): Promise<T> {
 	const content = await file.text();
-	return parseYaml(content);
+	return parseYaml(content) as T;
 }
 
-export function createYamlConverter() {
+export function createYamlConverter<T = unknown>() {
 	return {
 		verify,
-		parse,
-		unify,
-	} satisfies FileConverter;
+		parse: parse<T>,
+		unify: unify<T>,
+	} satisfies FileConverter<T>;
 }
 
 export default createYamlConverter;

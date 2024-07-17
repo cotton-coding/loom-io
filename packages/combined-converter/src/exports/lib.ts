@@ -7,9 +7,9 @@ import { FileConverter } from "../core/definitions.js";
 export { CombinedConverter, CombinedConverterOptions, type FileConverter };
 export { FileConverterException } from "../core/exceptions.js";
 
-export function createCombinedConverter(
-	converter: FileConverter | FileConverter[],
+export function createCombinedConverter<T = unknown>(
+	converter: FileConverter<T> | FileConverter<T>[],
 	options: CombinedConverterOptions = {}
 ) {
-	return new CombinedConverter(converter, options);
+	return new CombinedConverter<T>(converter, options);
 }

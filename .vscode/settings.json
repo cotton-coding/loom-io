@@ -4,4 +4,5 @@
     "YOTTABYTE",
     "ZETTABYTE"
   ],
+  "editor.formatOnSave": false
 }

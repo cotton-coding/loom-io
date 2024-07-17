@@ -28,6 +28,7 @@
 		"loom-io",
 		"loom-io-converter",
 		"yaml",
+		"front-matter",
 		"converter"
 	],
 	"author": "Wolfgang Rathgeb",
