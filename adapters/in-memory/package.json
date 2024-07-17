@@ -1,6 +1,6 @@
 {
 	"name": "@loom-io/in-memory-adapter",
-	"version": "0.12.2",
+	"version": "0.12.3",
 	"main": "dist/exports/lib.js",
 	"types": "dist/exports/lib.d.ts",
 	"author": "Cotton Coding",
