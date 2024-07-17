@@ -26,3 +26,8 @@ export class FrontMatterTypeNotSupportedException extends Error {
 		super(`The frontmatter format inside the file not supported: ${type}`);
 	}
 }
+
+export type DataFormat<T> = {
+	data: T;
+	content: string;
+};

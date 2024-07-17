@@ -1,41 +1,45 @@
-import type { LineResult, LoomFile } from '@loom-io/core/internal';
-import { getFrontMatterConverter, hasFrontMatter } from './utils.js';
-
+import type { LineResult, LoomFile } from "@loom-io/core/internal";
+import {
+	getFrontMatterConverter,
+	hasFrontMatter,
+	type DataFormat,
+} from "./utils.js";
 
 export async function readFrontMatter(line: LineResult) {
 	const frontMatter = [];
-	let lineContent = await line.read('utf8');
-	while(lineContent !== '---') {
+	let lineContent = await line.read("utf8");
+	while (lineContent !== "---") {
 		frontMatter.push(lineContent);
 		await line.next();
-		lineContent = await line.read('utf-8');
+		lineContent = await line.read("utf-8");
 	}
-	return frontMatter.join('\n');
+	return frontMatter.join("\n");
 }
 
 export async function readContent(line: LineResult) {
 	const content = [];
 	do {
-		const lineContent = await line.read('utf8');
-		if(!(content.length === 0 && (lineContent === '---' || lineContent === ''))) {
+		const lineContent = await line.read("utf8");
+		if (
+			!(content.length === 0 && (lineContent === "---" || lineContent === ""))
+		) {
 			content.push(lineContent);
 		}
 		await line.next();
-	} while(await line.hasNext());
-	return content.join('\n');
+	} while (await line.hasNext());
+	return content.join("\n");
 }
 
-export async function parse(file: LoomFile): Promise<unknown> {
+export async function parse<T>(file: LoomFile): Promise<DataFormat<T>> {
 	const reader = await file.reader();
 	const lineReader = await reader.firstLine();
 
 	const result = {
 		data: {} as unknown,
-		content: ''
+		content: "",
 	};
 
-
-	if(await hasFrontMatter(lineReader)) {
+	if (await hasFrontMatter(lineReader)) {
 		lineReader.next();
 		const frontMatter = await readFrontMatter(lineReader);
 		const { parse } = await getFrontMatterConverter(lineReader);
@@ -46,5 +50,5 @@ export async function parse(file: LoomFile): Promise<unknown> {
 
 	result.content = await readContent(lineReader);
 
-	return result;
+	return result as DataFormat<T>;
 }

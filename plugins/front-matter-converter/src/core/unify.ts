@@ -1,6 +1,10 @@
 import type { LoomFile } from "@loom-io/core";
 import * as YAML from "yaml";
-import { getFrontMatterConverter, hasFrontMatter } from "./utils.js";
+import {
+	DataFormat,
+	getFrontMatterConverter,
+	hasFrontMatter,
+} from "./utils.js";
 
 export async function writeToFile(
 	file: LoomFile,
@@ -37,7 +41,10 @@ export function ensureNewLine(content: string | undefined) {
 	return content;
 }
 
-export async function unify(file: LoomFile, content: unknown) {
+export async function unify<T>(
+	file: LoomFile,
+	content: Partial<DataFormat<T>> | string | null = null
+) {
 	if (content == null) {
 		await writeToFile(file);
 		return;
