@@ -24,7 +24,7 @@ export function createFrontMatterConverter<T = unknown>(config?: Config) {
 		verify: prepareVerify(config),
 		parse: parse<T>,
 		unify: unify<T>,
-	} satisfies FileConverter<DataFormat<T>, Partial<DataFormat<T>>>;
+	} satisfies FileConverter<DataFormat<T | undefined>, Partial<DataFormat<T>>>;
 }
 
 export default createFrontMatterConverter;

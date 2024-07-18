@@ -30,7 +30,7 @@ export async function readContent(line: LineResult) {
 	return content.join("\n");
 }
 
-export async function parse<T>(file: LoomFile): Promise<DataFormat<T>> {
+export async function parse<T>(file: LoomFile): Promise<DataFormat<T | undefined>> {
 	const reader = await file.reader();
 	const lineReader = await reader.firstLine();
 
@@ -40,9 +40,10 @@ export async function parse<T>(file: LoomFile): Promise<DataFormat<T>> {
 	};
 
 	if (await hasFrontMatter(lineReader)) {
-		lineReader.next();
-		const frontMatter = await readFrontMatter(lineReader);
 		const { parse } = await getFrontMatterConverter(lineReader);
+		await lineReader.next();
+		const frontMatter = await readFrontMatter(lineReader);
+
 		result.data = await parse(frontMatter);
 
 		await lineReader.next();
