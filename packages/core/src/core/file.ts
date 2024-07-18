@@ -88,7 +88,6 @@ export class LoomFile {
 				await this._adapter.copyFile(this.path, targetFile.path);
 				return targetFile;
 			} else {
-				console.log("Copying to file", this.path, target.path);
 				await this._adapter.copyFile(this.path, target.path);
 				return target;
 			}
