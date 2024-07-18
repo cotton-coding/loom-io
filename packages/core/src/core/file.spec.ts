@@ -46,6 +46,21 @@ describe("Test File Service", () => {
 		testHelper.destroy();
 	});
 
+	test("Get file meta data", async () => {
+		const path = "test/data/test.txt";
+		const content = faker.lorem.words(10000);
+		const testFilePath = testHelper.createFile(path, content);
+		const file = LoomFile.from(adapter, testFilePath);
+		const meta = await file.getMeta();
+		expect(meta.size).toBe(content.length);
+		expect(meta.createdAt).toBeInstanceOf(Date);
+		expect(meta.updatedAt).toBeInstanceOf(Date);
+		const rawMeta = await file.getRawMeta();
+		expect(rawMeta.size).toBe(content.length);
+		expect(rawMeta.birthtime).toBeDefined();
+		expect(rawMeta.mtime).toBeDefined();
+	});
+
 	test("If File exists on Object", async () => {
 		const file = LoomFile.from(adapter, "./test/data/test.json");
 		await expect(file.exists()).resolves.toBeTruthy();

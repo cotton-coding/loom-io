@@ -88,6 +88,7 @@ export class Adapter implements SourceAdapter {
 			ext,
 			name,
 			mtime: new Date(),
+			birthtime: new Date(),
 			content
 		};
 	}
@@ -192,7 +193,8 @@ export class Adapter implements SourceAdapter {
 		const file = this.getLastPartOfPath(path, MEMORY_TYPE.FILE);
 		return {
 			size: file.content.length,
-			mtime: file.mtime
+			mtime: file.mtime,
+			birthtime: file.birthtime,
 		};
 	}
 
