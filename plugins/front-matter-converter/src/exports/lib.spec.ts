@@ -33,7 +33,7 @@ describe("test library exports", async () => {
 		expect(converter.verify(other)).toBe(false);
 	});
 
-	test("parse front matter", async () => {
+	test("parse front matter (yaml)", async () => {
 		const file = new FileMock([
 			"---",
 			"key: value",
@@ -48,6 +48,26 @@ describe("test library exports", async () => {
 		expect(parsed.data).toEqual({ key: "value" });
 		expect(parsed.content).toBe("content");
 	});
+
+	test("parse front matter (json)", async () => {
+		const file = new FileMock([
+			"---json",
+			"{",
+			'"key": "value",',
+			'"data": { "key": "value" }',
+			"}",
+			"---",
+			"content",
+		]) as unknown as LoomFile;
+		const converter = frontMatterConverter();
+		const parsed = (await converter.parse(file)) as {
+			data: { key: string };
+			content: string;
+		};
+		expect(parsed.data).toEqual({ key: "value", data: { key: "value" } });
+		expect(parsed.content).toBe("content");
+	});
+
 
 	test("parse front matter and ignore empty line before content", async () => {
 		const file = new FileMock([
@@ -101,7 +121,7 @@ describe("test library exports", async () => {
 		expect(file.lines).toStrictEqual(["---", "key: value", "---", ""]);
 	});
 
-	test("unify front matter with multiline data", async () => {
+	test("unify front matter with multiline yaml data", async () => {
 		const file = new FileMock();
 		const data = { key: "value", cotton: "coding" };
 		const converter = frontMatterConverter();
@@ -147,6 +167,8 @@ describe("test library exports", async () => {
 			"and even more content",
 		]);
 	});
+
+
 
 	test("unify with content only", async () => {
 		const file = new FileMock();
