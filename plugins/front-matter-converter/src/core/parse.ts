@@ -50,6 +50,7 @@ export async function parse<T>(file: LoomFile): Promise<DataFormat<T | undefined
 	}
 
 	result.content = await readContent(lineReader);
+	reader.close();
 
 	return result as DataFormat<T>;
 }

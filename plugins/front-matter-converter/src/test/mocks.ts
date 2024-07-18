@@ -32,6 +32,10 @@ export class EditorMock {
 		}
 		return new LineResultMock(this.lines) as unknown as LineResult;
 	}
+
+	close() {
+		return Promise.resolve();
+	}
 }
 
 export class FileMock {
