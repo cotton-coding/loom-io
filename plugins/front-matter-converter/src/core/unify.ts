@@ -43,8 +43,8 @@ export function ensureNewLine(content: string | undefined) {
 
 export async function unify<T>(
 	file: LoomFile,
-	content: Partial<DataFormat<T>> | string | null = null
-) {
+	content: Partial<DataFormat<T>> | string | object | null = null
+): Promise<void> {
 	if (content == null) {
 		await writeToFile(file);
 		return;

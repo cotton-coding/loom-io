@@ -11,7 +11,6 @@ export async function getFrontMatterConverter(firstLine: LineResult): Promise<{
 	stringify: (content: unknown) => string;
 }> {
 	const type = (await firstLine.read("utf8")).replace("---", "");
-
 	if (["", "yaml", "yml"].includes(type)) {
 		return YAML;
 	} else if (type === "json") {

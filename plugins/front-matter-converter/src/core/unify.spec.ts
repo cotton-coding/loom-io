@@ -54,7 +54,6 @@ describe("unify", () => {
 	test("unifyJson returns yaml with newline", async () => {
 		const file = new FileMock() as unknown as LoomFile;
 		const data = { key: "value", some: "other" };
-		console.log(await stringifyJson(file, data));
 		expect(stringifyJson(file, data)).resolves.toBe(
 			"key: value\nsome: other\n"
 		);
