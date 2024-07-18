@@ -1,4 +1,4 @@
-import { FILE_SIZE_UNIT, SourceAdapter } from "../definitions.js";
+import { FILE_SIZE_UNIT, FileStat, SourceAdapter } from "../definitions.js";
 import { Directory } from "./dir.js";
 import { join as joinPath, extname, dirname, basename } from "node:path";
 import { Editor } from "./editor.js";
@@ -77,13 +77,19 @@ export class LoomFile<T extends SourceAdapter = SourceAdapter> {
 		return bytes / Math.pow(1024, index);
 	}
 
+	protected getLastModificationTime(stats: FileStat) {
+		if(stats.ctime === undefined) {
+			return stats.mtime;
+		}
+		return stats.mtime.getTime() > (stats.ctime.getTime()) ? stats.mtime : stats.ctime;
+	}
+
 	async getMeta() {
 		const meta = await this._adapter.stat(this.path);
-		const updatedAt = meta.mtime > (meta.ctime ?? 0) ? meta.mtime : meta.ctime;
 		return {
 			size: meta.size,
 			createdAt: meta.birthtime,
-			updatedAt
+			updatedAt: this.getLastModificationTime(meta),
 		};
 	}
 
