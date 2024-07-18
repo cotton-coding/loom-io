@@ -1,6 +1,6 @@
 {
 	"name": "@loom-io/front-matter-converter",
-	"version": "0.12.7",
+	"version": "0.12.8",
 	"description": "Convert front matter yaml and json into json from loom-io files",
 	"main": "dist/exports/lib.js",
 	"module": "dist/exports/lib.js",
