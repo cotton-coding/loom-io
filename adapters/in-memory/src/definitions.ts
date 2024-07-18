@@ -6,12 +6,13 @@ export enum MEMORY_TYPE {
 
 export type MemoryObject = MemoryFile | MemoryDirectory;
 
-export type MemoryFile = {
+export interface MemoryFile {
 	$type: MEMORY_TYPE.FILE;
 	name: string;
 	ext: string | undefined;
 	content: Buffer;
 	mtime: Date;
+	birthtime: Date;
 }
 
 export type MemoryRoot = {

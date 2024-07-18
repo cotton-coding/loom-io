@@ -88,10 +88,13 @@ export class Adapter implements SourceAdapter {
 
 	async stat (path: string) {
 		const fullPath = this.getFullPath(path);
-		const {size, mtime} = await fs.stat(fullPath);
+		const {size, mtime, birthtime, ctime, atime} = await fs.stat(fullPath);
 		return {
 			size,
-			mtime
+			atime,
+			mtime,
+			ctime,
+			birthtime,
 		};
 	}
 

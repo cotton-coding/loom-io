@@ -19,12 +19,12 @@ const prepareVerify =
 			return false;
 		};
 
-export function createFrontMatterConverter<T = unknown>(config?: Config) {
+export function createFrontMatterConverter<T = unknown>(config?: Config): FileConverter<DataFormat<T | undefined>, Partial<DataFormat<T>>> {
 	return {
 		verify: prepareVerify(config),
 		parse: parse<T>,
 		unify: unify<T>,
-	} satisfies FileConverter<DataFormat<T | undefined>, Partial<DataFormat<T>>>;
+	};
 }
 
 export default createFrontMatterConverter;

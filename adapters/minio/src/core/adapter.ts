@@ -11,7 +11,12 @@ function addTailSlash(path: string): string {
 	return path.endsWith('/') ? path : `${path}/`;
 }
 
-export class Adapter implements SourceAdapter {
+type AdapterStat = {
+	size: number;
+	mtime: Date;
+};
+
+export class Adapter implements SourceAdapter<AdapterStat> {
 	constructor(
 		protected s3: Client,
 		protected bucket: string
@@ -144,6 +149,7 @@ export class Adapter implements SourceAdapter {
 
 	async stat (path: string) {
 		const stat = await this.s3.statObject(this.bucket, path);
+		console.log('stat', stat);
 		return {
 			size: stat.size,
 			mtime: stat.lastModified

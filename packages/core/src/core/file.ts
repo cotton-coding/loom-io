@@ -8,13 +8,13 @@ export interface PrefixDefinition {
 	separator: string;
 }
 
-export class LoomFile {
+export class LoomFile<T extends SourceAdapter = SourceAdapter> {
 	protected _extension: string | undefined;
 
-	static from(adapter: SourceAdapter, dir: Directory, name: string): LoomFile;
-	static from(adapter: SourceAdapter, path: string): LoomFile;
-	static from(
-		adapter: SourceAdapter,
+	static from<T extends SourceAdapter>(adapter: T, dir: Directory, name: string): LoomFile<T>;
+	static from<T extends SourceAdapter>(adapter: T, path: string): LoomFile<T>;
+	static from<T extends SourceAdapter>(
+		adapter: T,
 		dirOrPath: Directory | string,
 		name: string = ""
 	) {
@@ -27,7 +27,7 @@ export class LoomFile {
 	}
 
 	constructor(
-		protected _adapter: SourceAdapter,
+		protected _adapter: T,
 		protected _dir: Directory,
 		protected _name: string
 	) {}
@@ -75,6 +75,20 @@ export class LoomFile {
 
 		const index = Object.values(FILE_SIZE_UNIT).indexOf(unit);
 		return bytes / Math.pow(1024, index);
+	}
+
+	async getMeta() {
+		const meta = await this._adapter.stat(this.path);
+		const updatedAt = meta.mtime > (meta.ctime ?? 0) ? meta.mtime : meta.ctime;
+		return {
+			size: meta.size,
+			createdAt: meta.birthtime,
+			updatedAt
+		};
+	}
+
+	async getRawMeta() {
+		return await this._adapter.stat(this.path);
 	}
 
 	async delete() {

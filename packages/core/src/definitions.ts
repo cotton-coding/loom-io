@@ -57,7 +57,7 @@ export interface FileHandler {
 	close(): MaybePromise<void>;
 }
 
-export interface SourceAdapter {
+export interface SourceAdapter<TStat extends FileStat = FileStat> {
 	readFile(path: string): MaybePromise<Buffer>;
 	readFile(path: string, encoding: BufferEncoding): MaybePromise<string>;
 	readFile(
@@ -67,7 +67,7 @@ export interface SourceAdapter {
 	writeFile(path: string, content: string | Buffer): MaybePromise<void>;
 	deleteFile(path: string): MaybePromise<void>;
 	openFile(path: string): MaybePromise<FileHandler>;
-	stat(path: string): MaybePromise<FileStat>;
+	stat(path: string): MaybePromise<TStat>;
 	readdir(path: string): MaybePromise<ObjectDirentInterface[]>;
 	mkdir(path: string): MaybePromise<void>;
 	rmdir(path: string, options?: rmdirOptions): MaybePromise<void>;
@@ -80,4 +80,8 @@ export interface SourceAdapter {
 export interface FileStat {
 	size: number;
 	mtime: Date;
+	atime?: Date;
+	ctime?: Date;
+	birthtime?: Date;
+
 }
