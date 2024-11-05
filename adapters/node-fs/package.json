@@ -1,57 +1,57 @@
 {
-	"name": "@loom-io/node-filesystem-adapter",
-	"version": "0.12.9",
-	"main": "dist/exports/lib.js",
-	"types": "dist/exports/lib.d.ts",
-	"author": "Cotton Coding",
-	"description": "A file system wrapper for Node.js and Bun",
-	"keywords": [
-		"loom-io",
-		"fs",
-		"filesystem",
-		"node",
-		"bun",
-		"nodejs",
-		"adapter"
-	],
-	"files": [
-		"dist"
-	],
-	"type": "module",
-	"scripts": {
-		"test": "vitest --typecheck.enabled --test-timeout=500",
-		"test:ci": "npm run test -- --run --coverage",
-		"lint": "eslint --ext .ts .",
-		"lint:fix": "eslint --ext .ts . --fix",
-		"build": "tsc --project tsconfig.json",
-		"prepublishOnly": "npm run build && publint"
-	},
-	"devDependencies": {
-		"@loom-io/interface-tests": "workspace:^",
-		"@loom-io/test-utils": "workspace:^",
-		"@faker-js/faker": "^8.4.1"
-	},
-	"peerDependencies": {
-		"@loom-io/core": "workspace:^"
-	},
-	"exports": {
-		".": {
-			"types": "./dist/exports/lib.d.ts",
-			"import": "./dist/exports/lib.js"
-		}
-	},
-	"maintainers": [
-		{
-			"name": "Wolfgang Rathgeb",
-			"email": "ghost+npm@dropanote.de"
-		}
-	],
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/cotton-coding/loom-io.git"
-	},
-	"homepage": "https://loom-io.cotton-coding.com",
-	"dependencies": {
-		"@loom-io/common": "workspace:*"
-	}
+  "name": "@loom-io/node-filesystem-adapter",
+  "version": "0.12.10",
+  "main": "dist/exports/lib.js",
+  "types": "dist/exports/lib.d.ts",
+  "author": "Cotton Coding",
+  "description": "A file system wrapper for Node.js and Bun",
+  "keywords": [
+    "loom-io",
+    "fs",
+    "filesystem",
+    "node",
+    "bun",
+    "nodejs",
+    "adapter"
+  ],
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "scripts": {
+    "test": "vitest --typecheck.enabled --test-timeout=500",
+    "test:ci": "npm run test -- --run --coverage",
+    "lint": "eslint --ext .ts .",
+    "lint:fix": "eslint --ext .ts . --fix",
+    "build": "tsc --project tsconfig.json",
+    "prepublishOnly": "npm run build && publint"
+  },
+  "devDependencies": {
+    "@loom-io/interface-tests": "workspace:^",
+    "@loom-io/test-utils": "workspace:^",
+    "@faker-js/faker": "^8.4.1"
+  },
+  "peerDependencies": {
+    "@loom-io/core": "workspace:^"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/exports/lib.d.ts",
+      "import": "./dist/exports/lib.js"
+    }
+  },
+  "maintainers": [
+    {
+      "name": "Wolfgang Rathgeb",
+      "email": "ghost+npm@dropanote.de"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cotton-coding/loom-io.git"
+  },
+  "homepage": "https://loom-io.cotton-coding.com",
+  "dependencies": {
+    "@loom-io/common": "workspace:*"
+  }
 }

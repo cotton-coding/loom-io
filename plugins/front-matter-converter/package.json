@@ -1,51 +1,51 @@
 {
-	"name": "@loom-io/front-matter-converter",
-	"version": "0.12.9",
-	"description": "Convert front matter yaml and json into json from loom-io files",
-	"main": "dist/exports/lib.js",
-	"module": "dist/exports/lib.js",
-	"types": "dist/exports/lib.d.ts",
-	"type": "module",
-	"scripts": {
-		"build": "tsc --project tsconfig.json",
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"prepublishOnly": "npm run build && publint"
-	},
-	"peerDependencies": {
-		"@loom-io/converter": "workspace:^",
-		"@loom-io/core": "workspace:^"
-	},
-	"peerDependenciesMeta": {
-		"@loom-io/core": {
-			"optional": true
-		},
-		"@loom-io/converter": {
-			"optional": true
-		}
-	},
-	"dependencies": {
-		"yaml": "^2.6.0"
-	},
-	"keywords": [
-		"loom-io",
-		"loom-io-converter",
-		"yaml",
-		"front-matter",
-		"converter"
-	],
-	"author": "Wolfgang Rathgeb",
-	"files": [
-		"dist"
-	],
-	"exports": {
-		".": {
-			"types": "./dist/exports/lib.d.ts",
-			"import": "./dist/exports/lib.js"
-		}
-	},
-	"homepage": "https://loom-io.cotton-coding.com",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/cotton-coding/loom-io.git"
-	}
+  "name": "@loom-io/front-matter-converter",
+  "version": "0.12.10",
+  "description": "Convert front matter yaml and json into json from loom-io files",
+  "main": "dist/exports/lib.js",
+  "module": "dist/exports/lib.js",
+  "types": "dist/exports/lib.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm run build && publint"
+  },
+  "peerDependencies": {
+    "@loom-io/converter": "workspace:^",
+    "@loom-io/core": "workspace:^"
+  },
+  "peerDependenciesMeta": {
+    "@loom-io/core": {
+      "optional": true
+    },
+    "@loom-io/converter": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "yaml": "^2.6.0"
+  },
+  "keywords": [
+    "loom-io",
+    "loom-io-converter",
+    "yaml",
+    "front-matter",
+    "converter"
+  ],
+  "author": "Wolfgang Rathgeb",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/exports/lib.d.ts",
+      "import": "./dist/exports/lib.js"
+    }
+  },
+  "homepage": "https://loom-io.cotton-coding.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cotton-coding/loom-io.git"
+  }
 }

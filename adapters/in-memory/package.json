@@ -1,55 +1,55 @@
 {
-	"name": "@loom-io/in-memory-adapter",
-	"version": "0.12.9",
-	"main": "dist/exports/lib.js",
-	"types": "dist/exports/lib.d.ts",
-	"author": "Cotton Coding",
-	"description": "A file system wrapper for Node.js and Bun",
-	"keywords": [
-		"loom-io",
-		"in-memory",
-		"adapter"
-	],
-	"files": [
-		"dist"
-	],
-	"type": "module",
-	"scripts": {
-		"test": "vitest --typecheck.enabled --test-timeout=500",
-		"test:ci": "npm run test -- --run --coverage",
-		"lint": "eslint --ext .ts .",
-		"lint:fix": "eslint --ext .ts . --fix",
-		"build": "tsc --project tsconfig.json",
-		"prepublishOnly": "npm run build && publint"
-	},
-	"devDependencies": {
-		"@faker-js/faker": "^8.4.1",
-		"@loom-io/interface-tests": "workspace:^"
-	},
-	"peerDependencies": {
-		"@loom-io/core": "workspace:^"
-	},
-	"dependencies": {
-		"@loom-io/common": "workspace:^"
-	},
-	"exports": {
-		".": {
-			"types": "./dist/exports/lib.d.ts",
-			"import": "./dist/exports/lib.js"
-		},
-		"./internal": {
-			"types": "./dist/exports/internal.d.ts",
-			"import": "./dist/exports/internal.js"
-		}
-	},
-	"maintainers": [
-		{
-			"name": "Wolfgang Rathgeb",
-			"email": "ghost+npm@dropanote.de"
-		}
-	],
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/cotton-coding/loom-io.git"
-	}
+  "name": "@loom-io/in-memory-adapter",
+  "version": "0.12.10",
+  "main": "dist/exports/lib.js",
+  "types": "dist/exports/lib.d.ts",
+  "author": "Cotton Coding",
+  "description": "A file system wrapper for Node.js and Bun",
+  "keywords": [
+    "loom-io",
+    "in-memory",
+    "adapter"
+  ],
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "scripts": {
+    "test": "vitest --typecheck.enabled --test-timeout=500",
+    "test:ci": "npm run test -- --run --coverage",
+    "lint": "eslint --ext .ts .",
+    "lint:fix": "eslint --ext .ts . --fix",
+    "build": "tsc --project tsconfig.json",
+    "prepublishOnly": "npm run build && publint"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^8.4.1",
+    "@loom-io/interface-tests": "workspace:^"
+  },
+  "peerDependencies": {
+    "@loom-io/core": "workspace:^"
+  },
+  "dependencies": {
+    "@loom-io/common": "workspace:^"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/exports/lib.d.ts",
+      "import": "./dist/exports/lib.js"
+    },
+    "./internal": {
+      "types": "./dist/exports/internal.d.ts",
+      "import": "./dist/exports/internal.js"
+    }
+  },
+  "maintainers": [
+    {
+      "name": "Wolfgang Rathgeb",
+      "email": "ghost+npm@dropanote.de"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cotton-coding/loom-io.git"
+  }
 }

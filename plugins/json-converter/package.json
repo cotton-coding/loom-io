@@ -1,47 +1,47 @@
 {
-	"name": "@loom-io/json-converter",
-	"version": "0.12.9",
-	"description": "A plugin for @loom-io to convert json files to JSON",
-	"main": "dist/json-converter.js",
-	"module": "dist/json-converter.js",
-	"types": "dist/json-converter.d.ts",
-	"type": "module",
-	"scripts": {
-		"build": "tsc --project tsconfig.json",
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"prepublishOnly": "npm run build && publint"
-	},
-	"peerDependencies": {
-		"@loom-io/core": "workspace:^",
-		"@loom-io/converter": "workspace:^"
-	},
-	"peerDependenciesMeta": {
-		"@loom-io/core": {
-			"optional": true
-		},
-		"@loom-io/converter": {
-			"optional": true
-		}
-	},
-	"keywords": [
-		"loom-io",
-		"loom-io-converter",
-		"json",
-		"converter"
-	],
-	"author": "Wolfgang Rathgeb",
-	"files": [
-		"dist"
-	],
-	"exports": {
-		".": {
-			"types": "./dist/json-converter.d.ts",
-			"import": "./dist/json-converter.js"
-		}
-	},
-	"homepage": "https://loom-io.cotton-coding.com",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/cotton-coding/loom-io.git"
-	}
+  "name": "@loom-io/json-converter",
+  "version": "0.12.10",
+  "description": "A plugin for @loom-io to convert json files to JSON",
+  "main": "dist/json-converter.js",
+  "module": "dist/json-converter.js",
+  "types": "dist/json-converter.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm run build && publint"
+  },
+  "peerDependencies": {
+    "@loom-io/core": "workspace:^",
+    "@loom-io/converter": "workspace:^"
+  },
+  "peerDependenciesMeta": {
+    "@loom-io/core": {
+      "optional": true
+    },
+    "@loom-io/converter": {
+      "optional": true
+    }
+  },
+  "keywords": [
+    "loom-io",
+    "loom-io-converter",
+    "json",
+    "converter"
+  ],
+  "author": "Wolfgang Rathgeb",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/json-converter.d.ts",
+      "import": "./dist/json-converter.js"
+    }
+  },
+  "homepage": "https://loom-io.cotton-coding.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cotton-coding/loom-io.git"
+  }
 }
