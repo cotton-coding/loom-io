@@ -1,40 +1,40 @@
 {
-	"description": "",
-	"scripts": {
-		"build:common": "pnpm run --filter @loom-io/common build",
-		"build:core": "pnpm run --filter @loom-io/core build",
-		"build:memory": "pnpm run --filter @loom-io/in-memory-adapter build",
-		"build:pre": "pnpm run build:common && pnpm run build:core && pnpm run build:memory",
-		"build": "pnpm run build:pre && pnpm run --recursive build",
-		"prepublishOnly": "pnpm run build:pre && pnpm run --recursive prepublishOnly",
-		"test": "vitest",
-		"test:ci": "vitest --run --coverage",
-		"lint": "pnpm run --recursive lint",
-		"lint:fix": "pnpm run --recursive lint:fix",
-		"clean:dist": "rm -rf */**/dist",
-		"clean:node_modules": "rm -rf */**/node_modules && rm -rf node_modules"
-	},
-	"keywords": [],
-	"author": "",
-	"license": "Apache-2.0",
-	"maintainers": [
-		{
-			"name": "Wolfgang Rathgeb",
-			"email": "ghost+npm@dropanote.de"
-		}
-	],
-	"devDependencies": {
-		"@faker-js/faker": "^8.4.1",
-		"@types/node": "^20.12.12",
-		"@typescript-eslint/eslint-plugin": "latest",
-		"@typescript-eslint/parser": "latest",
-		"@vitest/coverage-v8": "^1.6.0",
-		"publint": "^0.2.8",
-		"typescript": "^5.4.5",
-		"vitest": "^1.6.0"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/cotton-coding/loom-io.git"
-	}
+  "description": "",
+  "scripts": {
+    "build:common": "pnpm run --filter @loom-io/common build",
+    "build:core": "pnpm run --filter @loom-io/core build",
+    "build:memory": "pnpm run --filter @loom-io/in-memory-adapter build",
+    "build:pre": "pnpm run build:common && pnpm run build:core && pnpm run build:memory",
+    "build": "pnpm run build:pre && pnpm run --recursive build",
+    "prepublishOnly": "pnpm run build:pre && pnpm run --recursive prepublishOnly",
+    "test": "vitest",
+    "test:ci": "vitest --run --coverage",
+    "lint": "pnpm run --recursive lint",
+    "lint:fix": "pnpm run --recursive lint:fix",
+    "clean:dist": "rm -rf */**/dist",
+    "clean:node_modules": "rm -rf */**/node_modules && rm -rf node_modules"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "Apache-2.0",
+  "maintainers": [
+    {
+      "name": "Wolfgang Rathgeb",
+      "email": "ghost+npm@dropanote.de"
+    }
+  ],
+  "devDependencies": {
+    "@faker-js/faker": "^8.4.1",
+    "@types/node": "^20.17.6",
+    "@typescript-eslint/eslint-plugin": "latest",
+    "@typescript-eslint/parser": "latest",
+    "@vitest/coverage-v8": "^2.1.4",
+    "publint": "^0.2.12",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cotton-coding/loom-io.git"
+  }
 }
