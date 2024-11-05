@@ -1,11 +1,11 @@
 export function isInstanceOfLoomException(err: unknown, ref: EXCEPTION_REF) {
-	return (
-		err != null &&
+  return (
+    err != null &&
 		typeof err === "object" &&
 		!Array.isArray(err) &&
 		"__loomExceptionRef" in err &&
 		err.__loomExceptionRef === ref
-	);
+  );
 }
 
 export enum EXCEPTION_REF {
@@ -20,21 +20,21 @@ interface LoomException {
 }
 
 export class PathNotFoundException extends Error implements LoomException {
-	__loomExceptionRef = EXCEPTION_REF.PATH_NOT_EXISTS;
-	constructor(protected _path: string) {
-		super(`Path ${_path} does not exist`);
-	}
+  __loomExceptionRef = EXCEPTION_REF.PATH_NOT_EXISTS;
+  constructor(protected _path: string) {
+    super(`Path ${_path} does not exist`);
+  }
 
-	get path() {
-		return this._path;
-	}
+  get path() {
+    return this._path;
+  }
 }
 
 export class DirectoryNotEmptyException extends Error implements LoomException {
-	__loomExceptionRef = EXCEPTION_REF.DIRECTORY_NOT_EMPTY;
-	_path: string;
-	constructor(path: string) {
-		super(`Directory ${path} is not empty`);
-		this._path = path;
-	}
+  __loomExceptionRef = EXCEPTION_REF.DIRECTORY_NOT_EMPTY;
+  _path: string;
+  constructor(path: string) {
+    super(`Directory ${path} is not empty`);
+    this._path = path;
+  }
 }
