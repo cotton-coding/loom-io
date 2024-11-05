@@ -123,8 +123,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/core
       yaml:
-        specifier: ^2.4.1
-        version: 2.4.1
+        specifier: ^2.6.0
+        version: 2.6.0
 
   plugins/json-converter:
     dependencies:
@@ -144,8 +144,8 @@ importers:
         specifier: workspace:^
         version: link:../../packages/core
       yaml:
-        specifier: ^2.4.1
-        version: 2.4.1
+        specifier: ^2.6.0
+        version: 2.6.0
 
   tests/interface-tests:
     dependencies:
@@ -1810,8 +1810,8 @@ packages:
     resolution: {integrity: sha512-fDlsI/kFEx7gLvbecc0/ohLG50fugQp8ryHzMTuW9vSa1GJ0XYWKnhsUx7oie3G98+r56aTQIUB4kht42R3JvA==}
     engines: {node: '>=4.0'}
 
-  yaml@2.4.1:
-    resolution: {integrity: sha512-pIXzoImaqmfOrL7teGUBt/T7ZDnyeGBWyXQBvOVhLkWLN37GXv8NMLK406UY6dS51JfcQHsmcW5cJ441bHg6Lg==}
+  yaml@2.6.0:
+    resolution: {integrity: sha512-a6ae//JvKDEra2kdi1qzCyrJW/WZCgFi8ydDV+eXExl95t+5R+ijnqHJbz9tmMh8FUjx3iv2fCQ4dclAQlO2UQ==}
     engines: {node: '>= 14'}
     hasBin: true
 
@@ -3485,6 +3485,6 @@ snapshots:
 
   xmlbuilder@11.0.1: {}
 
-  yaml@2.4.1: {}
+  yaml@2.6.0: {}
 
   yocto-queue@0.1.0: {}

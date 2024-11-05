@@ -12,8 +12,8 @@
 		"prepublishOnly": "npm run build && publint"
 	},
 	"peerDependencies": {
-		"@loom-io/core": "workspace:^",
-		"@loom-io/converter": "workspace:^"
+		"@loom-io/converter": "workspace:^",
+		"@loom-io/core": "workspace:^"
 	},
 	"peerDependenciesMeta": {
 		"@loom-io/core": {
@@ -24,7 +24,7 @@
 		}
 	},
 	"dependencies": {
-		"yaml": "^2.4.1"
+		"yaml": "^2.6.0"
 	},
 	"keywords": [
 		"loom-io",
