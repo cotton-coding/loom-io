@@ -136,7 +136,7 @@ export class Editor implements Reader, Writer, ReaderInternal, Disposable{
 			const chunk = await this.read(position, length);
 			const matches = this.searchInChunk(value, chunk);
 			item = this.convertChunkMatchesToItems(matches, valueLength, position);
-			position += (chunkSize - valueLength/2);
+      position += chunkSize - Math.floor(valueLength / 2);
 		} while (item === undefined && position < last);
 
 		return item?.getFirstItem();
