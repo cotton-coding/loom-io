@@ -3,7 +3,7 @@ import { TestAdapter } from '@loom-io/interface-tests';
 import { Adapter } from '../src/core/adapter.js';
 
 async function createAdapter(): Promise<Adapter> {
-	return new Adapter();
+  return new Adapter();
 }
 
 
