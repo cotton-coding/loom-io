@@ -1,50 +1,50 @@
 {
-	"name": "@loom-io/yaml-converter",
-	"version": "0.12.9",
-	"description": "Convert yaml files to json with loom-io",
-	"main": "dist/yaml-converter.js",
-	"module": "dist/yaml-converter.js",
-	"types": "dist/yaml-converter.d.ts",
-	"type": "module",
-	"scripts": {
-		"build": "tsc --project tsconfig.json",
-		"test": "echo \"Error: no test specified\" && exit 1",
-		"prepublishOnly": "npm run build && publint"
-	},
-	"peerDependencies": {
-		"@loom-io/core": "workspace:^",
-		"@loom-io/converter": "workspace:^"
-	},
-	"peerDependenciesMeta": {
-		"@loom-io/core": {
-			"optional": true
-		},
-		"@loom-io/converter": {
-			"optional": true
-		}
-	},
-	"dependencies": {
-		"yaml": "^2.4.1"
-	},
-	"keywords": [
-		"loom-io",
-		"loom-io-converter",
-		"yaml",
-		"converter"
-	],
-	"author": "Wolfgang Rathgeb",
-	"files": [
-		"dist"
-	],
-	"exports": {
-		".": {
-			"types": "./dist/yaml-converter.d.ts",
-			"import": "./dist/yaml-converter.js"
-		}
-	},
-	"homepage": "https://loom-io.cotton-coding.com",
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/cotton-coding/loom-io.git"
-	}
+  "name": "@loom-io/yaml-converter",
+  "version": "0.12.10",
+  "description": "Convert yaml files to json with loom-io",
+  "main": "dist/yaml-converter.js",
+  "module": "dist/yaml-converter.js",
+  "types": "dist/yaml-converter.d.ts",
+  "type": "module",
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm run build && publint"
+  },
+  "peerDependencies": {
+    "@loom-io/converter": "workspace:^",
+    "@loom-io/core": "workspace:^"
+  },
+  "peerDependenciesMeta": {
+    "@loom-io/core": {
+      "optional": true
+    },
+    "@loom-io/converter": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "yaml": "^2.6.0"
+  },
+  "keywords": [
+    "loom-io",
+    "loom-io-converter",
+    "yaml",
+    "converter"
+  ],
+  "author": "Wolfgang Rathgeb",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/yaml-converter.d.ts",
+      "import": "./dist/yaml-converter.js"
+    }
+  },
+  "homepage": "https://loom-io.cotton-coding.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cotton-coding/loom-io.git"
+  }
 }
