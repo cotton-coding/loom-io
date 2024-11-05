@@ -7,24 +7,24 @@ import { Directory, LoomFile } from "@loom-io/core/internal";
 import { join as joinPath } from "node:path";
 
 export class FilesystemAdapter implements LoomSourceAdapter {
-	protected adapter: Adapter;
-	protected rootdir: PathLike;
-	constructor(rootdir: PathLike = process.cwd()) {
-		this.rootdir = rootdir;
-		this.adapter = new Adapter(rootdir);
-	}
-	file(path: string): LoomFile {
-		const dir = new Directory(this.adapter, dirname(path));
-		return new LoomFile(this.adapter, dir, basename(path));
-	}
-	dir(path: string): Directory {
-		return new Directory(this.adapter, path);
-	}
+  protected adapter: Adapter;
+  protected rootdir: PathLike;
+  constructor(rootdir: PathLike = process.cwd()) {
+    this.rootdir = rootdir;
+    this.adapter = new Adapter(rootdir);
+  }
+  file(path: string): LoomFile {
+    const dir = new Directory(this.adapter, dirname(path));
+    return new LoomFile(this.adapter, dir, basename(path));
+  }
+  dir(path: string): Directory {
+    return new Directory(this.adapter, path);
+  }
 
-	getFullPath(dirOrFile: Directory | LoomFile, ignoreAdapter = false) {
-		if (!ignoreAdapter && this.adapter !== dirOrFile.adapter) {
-			throw new Error("The directory or file does not belong to this adapter");
-		}
-		return joinPath(this.rootdir.toString(), dirOrFile.path);
-	}
+  getFullPath(dirOrFile: Directory | LoomFile, ignoreAdapter = false) {
+    if (!ignoreAdapter && this.adapter !== dirOrFile.adapter) {
+      throw new Error("The directory or file does not belong to this adapter");
+    }
+    return joinPath(this.rootdir.toString(), dirOrFile.path);
+  }
 }

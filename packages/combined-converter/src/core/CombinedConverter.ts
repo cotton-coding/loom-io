@@ -72,6 +72,7 @@ export class CombinedConverter<T> implements FileConverter {
           return Promise.reject();
         }),
       );
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       if (this.config.failOnNoConverter) {
         throw new NoValidFileConverterException(file.name);
@@ -83,6 +84,7 @@ export class CombinedConverter<T> implements FileConverter {
     try {
       await this.getConverter(file);
       return true;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       return false;
     }
