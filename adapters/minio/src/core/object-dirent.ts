@@ -1,6 +1,7 @@
 import { ObjectDirentInterface } from '@loom-io/core';
 import { BucketItem } from 'minio';
 import { addPrecedingAndTailingSlash } from '@loom-io/common';
+import { normalize } from 'node:path';
 
 export class ObjectDirent implements ObjectDirentInterface{
 
@@ -44,7 +45,7 @@ export class ObjectDirent implements ObjectDirentInterface{
 
   get path() {
     const [path] = this.getPathAndName();
-    return addPrecedingAndTailingSlash(path);
+    return normalize(addPrecedingAndTailingSlash(path));
   }
 
 }
