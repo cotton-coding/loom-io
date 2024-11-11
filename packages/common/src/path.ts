@@ -1,12 +1,14 @@
+import {sep} from 'node:path'
+
 export function removePrecedingSlash(path: string): string {
-	if (path.startsWith('/')) {
+	if (path.startsWith(sep)) {
 		return path.slice(1);
 	}
 	return path;
 }
 
 export function removeTailingSlash(path: string): string {
-	if (path.endsWith('/')) {
+	if (path.endsWith(sep)) {
 		return path.slice(0, -1);
 	}
 	return path;
@@ -16,15 +18,15 @@ export function removePrecedingAndTrailingSlash(path: string): string {
 }
 
 export function addPrecedingSlash(path: string): string {
-	if (!path.startsWith('/')) {
-		return `/${path}`;
+	if (!path.startsWith(sep)) {
+		return `${sep}${path}`;
 	}
 	return path;
 }
 
 export function addTailingSlash(path: string): string {
-	if (!path.endsWith('/')) {
-		return `${path}/`;
+	if (!path.endsWith(sep)) {
+		return `${path}${sep}`;
 	}
 	return path;
 }
@@ -34,18 +36,18 @@ export function addPrecedingAndTailingSlash(path: string): string {
 }
 
 export function splitTailingPath(path: string): [string, string] | [string, undefined] | [string, string]{
-	if(path === '' || path === '/') {
-		return ['/', undefined];
+	if(path === '' || path === sep) {
+		return [sep, undefined];
 	}
-	const index = removeTailingSlash(path).lastIndexOf('/');
+	const index = removeTailingSlash(path).lastIndexOf(sep);
 	if (index === -1) {
-		return ['/', path];
+		return [sep, path];
 	}
 	return [path.slice(0, index + 1), path.slice(index + 1)];
 }
 
 export function getPathDepth(path: string): number {
-	const elements = removePrecedingAndTrailingSlash(path).split('/');
+	const elements = removePrecedingAndTrailingSlash(path).split(sep);
 	if (elements.length === 1 && elements[0] === '') {
 		return 0;
 	}
@@ -62,19 +64,19 @@ export function getPathDepth(path: string): number {
  * @returns
  */
 export function getSegmentsOfPath(path: string, depth: number): string {
-	const isRelative = path.startsWith('./');
-	const firstIsSlash = path.startsWith('/');
-	const parts = removePrecedingAndTrailingSlash(path).split('/');
+	const isRelative = path.startsWith(`.${sep}`);
+	const firstIsSlash = path.startsWith(sep);
+	const parts = removePrecedingAndTrailingSlash(path).split(sep);
 	if (depth === 0) {
-		return '/';
+		return sep;
 	} else if (depth >= parts.length || (isRelative && depth === parts.length - 1)) {
 		return path;
 	} else {
 		if(isRelative) {
-			return `${parts.slice(0, depth+1).join('/')}/`;
+			return `${parts.slice(0, depth+1).join(sep)}/`;
 		}
-		const subPath = parts.slice(0, depth).join('/');
-		return `${firstIsSlash ? '/' : ''}${subPath}/`;
+		const subPath = parts.slice(0, depth).join(sep);
+		return `${firstIsSlash ? sep : ''}${subPath}${sep}`;
 	}
 }
 
@@ -89,7 +91,7 @@ export function getSegmentsOfPath(path: string, depth: number): string {
  */
 export function getUniqSegmentsOfPath(paths: string[], depth: number): string[] {
 	return Array.from(paths.reduce((acc, path) => {
-		path = path.startsWith('./') ? path.slice(2) : path;
+		path = path.startsWith(`.${sep}`) ? path.slice(2) : path;
 		const first = getSegmentsOfPath(path, depth);
 		acc.add(removeTailingSlash(first));
 		return acc;
