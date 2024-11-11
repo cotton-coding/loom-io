@@ -68,7 +68,7 @@ export class Adapter implements SourceAdapter<AdapterStat> {
 
   async dirExists(path: string): Promise<boolean> {
     const pathWithTailSlash = this.translatePath(addTailingSlash(path));
-    if (path === "/") {
+    if (pathWithTailSlash === "/") {
       return true;
     }
     return this.exists(pathWithTailSlash);

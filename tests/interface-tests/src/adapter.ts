@@ -470,7 +470,7 @@ export const TestAdapter = (
       );
 
       test.sequential("should handle root slash", async () => {
-        const path = "/";
+        const path = sep;
         await adapter.mkdir(path);
         expect(await adapter.dirExists(path)).toBe(true);
         expect(await adapter.readdir(path)).toHaveLength(0);
