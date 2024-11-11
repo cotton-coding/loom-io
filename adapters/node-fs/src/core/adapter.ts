@@ -3,7 +3,7 @@ import * as fs from 'node:fs/promises';
 import type { SourceAdapter, rmdirOptions, ObjectDirentInterface } from '@loom-io/core';
 import { DirectoryNotEmptyException, PathNotFoundException } from '@loom-io/core';
 import { PathLike } from 'node:fs';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, normalize, resolve, sep } from 'node:path';
 import { isNodeErrnoExpression } from '../utils/error-handling.js';
 import { ObjectDirent } from './object-dirent.js';
 export class Adapter implements SourceAdapter {
@@ -14,7 +14,7 @@ export class Adapter implements SourceAdapter {
     rootdir: PathLike = process.cwd(),
   ) {
     const fullPath = resolve(rootdir.toString());
-    this.rootdir = fullPath.endsWith('/') ? fullPath : `${fullPath}/`;
+    this.rootdir = fullPath.endsWith(sep) ? fullPath : normalize(`${fullPath}/`);
   }
 
   get raw() {
@@ -22,11 +22,15 @@ export class Adapter implements SourceAdapter {
   }
 
   protected getFullPath(path: string): string {
+    console.log({path, rootdir: this.rootdir});
+    if(path.match(/^[A-Za-z]{1}:/) && !['', '\\'].includes(this.rootdir)) {
+      return join(this.rootdir, path.slice(2));
+    }
     return join(this.rootdir || '', path);
   }
 
   protected getRelativePath(path: string): string {
-    return path.replace(this.rootdir, '/');
+    return path.replace(this.rootdir, sep);
   }
 
   protected async exists(path: string, ref: number): Promise<boolean> {
@@ -50,6 +54,7 @@ export class Adapter implements SourceAdapter {
 
   async mkdir(path: string): Promise<void> {
     const fullPath = this.getFullPath(path);
+    console.log({fullPath});
     await fs.mkdir(fullPath, { recursive: true });
   }
 
@@ -65,11 +70,11 @@ export class Adapter implements SourceAdapter {
       const fullPath = this.getFullPath(path);
       if(options.recursive || options.force) {
         await fs.rm(fullPath, options);
-        if(path === '/' || path === '') {
+        if(path === sep || path === '') {
           await fs.mkdir(this.rootdir);
         }
       } else {
-        if(path !== '/' && path !== '') {
+        if(path !== sep && path !== '') {
           await fs.rmdir(fullPath);
         }
       }

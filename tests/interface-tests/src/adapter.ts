@@ -441,7 +441,8 @@ export const TestAdapter = (
       expect(dirent.isFile()).toBe(true);
       expect(dirent.isDirectory()).toBe(false);
       expect(dirent.name).toBe(fileName);
-      expect(dirent.path).toBe(path.startsWith(sep) ? path : normalize(`/${path}`));
+      const pathRef = path.match(/^([A-Za-z]:)?[\\/]/) ? path.slice(2) : path;
+      expect(dirent.path).toBe(pathRef.startsWith(sep) ? pathRef : normalize(`/${pathRef}`));
     });
 
     describe.sequential("root directory tests", () => {
