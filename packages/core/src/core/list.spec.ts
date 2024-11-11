@@ -4,6 +4,7 @@ import { Directory } from './dir.js';
 import { LoomFile } from './file.js';
 import { InMemoryAdapterHelper } from '@loom-io/test-utils';
 import { getUniqSegmentsOfPath, removePrecedingSlash } from '@loom-io/common';
+import { normalize, sep } from 'node:path';
 
 class RevealedList extends List {
 
@@ -73,15 +74,15 @@ describe('Test List', () => {
 
     test('Concat Lists', async () => {
 
-      await adapterHelper.createFile('testDir/testFile.txt');
+      await adapterHelper.createFile(normalize('testDir/testFile.txt'));
       const base1 = 'cotton';
       const base2 = 'wool';
 
       const testPaths1 = adapterHelper.createMultipleDirectories(7, base1);
       const testPaths2 = adapterHelper.createMultipleDirectories(13, base2);
 
-      const basePaths1 = Array.from(new Set(testPaths1.map((path) => removePrecedingSlash(path).split('/').splice(1, 1)).flat()));
-      const basePaths2 = Array.from(new Set(testPaths2.map((path) => removePrecedingSlash(path).split('/').splice(1, 1)).flat()));
+      const basePaths1 = Array.from(new Set(testPaths1.map((path) => removePrecedingSlash(path).split(sep).splice(1, 1)).flat()));
+      const basePaths2 = Array.from(new Set(testPaths2.map((path) => removePrecedingSlash(path).split(sep).splice(1, 1)).flat()));
 
       const dir1 = new Directory(adapter, base1);
       const dir2 = new Directory(adapter, base2);
@@ -120,7 +121,7 @@ describe('Test List', () => {
       await adapterHelper.createFile('testFile.txt');
 
       // TODO: Handle '/' and './' and '.'
-      const dir = new Directory(adapter, '/');
+      const dir = new Directory(adapter, sep);
       const list = await dir.list();
       const filtered = list.filter((wrap) => wrap.name === 'testDir');
       expect(filtered).toBeInstanceOf(List);
@@ -131,11 +132,11 @@ describe('Test List', () => {
     test('filter function with subDir', async () => {
       const subDirName = 'testDir';
       adapterHelper.createDirectory(subDirName);
-      adapterHelper.createFile(`${subDirName}/some.log`, 'lorem');
+      adapterHelper.createFile(normalize(`${subDirName}/some.log`), 'lorem');
       adapterHelper.createMultipleDirectories();
       adapterHelper.createFile('testFile.txt');
 
-      const dir = new Directory(adapter, '/');
+      const dir = new Directory(adapter, sep);
       const list = await dir.list();
       const filtered = list.filter((wrap) => wrap.name === subDirName);
       expect(filtered).toBeInstanceOf(List);
@@ -153,7 +154,7 @@ describe('Test List', () => {
       await adapterHelper.createMultipleDirectories();
       await adapterHelper.createFile('testFile.txt');
 
-      const dir = new Directory(adapter, '/');
+      const dir = new Directory(adapter, sep);
       const list = await dir.list();
       const filtered = list.filterByType('isDirectory');
       expect(filtered).toBeInstanceOf(List);
@@ -173,7 +174,7 @@ describe('Test List', () => {
       await adapterHelper.createFile();
 
 
-      const dir = new Directory(adapter, '/');
+      const dir = new Directory(adapter, sep);
       const list = await dir.list();
       const filtered = list.filterByType('isFile');
       expect(filtered).toBeInstanceOf(List);
@@ -206,7 +207,7 @@ describe('Test List', () => {
 
       const total = amount + 2;
 
-      const dir = new Directory(adapter, '/');
+      const dir = new Directory(adapter, sep);
       const list = await dir.list();
       expect(list).toHaveLength(total);
 
@@ -242,7 +243,7 @@ describe('Test List', () => {
 
       const total = amount + 2;
 
-      const dir = new Directory(adapter, '/');
+      const dir = new Directory(adapter, sep);
       const list = await dir.list();
       expect(list).toHaveLength(total);
     });
@@ -255,7 +256,7 @@ describe('Test List', () => {
 
       const total = amount + 2;
 
-      const dir = new Directory(adapter, '/');
+      const dir = new Directory(adapter, sep);
       const list = await dir.list();
       expect(list).toHaveLength(total);
 
@@ -274,7 +275,7 @@ describe('Test List', () => {
 
       const total = amount + 2;
 
-      const dir = new Directory(adapter, '/');
+      const dir = new Directory(adapter, sep);
       const list = await dir.list();
       expect(list).toHaveLength(total);
 
@@ -289,7 +290,7 @@ describe('Test List', () => {
   describe('protected functions', () => {
 
     test('Add DirentWrapper', async () => {
-      const dir = new Directory(adapter, './test/data');
+      const dir = new Directory(adapter, normalize('./test/data'));
       const list = await dir.list();
       const revealedList = new RevealedList(list);
       const paths = revealedList.getWraps();
@@ -299,7 +300,7 @@ describe('Test List', () => {
     });
 
     test('Add List', async () => {
-      const dir = new Directory(adapter, './test/data');
+      const dir = new Directory(adapter, normalize('./test/data'));
       const list = await dir.list();
       const revealedList = new RevealedList(list);
       const newList = new RevealedList();

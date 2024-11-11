@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest';
 import { Editor, Reader } from './editor.js';
-import { dirname, basename } from 'node:path';
+import { dirname, basename, normalize } from 'node:path';
 import { Directory } from './dir.js';
 import { LoomFile } from './file.js';
 
@@ -16,9 +16,9 @@ function createEditor(adapter, testFile: string): Promise<Editor> {
   return Editor.from(adapter, file);
 }
 
-const TEST_FILE_PATH = '/test/data/editor.md';
-const TEST_TXT_FILE_PATH = '/test/data/test.txt';
-const TEST_EMPTY_FILE_PATH = '/test/data/empty.txt';
+const TEST_FILE_PATH = normalize('/test/data/editor.md');
+const TEST_TXT_FILE_PATH = normalize('/test/data/test.txt');
+const TEST_EMPTY_FILE_PATH = normalize('/test/data/empty.txt');
 
 class TestEditor extends Editor {
 
@@ -81,7 +81,7 @@ I already started to implement some ideas, but only two had the ability to get s
 I also have some ideas in my mind, but not sure if they are worth to invest time. I am open to good ideas, co-founders, or only a good Open-Source project.
 ### EOF`;
     await testHelper.createFile(TEST_FILE_PATH, testFileContent);
-    await testHelper.createFile('/test/data/test.txt', 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.');
+    await testHelper.createFile(normalize('/test/data/test.txt'), 'Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.');
     await testHelper.createFile(TEST_EMPTY_FILE_PATH, '');
   });
 
@@ -465,7 +465,7 @@ I also have some ideas in my mind, but not sure if they are worth to invest time
 
     test('read file with only one line', async () => {
       const longText = faker.lorem.words(10000);
-      testHelper.createFile('/test/data/test_large.txt', longText);
+      testHelper.createFile(normalize('/test/data/test_large.txt'), longText);
       const fileContentLength = longText.length;
       const reader = await createEditor(adapter, '/test/data/test_large.txt');
       const resultForward = await reader.firstLine();
