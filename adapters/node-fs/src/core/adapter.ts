@@ -22,7 +22,6 @@ export class Adapter implements SourceAdapter {
   }
 
   protected getFullPath(path: string): string {
-    console.log({path, rootdir: this.rootdir});
     if(path.match(/^[A-Za-z]{1}:/) && !['', '\\'].includes(this.rootdir)) {
       return join(this.rootdir, path.slice(2));
     }
@@ -54,7 +53,6 @@ export class Adapter implements SourceAdapter {
 
   async mkdir(path: string): Promise<void> {
     const fullPath = this.getFullPath(path);
-    console.log({fullPath});
     await fs.mkdir(fullPath, { recursive: true });
   }
 

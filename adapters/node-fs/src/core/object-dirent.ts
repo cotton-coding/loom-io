@@ -22,7 +22,6 @@ export class ObjectDirent implements ObjectDirentInterface{
   }
 
   get path() {
-    console.log({rootPath: this._rootPath, dirent: this._dirent});
     const pathFromRelativeRoot = this._dirent.parentPath.slice(this._rootPath.length);
     if(process.version.startsWith('v18') && pathFromRelativeRoot.endsWith(this.name)) {
       return addPrecedingAndTailingSlash(pathFromRelativeRoot.slice(0, -this.name.length));
