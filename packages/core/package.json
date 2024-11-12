@@ -1,6 +1,6 @@
 {
   "name": "@loom-io/core",
-  "version": "0.12.10",
+  "version": "0.12.11",
   "main": "dist/exports/lib.js",
   "types": "dist/exports/lib.d.ts",
   "author": "Cotton Coding",

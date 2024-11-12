@@ -1,6 +1,6 @@
 {
   "name": "@loom-io/test-utils",
-  "version": "0.12.10",
+  "version": "0.12.11",
   "description": "Utils for testing loom-io packages",
   "main": "./dist/index.js",
   "type": "module",
