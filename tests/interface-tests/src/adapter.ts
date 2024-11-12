@@ -13,7 +13,7 @@ import {
   type SourceAdapter,
 } from "@loom-io/core";
 import { faker } from "@faker-js/faker";
-import { basename, dirname, join } from "node:path";
+import { basename, dirname, join, normalize, sep } from "node:path";
 import { getUniqSegmentsOfPath, splitTailingPath } from "@loom-io/common";
 import { nanoid } from "nanoid";
 
@@ -108,7 +108,7 @@ export const TestAdapter = (
     };
   }
 
-  describe.concurrent("Adapter", async () => {
+  describe("Adapter", async () => {
     if (config?.beforeAll) {
       beforeAll(config.beforeAll);
     }
@@ -144,10 +144,10 @@ export const TestAdapter = (
     });
 
     test("rmdir with file should fail", async () => {
-      const path = getRandomPath("test/other/mkdir");
+      const path = getRandomPath(normalize("test/other/mkdir"));
       const fileName = faker.system.commonFileName("txt");
       await adapter.mkdir(path);
-      await adapter.writeFile(`${path}/${fileName}`, "test");
+      await adapter.writeFile(normalize(`${path}/${fileName}`), "test");
       expect(async () => await adapter.rmdir(path)).rejects.toThrow(
         DirectoryNotEmptyException,
       );
@@ -163,7 +163,7 @@ export const TestAdapter = (
     test("exists with path", async () => {
       const path = getRandomPath();
       await adapter.mkdir(path);
-      const subPath = path.split("/").slice(0, -1).join("/");
+      const subPath = path.split(sep).slice(0, -1).join(sep);
       expect(await adapter.dirExists(path)).toBe(true);
       expect(await adapter.dirExists(subPath)).toBe(true);
     });
@@ -177,20 +177,20 @@ export const TestAdapter = (
     });
 
     test("list dir content", async () => {
-      await adapter.mkdir("list-dir-content/list");
-      await adapter.writeFile("list-dir-content/list/file.txt", "test");
-      const list = await adapter.readdir("list-dir-content/list/");
+      await adapter.mkdir(normalize("list-dir-content/list"));
+      await adapter.writeFile(normalize("list-dir-content/list/file.txt"), "test");
+      const list = await adapter.readdir(normalize("list-dir-content/list/"));
       expect(list).toHaveLength(1);
       expect(list[0].name).toEqual("file.txt");
       expect(list[0].isFile()).toBe(true);
       expect(list[0].isDirectory()).toBe(false);
-      expect(list[0].path).toEqual("/list-dir-content/list/");
+      expect(list[0].path).toEqual(normalize("/list-dir-content/list/"));
     });
 
     test("list dir content with multiple sub directories", async () => {
       const basePath = getRandomPath("list-dir-content");
       await adapter.mkdir(basePath);
-      const dirs = ["a/cow", "b/ape", "c/human"];
+      const dirs = ["a/cow", "b/ape", "c/human"].map(normalize);
       const dirPromises = dirs.map(async (dir) => {
         await adapter.mkdir(join(basePath, dir));
       });
@@ -210,22 +210,22 @@ export const TestAdapter = (
         "cotton-coding",
         "loom-io",
         "some",
-      ];
+      ].map(normalize);
       const files = [
         "some/file.txt",
         "cotton-file.md",
         "not-ignore-this.yml",
         "there-is-more.txt",
-      ];
+      ].map(normalize);
 
       const firstLevelDirsAndFiles = new Set<string>();
       const dirPromises = dirs.map(async (dir) => {
-        const first = dir.split("/")[0];
+        const first = dir.split(sep)[0];
         firstLevelDirsAndFiles.add(first);
         await adapter.mkdir(join(basePath, dir));
       });
       const filePromises = files.map(async (file) => {
-        const first = file.split("/")[0];
+        const first = file.split(sep)[0];
         firstLevelDirsAndFiles.add(first);
         await adapter.mkdir(dirname(join(basePath, file)));
         await adapter.writeFile(join(basePath, file), Math.random().toString());
@@ -256,7 +256,7 @@ export const TestAdapter = (
       const path = getRandomPath("test/other/mkdir");
       const fileName = faker.system.commonFileName("txt");
       try {
-        await adapter.writeFile(`${path}/${fileName}`, "test");
+        await adapter.writeFile(normalize(`${path}/${fileName}`), "test");
       } catch (error) {
         expect(error).toBeInstanceOf(PathNotFoundException);
       }
@@ -430,7 +430,7 @@ export const TestAdapter = (
 
     test("Validate DirentObject of file", async () => {
       const file = await getRandomPath(faker.system.commonFileName("md"));
-      const path = `${dirname(file)}/`;
+      const path = normalize(`${dirname(file)}/`);
       const fileName = basename(file);
       const content = faker.lorem.words(100);
       await adapter.mkdir(path);
@@ -441,16 +441,17 @@ export const TestAdapter = (
       expect(dirent.isFile()).toBe(true);
       expect(dirent.isDirectory()).toBe(false);
       expect(dirent.name).toBe(fileName);
-      expect(dirent.path).toBe(path.startsWith("/") ? path : `/${path}`);
+      const pathRef = path.match(/^([A-Za-z]{1}:)[\\/]/) ? path.slice(2) : path;
+      expect(dirent.path).toBe(pathRef.startsWith(sep) ? pathRef : normalize(`/${pathRef}`));
     });
 
     describe.sequential("root directory tests", () => {
       beforeEach(async () => {
-        await adapter.rmdir("/", { recursive: true });
+        await adapter.rmdir(sep, { recursive: true });
       });
 
       afterAll(async () => {
-        await adapter.rmdir("/", { recursive: true });
+        await adapter.rmdir(sep, { recursive: true });
       });
 
       test.sequential(
@@ -461,7 +462,7 @@ export const TestAdapter = (
           );
           const paths = await createMultipleDirectories(adapter, 50);
           const amount = getUniqSegmentsOfPath(paths, 1).length;
-          const read = await adapter.readdir("/");
+          const read = await adapter.readdir(sep);
           expect(read.length).toBe(amount);
           finish();
         },
@@ -469,7 +470,7 @@ export const TestAdapter = (
       );
 
       test.sequential("should handle root slash", async () => {
-        const path = "/";
+        const path = sep;
         await adapter.mkdir(path);
         expect(await adapter.dirExists(path)).toBe(true);
         expect(await adapter.readdir(path)).toHaveLength(0);
@@ -481,15 +482,15 @@ export const TestAdapter = (
           const finish = beginTest(
             "list dir content with multiple objects in sub directory",
           );
-          await adapter.mkdir("list-dir-content/list");
-          await adapter.writeFile("list-dir-content/list/file.txt", "test");
+          await adapter.mkdir(normalize("list-dir-content/list"));
+          await adapter.writeFile(normalize("list-dir-content/list/file.txt"), "test");
 
-          const list = await adapter.readdir("/");
+          const list = await adapter.readdir(sep);
           expect(list).toHaveLength(1);
           expect(list[0].name).toEqual("list-dir-content");
           expect(list[0].isFile()).toBe(false);
           expect(list[0].isDirectory()).toBe(true);
-          expect(list[0].path).toEqual("/");
+          expect(list[0].path).toEqual(sep);
           finish();
         },
       );

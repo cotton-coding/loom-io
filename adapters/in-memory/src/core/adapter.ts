@@ -5,7 +5,7 @@ import { ObjectDirent } from './object-dirent.js';
 import { MEMORY_TYPE, MemoryDirectory, MemoryFile, MemoryObject, MemoryRoot } from '../definitions.js';
 import { isMemoryDirectoryAndMatchNamePrepared } from '../utils/validations.js';
 import { removePrecedingAndTrailingSlash, splitTailingPath } from '@loom-io/common';
-import { basename, dirname } from 'path';
+import { basename, dirname, sep } from 'node:path';
 export class Adapter implements SourceAdapter {
 
   protected storage: MemoryRoot;
@@ -33,10 +33,10 @@ export class Adapter implements SourceAdapter {
   protected getLastPartOfPath(path: string | undefined, ref?: MEMORY_TYPE): MemoryObject | MemoryRoot;
   protected getLastPartOfPath(path: string | undefined, ref?: MEMORY_TYPE): MemoryObject | MemoryRoot {
     path = path?.trim();
-    if(path === undefined || path === '' || path === '/' || path === '.') {
+    if(path === undefined || path === '' || path === sep || path === '.') {
       return this.storage;
     }
-    const parts = removePrecedingAndTrailingSlash(path).split('/');
+    const parts = removePrecedingAndTrailingSlash(path).split(sep);
     const lastPart = parts.pop();
     if(lastPart === undefined) {
       return this.storage;
@@ -96,8 +96,7 @@ export class Adapter implements SourceAdapter {
   protected createObject(path: string, ref: MEMORY_TYPE.FILE): MemoryFile;
   protected createObject(path: string, ref: MEMORY_TYPE.DIRECTORY): MemoryDirectory;
   protected createObject(path: string, ref: MEMORY_TYPE): MemoryObject {
-
-    const parts = removePrecedingAndTrailingSlash(path).split('/');
+    const parts = removePrecedingAndTrailingSlash(path).split(sep);
     try {
       const lastPart = this.getLastPartOfPath(path);
       throw new AlreadyExistsException(path, lastPart);
@@ -138,7 +137,7 @@ export class Adapter implements SourceAdapter {
 
   mkdir(path: string): void {
     path = path.trim();
-    if(path === '/' || path === '') {
+    if(path === sep || path === '') {
       return;
     }
     try {
@@ -214,7 +213,7 @@ export class Adapter implements SourceAdapter {
       file.mtime = new Date();
     } catch (err) {
       if(err instanceof NotFoundException) {
-        if(removePrecedingAndTrailingSlash(path).split('/').length === err.depth + 1) {
+        if(removePrecedingAndTrailingSlash(path).split(sep).length === err.depth + 1) {
           const [,tail] = splitTailingPath(path);
           if(tail === undefined) {
             throw new Error('Invalid path'); // TODO: Create a custom exception

@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach, afterEach } from "vitest";
 import { Directory } from "./dir.js";
-import { join as joinPath } from "node:path";
+import { join as joinPath, normalize, sep } from "node:path";
 import { InMemoryAdapterHelper } from "@loom-io/test-utils";
 import { LoomFile } from "./file.js";
 import { DirectoryNotEmptyException } from "../exceptions.js";
@@ -15,18 +15,18 @@ describe("Test Directory Service", () => {
   });
 
   test("path", () => {
-    const dir = new Directory(adapter, "./test/data");
-    expect(dir.path).toBe("test/data");
+    const dir = new Directory(adapter, normalize("./test/data"));
+    expect(dir.path).toBe(normalize("test/data"));
   });
 
   test("relativePath", () => {
-    const dir = new Directory(adapter, "./test/");
-    const dir2 = new Directory(adapter, "./test/data");
+    const dir = new Directory(adapter, normalize("./test/"));
+    const dir2 = new Directory(adapter, normalize("./test/data"));
     expect(dir.relativePath(dir2)).toBe("data");
   });
 
   test("exists", async () => {
-    adapter.mkdir("test/data");
+    adapter.mkdir(normalize("test/data"));
     const dir = new Directory(adapter, "./test/data/");
     const exists = await dir.exists();
     expect(exists).toBeTruthy();
@@ -41,18 +41,18 @@ describe("Test Directory Service", () => {
   test("parent", () => {
     const dir = new Directory(adapter, "./test/data");
     expect(dir.parent).toBeInstanceOf(Directory);
-    expect(dir.parent!.path).toBe("/test");
+    expect(dir.parent!.path).toBe(normalize("/test"));
   });
 
   test("parent of root", () => {
-    const root = new Directory(adapter, "/");
+    const root = new Directory(adapter, sep);
     expect(root.parent).toBe(undefined);
   });
 
   test("parent of first level after root", () => {
     const dir = new Directory(adapter, "/etc");
     expect(dir.parent).toBeDefined();
-    expect(dir.parent!.path).toBe("/");
+    expect(dir.parent!.path).toBe(sep);
   });
 
   test.each([
@@ -67,7 +67,7 @@ describe("Test Directory Service", () => {
   });
 
   test("get name of root", () => {
-    const root = new Directory(adapter, "/");
+    const root = new Directory(adapter, sep);
     expect(root.name).toBe("");
   });
 
@@ -92,7 +92,7 @@ describe("Test Directory Service", () => {
     });
 
     test("copyTo", async () => {
-      const basePath = adapterHelper.last!;
+      const basePath = normalize(adapterHelper.last!);
       const dir = new Directory(adapter, basePath, "loom");
       await dir.create();
       await adapterHelper.createDirectory(joinPath(basePath, "loom/cotton"));
@@ -194,7 +194,7 @@ describe("Test Directory Service", () => {
     describe("files method", () => {
       test("files test returned amount", async () => {
         await adapterHelper.createMultipleDirectories();
-        await adapterHelper.createFile("dorem/tt.txt", "lorem-dorem");
+        await adapterHelper.createFile(normalize("dorem/tt.txt"), "lorem-dorem");
         await adapterHelper.createFile("tt2.txt", "lorem");
 
         const dir = new Directory(adapter, "/");
@@ -210,12 +210,12 @@ describe("Test Directory Service", () => {
 
       test("get files recursive", async () => {
         await adapterHelper.createMultipleDirectories();
-        await adapterHelper.createFile("dorem/tt.txt", "lorem");
+        await adapterHelper.createFile(normalize("dorem/tt.txt"), "lorem");
         await adapterHelper.createFile(
-          "random/path/to/cotton/coding/lorem.txt",
+          normalize("random/path/to/cotton/coding/lorem.txt"),
           "lorem",
         );
-        await adapterHelper.createFile("more/lorem.txt", "lorem");
+        await adapterHelper.createFile(normalize("more/lorem.txt"), "lorem");
 
         const dir = new Directory(adapter, "/");
 
@@ -233,9 +233,9 @@ describe("Test Directory Service", () => {
   describe("test symbols", () => {
     test("toPrimitive", () => {
       const dir = new Directory(adapter, "/test/data");
-      expect(`${dir}`).toBe("/test/data");
-      expect(dir + "").toBe("/test/data");
-      expect(String(dir)).toBe("/test/data");
+      expect(`${dir}`).toBe(normalize("/test/data"));
+      expect(dir + "").toBe(normalize("/test/data"));
+      expect(String(dir)).toBe(normalize("/test/data"));
       expect(+dir).toBeNaN();
     });
 

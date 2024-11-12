@@ -9,13 +9,10 @@ import {
   DirectoryNotEmptyException,
   PathNotFoundException,
 } from "@loom-io/core";
-import { removePrecedingSlash } from "@loom-io/common";
-import { join } from "path";
+import { removePrecedingSlash, addTailingSlash } from "@loom-io/common";
+import { join, normalize } from "node:path";
 import { S3Error } from "minio/dist/esm/errors.mjs";
 
-function addTailSlash(path: string): string {
-  return path.endsWith("/") ? path : `${path}/`;
-}
 
 type AdapterStat = {
   size: number;
@@ -28,7 +25,7 @@ export class Adapter implements SourceAdapter<AdapterStat> {
     protected bucket: string,
   ) {}
   async deleteFile(path: string): Promise<void> {
-    await this.s3.removeObject(this.bucket, path);
+    await this.s3.removeObject(this.bucket, this.translatePath(path));
   }
 
   get raw() {
@@ -39,7 +36,17 @@ export class Adapter implements SourceAdapter<AdapterStat> {
     return this.bucket;
   }
 
+  protected translatePath(path: string) {
+    if(path.match(/[A-Za-z]{1}:/)) {
+      return path.slice(2).replaceAll('\\', '/');
+    } else if (path.includes('\\')) {
+      return path.replaceAll('\\', '/');
+    }
+    return path;
+  }
+
   protected async exists(path: string): Promise<boolean> {
+    
     const bucketStream = this.s3.listObjectsV2(this.bucket, path);
     return new Promise((resolve, reject) => {
       bucketStream.on("data", () => {
@@ -56,19 +63,19 @@ export class Adapter implements SourceAdapter<AdapterStat> {
   }
 
   async fileExists(path: string): Promise<boolean> {
-    return this.exists(path);
+    return this.exists(this.translatePath(path));
   }
 
   async dirExists(path: string): Promise<boolean> {
-    const pathWithTailSlash = addTailSlash(path);
-    if (path === "/") {
+    const pathWithTailSlash = this.translatePath(addTailingSlash(path));
+    if (pathWithTailSlash === "/") {
       return true;
     }
     return this.exists(pathWithTailSlash);
   }
 
   async mkdir(path: string): Promise<void> {
-    const pathWithTailSlash = removePrecedingSlash(addTailSlash(path));
+    const pathWithTailSlash = this.translatePath(removePrecedingSlash(addTailingSlash(path)));
     if (pathWithTailSlash === "") {
       return;
     }
@@ -76,15 +83,15 @@ export class Adapter implements SourceAdapter<AdapterStat> {
   }
 
   protected async rmdirRecursive(bucket: string, path: string): Promise<void> {
-    path = removePrecedingSlash(addTailSlash(path));
-    const objects = await this.s3.listObjectsV2(bucket, path, true);
+    const pathWithTailSlash = this.translatePath(removePrecedingSlash(addTailingSlash(path)));
+    const objects = await this.s3.listObjectsV2(bucket, pathWithTailSlash, true);
     for await (const obj of objects) {
       await this.s3.removeObject(bucket, obj.name);
     }
   }
 
   protected async rmdirForce(path: string): Promise<void> {
-    const pathWithTailSlash = removePrecedingSlash(addTailSlash(path));
+    const pathWithTailSlash = this.translatePath(removePrecedingSlash(addTailingSlash(path)));
     if (pathWithTailSlash === "") {
       await this.rmdirRecursive(this.bucket, pathWithTailSlash);
       return;
@@ -95,6 +102,7 @@ export class Adapter implements SourceAdapter<AdapterStat> {
   }
 
   protected async dirHasFiles(path: string): Promise<boolean> {
+    path = this.translatePath(path);
     const pathWithTailSlash = path.endsWith("/") ? path : `${path}/`;
     const bucketStream = await this.s3.listObjectsV2(
       this.bucket,
@@ -117,8 +125,25 @@ export class Adapter implements SourceAdapter<AdapterStat> {
     });
   }
 
+  async rmdir(path: string, options: rmdirOptions = {}): Promise<void> {
+    if (options.force) {
+      await this.rmdirForce(path);
+      return;
+    } else if (options.recursive) {
+      await this.rmdirRecursive(this.bucket, path);
+      return;
+    } else {
+      path = this.translatePath(path);
+      if (await this.dirHasFiles(path)) {
+        throw new DirectoryNotEmptyException(path);
+      }
+      const pathWithTailSlash = path.endsWith("/") ? path : `${path}/`;
+      await this.s3.removeObject(this.bucket, pathWithTailSlash);
+    }
+  }
+
   async readdir(path: string): Promise<ObjectDirentInterface[]> {
-    const pathWithTailSlash = removePrecedingSlash(addTailSlash(path));
+    const pathWithTailSlash = this.translatePath(removePrecedingSlash(addTailingSlash(path)));
     const bucketStream = await this.s3.listObjectsV2(
       this.bucket,
       pathWithTailSlash,
@@ -144,25 +169,9 @@ export class Adapter implements SourceAdapter<AdapterStat> {
       });
     });
   }
-
-  async rmdir(path: string, options: rmdirOptions = {}): Promise<void> {
-    if (options.force) {
-      await this.rmdirForce(path);
-      return;
-    } else if (options.recursive) {
-      await this.rmdirRecursive(this.bucket, path);
-      return;
-    } else {
-      if (await this.dirHasFiles(path)) {
-        throw new DirectoryNotEmptyException(path);
-      }
-      const pathWithTailSlash = path.endsWith("/") ? path : `${path}/`;
-      await this.s3.removeObject(this.bucket, pathWithTailSlash);
-    }
-  }
-
+  
   async stat(path: string) {
-    const stat = await this.s3.statObject(this.bucket, path);
+    const stat = await this.s3.statObject(this.bucket, this.translatePath(path));
     return {
       size: stat.size,
       mtime: stat.lastModified,
@@ -175,7 +184,7 @@ export class Adapter implements SourceAdapter<AdapterStat> {
     path: string,
     encoding?: BufferEncoding,
   ): Promise<Buffer | string> {
-    const stream = await this.s3.getObject(this.bucket, path);
+    const stream = await this.s3.getObject(this.bucket, this.translatePath(path));
     return new Promise((resolve, reject) => {
       const buffers: Buffer[] = [];
       stream.on("data", (data) => {
@@ -195,14 +204,14 @@ export class Adapter implements SourceAdapter<AdapterStat> {
 
   async writeFile(path: string, data: Buffer | string): Promise<void> {
     const buffer = Buffer.from(data);
-    await this.s3.putObject(this.bucket, path, buffer, buffer.length, {
+    await this.s3.putObject(this.bucket, this.translatePath(path), buffer, buffer.length, {
       "Content-Type": "text/plain",
     });
     return;
   }
 
   async openFile(path: string): Promise<FileHandler> {
-    return new FileHandler(this, this.bucket, path);
+    return new FileHandler(this, this.bucket, this.translatePath(path));
   }
 
   async isCopyable(adapter: SourceAdapter): Promise<boolean> {
@@ -217,15 +226,15 @@ export class Adapter implements SourceAdapter<AdapterStat> {
       const conds = new CopyConditions();
       await this.s3.copyObject(
         this.bucket,
-        dest,
-        join(this.bucket, src),
+        this.translatePath(dest),
+        this.translatePath(join(this.bucket, src)),
         conds,
       );
     } catch (err) {
       if (err instanceof S3Error) {
         if (err.code === "NoSuchKey") {
           // @ts-expect-error property code does not exist on S3Error
-          throw new PathNotFoundException(err.key);
+          throw new PathNotFoundException(normalize(err.key));
         }
 
         throw err;

@@ -1,3 +1,4 @@
+import { normalize, sep } from 'node:path';
 import { MemoryDirectory, MEMORY_TYPE, MemoryRoot, MemoryObject, MemoryFile } from '../definitions.js';
 import { AlreadyExistsException, NotFoundException } from '../exceptions.js';
 import { Adapter } from './adapter.js';
@@ -157,7 +158,7 @@ describe('Memory Adapter internal functions', async () => {
     const path = 'test/some/cotton/coding/file.txt';
     const file = adapter.createObject(path, MEMORY_TYPE.FILE);
     expect(adapter._storage.content.length).toBe(1);
-    const parts = path.split('/');
+    const parts = path.split(sep);
     const fileName = parts.pop();
     let ref: MemoryDirectory | MemoryRoot = adapter._storage;
     for(const part of parts) {
@@ -208,7 +209,7 @@ describe('Memory Adapter internal functions', async () => {
     adapter.setTestStorage();
     const dir = adapter.getLastPartOfPath('test', MEMORY_TYPE.DIRECTORY);
     expect(dir).toBe(adapter._storage.content[0]);
-    const file = adapter.getLastPartOfPath('test/file.txt', MEMORY_TYPE.FILE);
+    const file = adapter.getLastPartOfPath(normalize('test/file.txt'), MEMORY_TYPE.FILE);
     expect(file).toBe(adapter._storage.content[0].content[0]);
   });
 
@@ -216,29 +217,29 @@ describe('Memory Adapter internal functions', async () => {
     adapter.setTestStorage();
     const dir = adapter.getLastPartOfPath('cotton-coding', MEMORY_TYPE.DIRECTORY);
     expect(dir).toBe(adapter._storage.content[1]);
-    const file = adapter.getLastPartOfPath('cotton-coding/sub-dir', MEMORY_TYPE.DIRECTORY);
+    const file = adapter.getLastPartOfPath(normalize('cotton-coding/sub-dir'), MEMORY_TYPE.DIRECTORY);
     expect(file).toBe(adapter._storage.content[1].content[0]);
   });
 
   test('get last part of path (find empty dir)', () => {
     adapter.setTestStorage();
-    const dir = adapter.getLastPartOfPath('cotton-coding/empty-dir/', MEMORY_TYPE.DIRECTORY);
+    const dir = adapter.getLastPartOfPath(normalize('cotton-coding/empty-dir/'), MEMORY_TYPE.DIRECTORY);
     expect(dir).toBe(adapter._storage.content[1].content[1]);
   });
 
   test('get last part of path (not found with type)', () => {
     adapter.setTestStorage();
-    expect(() => adapter.getLastPartOfPath('cotton-coding/sub-dir', MEMORY_TYPE.FILE)).toThrow(NotFoundException);
+    expect(() => adapter.getLastPartOfPath(normalize('cotton-coding/sub-dir'), MEMORY_TYPE.FILE)).toThrow(NotFoundException);
   });
 
   test('get last part of path (not found)', () => {
     adapter.setTestStorage();
-    expect(() => adapter.getLastPartOfPath('/cotton-coding/sub-dir/file.txt')).toThrow(NotFoundException);
+    expect(() => adapter.getLastPartOfPath(normalize('/cotton-coding/sub-dir/file.txt'))).toThrow(NotFoundException);
   });
 
 
-  test('Crate object by filename with deep path and existing directories', () => {
-    const path = 'test/some/cotton/coding/file.txt';
+  test('Create object by filename with deep path and existing directories', () => {
+    const path = normalize('test/some/cotton/coding/file.txt');
     adapter.createObject(path, MEMORY_TYPE.FILE);
     expect(() => adapter.createObject(path, MEMORY_TYPE.FILE)).toThrow(AlreadyExistsException);
     expect(adapter._storage.content.length).toBe(1);

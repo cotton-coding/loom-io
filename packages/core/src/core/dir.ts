@@ -1,4 +1,4 @@
-import { join as joinPath, relative as relativePath} from 'node:path';
+import { join as joinPath, normalize, relative as relativePath, sep} from 'node:path';
 import { LoomFile } from './file.js';
 import { List } from './list.js';
 import { SourceAdapter } from '../definitions.js';
@@ -19,7 +19,7 @@ export class Directory {
   ) {
     this._path = joinPath(path, ...(paths || []));
     this._adapter = adapter;
-    this.isRoot = this._path === '' || this._path === '/';
+    this.isRoot = this._path === '' || this._path === sep;
   }
 
   strict(strictMode: boolean = true) {
@@ -36,15 +36,15 @@ export class Directory {
       return '';
     }
 
-    const split = removeTailingSlash(this.path).split('/');
+    const split = removeTailingSlash(this.path).split(sep);
     return split.pop()!;
   }
 
   get parent(): Directory | undefined {
     if(this.isRoot) return undefined;
-    const split = this.path.split('/');
+    const split = this.path.split(sep);
     split.pop();
-    return new Directory(this._adapter, `/${split.join('/')}`);
+    return new Directory(this._adapter, normalize(`/${split.join('/')}`));
   }
 
   get adapter() {
@@ -89,7 +89,7 @@ export class Directory {
   }
 
   subDir(name: string) {
-    return new Directory(this._adapter, this.path, name);
+    return new Directory(this._adapter, this.path, normalize(name));
   }
 
   async list(): Promise<List> {
@@ -109,7 +109,7 @@ export class Directory {
 
 
   file(name: string): LoomFile {
-    return new LoomFile(this._adapter, this, name);
+    return new LoomFile(this._adapter, this, normalize(name));
   }
 
   protected async filesRecursion(list: List): Promise<List<LoomFile>>{

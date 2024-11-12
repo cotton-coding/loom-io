@@ -6,6 +6,7 @@ import { Directory } from "./dir.js";
 import { FILE_SIZE_UNIT } from "../definitions.js";
 import { faker } from "@faker-js/faker";
 import { Editor } from "./editor.js";
+import { normalize } from "path";
 
 describe("Test File Service", () => {
   let testHelper: InMemoryAdapterHelper;
@@ -13,23 +14,23 @@ describe("Test File Service", () => {
 
   beforeEach(async () => {
     testHelper = await InMemoryAdapterHelper.init();
-    await testHelper.createDirectory("test/data");
+    await testHelper.createDirectory(normalize("test/data"));
     await testHelper.createFile(
-      "test/data/test.json",
+      normalize("test/data/test.json"),
       JSON.stringify({ test: true })
     );
     adapter = testHelper.adapter;
   });
 
   test("Create Instance and set path", () => {
-    const path = "test/data/test.txt";
+    const path = normalize("test/data/test.txt");
     const file = LoomFile.from(adapter, path);
     expect(file).toBeInstanceOf(LoomFile);
     expect(file.path).toBe(`${path}`);
   });
 
   test("Get file size", async () => {
-    const path = "test/data/test.txt";
+    const path = normalize("test/data/test.txt");
     const content = faker.lorem.words(10000);
     const testFilePath = testHelper.createFile(path, content);
     const file = LoomFile.from(adapter, testFilePath);
@@ -47,7 +48,7 @@ describe("Test File Service", () => {
   });
 
   test("Get file meta data", async () => {
-    const path = "test/data/test.txt";
+    const path = normalize("test/data/test.txt");
     const content = faker.lorem.words(10000);
     const testFilePath = testHelper.createFile(path, content);
     const file = LoomFile.from(adapter, testFilePath);
@@ -73,7 +74,7 @@ describe("Test File Service", () => {
   test("get parent or dir", () => {
     const file = LoomFile.from(adapter, "./test/data/test.json");
     expect(file.dir).instanceOf(Directory);
-    expect(file.dir.path).toBe("test/data");
+    expect(file.dir.path).toBe(normalize("test/data"));
     expect(file.dir).toBe(file.parent);
   });
 
@@ -122,7 +123,7 @@ describe("Test File Service", () => {
     test("Read text file", async () => {
       const contentToWrite = faker.lorem.words(1000);
       const testFile = testHelper.createFile(
-        "someTestFile/file.txt",
+        normalize("someTestFile/file.txt"),
         contentToWrite
       );
       const file = LoomFile.from(adapter, testFile);
@@ -204,9 +205,9 @@ describe("Test File Service", () => {
   describe("Test Symbol", () => {
     test("toPrimitive", () => {
       const file = LoomFile.from(adapter, "./test/data/test.json");
-      expect(`${file}`).toBe("test/data/test.json");
-      expect(file + "").toBe("test/data/test.json");
-      expect(String(file)).toBe("test/data/test.json");
+      expect(`${file}`).toBe(normalize("test/data/test.json"));
+      expect(file + "").toBe(normalize("test/data/test.json"));
+      expect(String(file)).toBe(normalize("test/data/test.json"));
       expect(+file).toBeNaN();
     });
 
