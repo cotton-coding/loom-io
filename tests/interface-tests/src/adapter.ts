@@ -441,7 +441,7 @@ export const TestAdapter = (
       expect(dirent.isFile()).toBe(true);
       expect(dirent.isDirectory()).toBe(false);
       expect(dirent.name).toBe(fileName);
-      const pathRef = path.match(/^([A-Za-z]:)?[\\/]/) ? path.slice(2) : path;
+      const pathRef = path.match(/^([A-Za-z]{1}:)[\\/]/) ? path.slice(2) : path;
       expect(dirent.path).toBe(pathRef.startsWith(sep) ? pathRef : normalize(`/${pathRef}`));
     });
 
