@@ -24,6 +24,7 @@
     }
   ],
   "devDependencies": {
+    "@changesets/cli": "^2.27.11",
     "@faker-js/faker": "^8.4.1",
     "@types/node": "^20.17.6",
     "@typescript-eslint/eslint-plugin": "latest",
