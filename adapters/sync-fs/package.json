@@ -1,0 +1,52 @@
+{
+  "name": "@loom-io/sync-fs",
+  "version": "0.12.11",
+  "main": "dist/exports/lib.js",
+  "types": "dist/exports/lib.d.ts",
+  "author": "Cotton Coding",
+  "description": "A file system wrapper for Node.js",
+  "keywords": [
+    "loom-io",
+    "fs",
+    "filesystem",
+    "node",
+    "bun",
+    "nodejs",
+    "adapter"
+  ],
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "scripts": {
+    "test": "vitest --typecheck.enabled --test-timeout=500",
+    "test:ci": "npm run test -- --run --coverage",
+    "lint": "eslint --ext .ts .",
+    "lint:fix": "eslint --ext .ts . --fix",
+    "build": "tsc --project tsconfig.json",
+    "prepublishOnly": "npm run build && publint"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^8.4.1"
+  },
+  "peerDependencies": {
+    "pipe-and-combine": "^0.7.10"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/exports/lib.d.ts",
+      "import": "./dist/exports/lib.js"
+    }
+  },
+  "maintainers": [
+    {
+      "name": "Wolfgang Rathgeb",
+      "email": "ghost+npm@dropanote.de"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/cotton-coding/loom-io.git"
+  },
+  "homepage": "https://loom-io.cotton-coding.com"
+}
