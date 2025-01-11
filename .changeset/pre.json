@@ -1,0 +1,19 @@
+{
+  "mode": "pre",
+  "tag": "beta",
+  "initialVersions": {
+    "@loom-io/fs-sync": "0.13.0",
+    "@loom-io/in-memory-adapter": "0.12.11",
+    "@loom-io/minio-s3-adapter": "0.12.11",
+    "@loom-io/node-filesystem-adapter": "0.12.11",
+    "@loom-io/converter": "0.12.11",
+    "@loom-io/common": "1.0.2",
+    "@loom-io/core": "0.12.11",
+    "@loom-io/front-matter-converter": "0.12.11",
+    "@loom-io/json-converter": "0.12.11",
+    "@loom-io/yaml-converter": "0.12.11",
+    "@loom-io/interface-tests": "0.12.11",
+    "@loom-io/test-utils": "0.12.11"
+  },
+  "changesets": []
+}

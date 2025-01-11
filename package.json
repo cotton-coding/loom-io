@@ -32,7 +32,9 @@
     "@vitest/coverage-v8": "^2.1.4",
     "publint": "^0.2.12",
     "typescript": "^5.6.3",
-    "vitest": "^2.1.4"
+    "vitest": "^2.1.4",
+    "eslint": "^9.16.0",
+		"eslint-config-prettier": "^9.1.0"
   },
   "repository": {
     "type": "git",
