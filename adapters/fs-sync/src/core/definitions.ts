@@ -7,29 +7,28 @@ export enum FTYPES {
   LISTITEM,
 }
 
-export interface Base {
+export interface EntityBase {
   $type: FTYPES;
-  base: string;
   path: string;
 }
 
-export interface ListItem extends Base {
+export interface ListItem extends EntityBase {
   $type: FTYPES.LISTITEM;
-  base: string;
   path: string;
   dirent: Dirent;
 }
 
-export interface File extends Base {
+export interface File extends EntityBase {
   $type: FTYPES.FILE;
-  base: string;
-  readAt?: Date;
-  content?: Buffer | string;
 }
 
-export interface Directory extends Base {
+export interface Content<T = undefined | BufferEncoding> extends File {
+  readAt: Date;
+  content: T extends BufferEncoding ? string : Buffer;
+}
+
+export interface Directory extends EntityBase {
   $type: FTYPES.DIRECTORY;
-  base: string;
 }
 
 export type Entity = File | Directory | ListItem;

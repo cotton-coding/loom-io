@@ -1,31 +1,18 @@
 import { readdirSync } from "node:fs";
-import type { Base, Directory, Entity, File, ListItem } from "./definitions.js";
+import type { Directory, Entity, File, ListItem } from "./definitions.js";
 import { FTYPES } from "./definitions.js";
-import { isDirectory, isFile, isListItem } from "./general.js";
+import { isDirectory, isFile, isListItem } from "./helper.js";
 import * as np from "path";
 
-export const list =
-  (recursive: boolean = false) =>
-  (dir: Directory): ListItem[] => {
-    return readdirSync(dir.path, { withFileTypes: true, recursive }).map(
-      (dirent) => ({
-        $type: FTYPES.LISTITEM,
-        base: dir.base,
-        path: dir.path,
-        dirent,
-      })
-    );
-  };
-
-export const listToNames =
+export const names =
   () =>
   (list: ListItem[]): string[] => {
     return list.map(({ dirent }) => dirent.name);
   };
 
-export const convertListItem =
+export const convert =
   () =>
-  (item: Entity): Exclude<Entity, ListItem> => {
+  (item: Entity): File | Directory => {
     if (!isListItem(item)) {
       return item;
     }
@@ -33,13 +20,11 @@ export const convertListItem =
     if (item.dirent.isDirectory()) {
       return {
         $type: FTYPES.DIRECTORY,
-        base: item.base,
         path: np.join(item.path, item.dirent.name),
       };
     } else {
       return {
         $type: FTYPES.FILE,
-        base: item.base,
         path: np.join(item.path, item.dirent.name),
       };
     }
@@ -49,7 +34,7 @@ export function only(type: FTYPES.FILE): (dir: Entity[]) => File[];
 export function only(type: FTYPES.DIRECTORY): (dir: Entity[]) => Directory[];
 export function only(type: FTYPES): (list: Entity[]) => (File | Directory)[] {
   return (list) => {
-    const convertedList = list.map(convertListItem());
+    const convertedList = list.map(convert());
     return convertedList.filter(({ $type }) => $type === type);
   };
 }
