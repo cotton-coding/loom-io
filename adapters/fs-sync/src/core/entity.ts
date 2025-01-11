@@ -150,6 +150,15 @@ export const copyFile = (dest: string | Directory | File) => {
   });
 };
 
+export const renameFile = (newName: string) =>
+  g((file: File) => {
+    const newPath = np.resolve(np.dirname(file.path), newName);
+    fs.renameSync(file.path, newPath);
+    return {
+      path: newPath,
+    };
+  });
+
 export const moveTo = (dest: string | File | Directory) => {
   const destPath = getPath(dest);
   return g((base: Directory | File) => {
